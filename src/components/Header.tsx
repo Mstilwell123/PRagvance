@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { NAV, SITE } from "@/lib/site";
@@ -12,14 +11,9 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-[color:var(--line)] bg-[color:rgba(0,0,0,0.82)] backdrop-blur-md">
       <div className="section-pad mx-auto flex max-w-6xl items-center justify-between gap-4 py-3">
         <Link href="/" className="flex items-center gap-3" aria-label="Pragvance home">
-          <Image
-            src="/logo-lockup.png"
-            alt="Pragvance — Practical AI. Built to advance your business."
-            width={160}
-            height={40}
-            className="h-8 w-auto object-contain object-left"
-            priority
-          />
+          <span className="text-sm font-semibold tracking-[0.12em] text-[color:var(--text)] md:text-base">
+            PRAGVANCE<span className="text-[color:var(--gold)]">.AI</span>
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
