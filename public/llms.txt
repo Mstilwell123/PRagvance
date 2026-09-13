@@ -1,0 +1,33 @@
+# Pragvance.ai
+
+> Practical AI. Built to advance your business.
+
+Pragvance helps you staff a Grok Bot department — roles, skills, tools, routines — and ships apps & SaaS when the work needs a product.
+
+## Site
+- Home: https://pragvance.ai/
+- Agent Swarm: https://pragvance.ai/swarm
+- Shadow Lab: https://pragvance.ai/shadow-lab
+- AI Reality Check: https://pragvance.ai/assessment
+- Apps & SaaS: https://pragvance.ai/apps
+- Contact: https://pragvance.ai/contact
+
+## Offers
+- Agent Swarm (primary): $99/mo on Skool — https://www.skool.com/the-swarm-2120
+  Weekly live training to build a Grok Bot agent team. Classroom stays on Skool.
+- Shadow Lab (upsell): $497 seat / $997 month — book via https://pragvance.ai/contact
+  Live high-touch seats. Not a second school on this site.
+- AI Reality Check: free readiness assessment at /assessment
+- Apps: portfolio including MinutesIntel.ai (https://minutesintel.ai); custom builds via contact
+
+## Contact
+- Email: support@pragvance.ai
+- Legal: PRAGVANCE LLC (Oregon, USA)
+
+## Do not confuse
+- Not a BI / market-data platform
+- Not hosting the Skool classroom on pragvance.ai
+- Public product name: MinutesIntel.ai (never MinutesIQ)
+
+## Optional later
+- Login / dashboard are private (noindex) — not listed here
