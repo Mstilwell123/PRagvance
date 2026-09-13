@@ -1,0 +1,22 @@
+import { p00 } from './c4-parts/p00';
+import { p01 } from './c4-parts/p01';
+import { p02 } from './c4-parts/p02';
+import { p03 } from './c4-parts/p03';
+import { p04 } from './c4-parts/p04';
+import { p05 } from './c4-parts/p05';
+import { p06 } from './c4-parts/p06';
+import { p07 } from './c4-parts/p07';
+import { p08 } from './c4-parts/p08';
+import { p09 } from './c4-parts/p09';
+import { p10 } from './c4-parts/p10';
+import { p11 } from './c4-parts/p11';
+import { p12 } from './c4-parts/p12';
+import { p13 } from './c4-parts/p13';
+import { p14 } from './c4-parts/p14';
+import { p15 } from './c4-parts/p15';
+import { p16 } from './c4-parts/p16';
+import { p17 } from './c4-parts/p17';
+import { p18 } from './c4-parts/p18';
+import { p19 } from './c4-parts/p19';
+
+export const c4 = p00 + p01 + p02 + p03 + p04 + p05 + p06 + p07 + p08 + p09 + p10 + p11 + p12 + p13 + p14 + p15 + p16 + p17 + p18 + p19;
