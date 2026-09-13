@@ -24,7 +24,7 @@ export default function HomePage() {
           <div className="section-pad mx-auto flex max-w-6xl flex-col gap-5 py-8 md:flex-row md:items-center md:justify-between md:py-10">
             <div className="max-w-2xl">
               <p className="text-xs font-medium uppercase tracking-[0.2em] text-[color:var(--electric-bright)]">
-                Pragvance.ai · Draft
+                Pragvance.ai
               </p>
               <h1 className="mt-2 text-2xl font-semibold leading-snug text-[color:var(--text)] md:text-3xl">
                 Practical AI. Built to advance your business.
