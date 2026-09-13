@@ -7,35 +7,38 @@ import { DESKS, SITE } from "@/lib/site";
 export default function HomePage() {
   return (
     <>
-      {/* HERO — single banner image; CTAs in a bar below so art does not collide with HTML copy */}
-      <section className="relative overflow-hidden bg-black" aria-label="Hero">
-        <div className="relative mx-auto w-full max-w-[1600px]">
+      {/* HERO — clean dark; no collage banner art */}
+      <section className="relative overflow-hidden bg-[color:var(--bg-void)]" aria-label="Hero">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 60% at 70% 40%, rgba(9,155,228,0.18), transparent 55%), radial-gradient(ellipse 50% 40% at 20% 80%, rgba(208,162,86,0.12), transparent 50%), linear-gradient(180deg, #000d1a 0%, #000000 100%)",
+          }}
+        />
+        <div className="section-pad relative z-10 mx-auto flex min-h-[78vh] max-w-6xl flex-col justify-center py-16 md:py-20">
           <Image
-            src="/hero-banner.png"
-            alt="Pragvance.ai — AI Education, Consulting, Strategy. Agent Swarm with Grok Bot."
-            width={1983}
-            height={793}
+            src="/logo-lockup.png"
+            alt="Pragvance"
+            width={220}
+            height={72}
             priority
-            className="h-auto w-full object-contain"
-            sizes="100vw"
+            className="mb-8 h-14 w-auto object-contain object-left md:h-16"
           />
-        </div>
-        <div className="relative z-10 border-t border-[color:var(--line)] bg-[color:rgba(0,0,0,0.92)]">
-          <div className="section-pad mx-auto flex max-w-6xl flex-col gap-5 py-8 md:flex-row md:items-center md:justify-between md:py-10">
-            <div className="max-w-2xl">
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-[color:var(--electric-bright)]">
-                Pragvance.ai · Draft
-              </p>
-              <h1 className="mt-2 text-2xl font-semibold leading-snug text-[color:var(--text)] md:text-3xl">
-                Practical AI. Built to advance your business.
-              </h1>
-              <p className="mt-2 text-sm text-[color:var(--text-muted)] md:text-base">
-                Staff a Grok Bot department — roles, skills, tools, and routines — so agents work
-                together on your real work.
-              </p>
-            </div>
-            <CtaButtons className="shrink-0" />
-          </div>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-[color:var(--electric-bright)]">
+            Pragvance.ai · Draft
+          </p>
+          <h1 className="mt-3 max-w-3xl text-4xl font-semibold leading-tight text-[color:var(--text)] md:text-5xl lg:text-6xl">
+            Practical AI. Built to advance your business.
+          </h1>
+          <p className="mt-5 max-w-2xl text-lg text-[color:var(--text-muted)] md:text-xl">
+            Staff a Grok Bot department — roles, skills, tools, and routines — so agents work
+            together on your real work. Not another chat prompt pack.
+          </p>
+          <CtaButtons className="mt-8" />
+          <p className="mt-4 text-sm text-[color:var(--text-muted)]">
+            Primary: Agent Swarm on Skool · Secondary: Shadow Lab via contact
+          </p>
         </div>
       </section>
 
