@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     "Grok Bot",
     "Agent Swarm",
     "Shadow Lab",
-    "AI Reality Check",
+    "AI Assessment",
     "AI apps",
     "Pragvance",
   ],
