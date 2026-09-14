@@ -63,7 +63,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-[color:var(--line)] py-4 text-center text-xs text-[color:var(--text-muted)]">
-        © {new Date().getFullYear()} {SITE.legal}. Draft marketing site — not production publish.
+        © {new Date().getFullYear()} {SITE.legal}.
       </div>
     </footer>
   );
