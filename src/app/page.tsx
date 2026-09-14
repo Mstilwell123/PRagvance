@@ -163,9 +163,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* REALITY CHECK */}
+      {/* AI ASSESSMENT */}
       <section
-        id="reality-check"
+        id="ai-assessment"
         className="border-t border-[color:var(--line)] bg-[color:var(--bg-space)]"
         aria-labelledby="rc-heading"
       >
@@ -176,17 +176,17 @@ export default function HomePage() {
                 id="rc-heading"
                 className="text-2xl font-semibold text-[color:var(--gold-bright)] md:text-3xl"
               >
-                AI Reality Check
+                AI Assessment
               </h2>
               <p className="mt-4 text-[color:var(--text-muted)]">
-                A free readiness pass — six quick questions — so you see where agents help and
-                where they don’t, before you invest.
+                A free 25-question diagnostic (0–75) so you see where agents help and where they
+                don’t — before you invest.
               </p>
               <Link
                 href="/assessment"
                 className="mt-6 inline-flex rounded-full bg-[color:var(--gold)] px-6 py-3 text-sm font-semibold text-black hover:bg-[color:var(--gold-bright)]"
               >
-                Take the Reality Check
+                Take the AI Assessment
               </Link>
             </div>
             <div className="panel p-6">
