@@ -1,1 +1,2 @@
-@file:///tmp/hero-part-0.ts
+// Leftover probe stub — empty module so production `tsc` passes.
+export {};
