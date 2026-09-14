@@ -15,7 +15,7 @@ export const NAV = [
   { href: "/", label: "Home" },
   { href: "/swarm", label: "Agent Swarm" },
   { href: "/shadow-lab", label: "Shadow Lab" },
-  { href: "/assessment", label: "Reality Check" },
+  { href: "/assessment", label: "AI Assessment" },
   { href: "/apps", label: "Apps" },
   { href: "/contact", label: "Contact" },
 ] as const;
@@ -34,8 +34,8 @@ export const FAQ = [
     a: "The Swarm is the self-paced / weekly classroom track on Skool. Shadow Lab is live high-touch seats ($497 seat / $997 month) for founders who want closer coaching. Lab is an upsell, not a second school on this site.",
   },
   {
-    q: "What is the AI Reality Check?",
-    a: "A free readiness assessment that helps you see where AI can actually help your business — and where it cannot — before you invest in agents, training, or a build.",
+    q: "What is the AI Assessment?",
+    a: "A free 25-question diagnostic (0–75) that bands how your company uses AI — from chat toys to an operating layer — and points to Agent Swarm or Shadow Lab. It replaces the old Reality Check.",
   },
   {
     q: "Do you build custom AI apps?",
