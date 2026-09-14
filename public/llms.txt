@@ -8,16 +8,16 @@ Pragvance helps you staff a Grok Bot department — roles, skills, tools, routin
 - Home: https://pragvance.ai/
 - Agent Swarm: https://pragvance.ai/swarm
 - Shadow Lab: https://pragvance.ai/shadow-lab
-- AI Reality Check: https://pragvance.ai/assessment
+- AI Assessment: https://pragvance.ai/assessment
 - Apps & SaaS: https://pragvance.ai/apps
 - Contact: https://pragvance.ai/contact
 
 ## Offers
-- Agent Swarm (primary): $99/mo on Skool — https://www.skool.com/the-swarm-2120
+- Agent Swarm (primary): $99/mo on Skool — https://www.skool.com/agentswarmbypragvance
   Weekly live training to build a Grok Bot agent team. Classroom stays on Skool.
 - Shadow Lab (upsell): $497 seat / $997 month — book via https://pragvance.ai/contact
   Live high-touch seats. Not a second school on this site.
-- AI Reality Check: free readiness assessment at /assessment
+- AI Assessment: free readiness assessment at /assessment
 - Apps: portfolio including MinutesIntel.ai (https://minutesintel.ai); custom builds via contact
 
 ## Contact
