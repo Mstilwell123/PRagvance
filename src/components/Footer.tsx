@@ -56,7 +56,7 @@ export default function Footer() {
             </li>
             <li>
               <Link href="/assessment" className="hover:text-[color:var(--electric-bright)]">
-                Free AI Reality Check
+                AI Assessment
               </Link>
             </li>
           </ul>
