@@ -50,8 +50,21 @@ export default function Footer() {
               </a>
             </li>
             <li>
-              <Link href="/shadow-lab" className="hover:text-[color:var(--electric-bright)]">
-                Shadow Lab — {SITE.labSeat} / {SITE.labMonth}
+              <Link href="/shadow-lab-group" className="hover:text-[color:var(--electric-bright)]">
+                Group Training — {SITE.labSeat}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/shadow-lab-monthly"
+                className="hover:text-[color:var(--electric-bright)]"
+              >
+                Lab Monthly — {SITE.labMonth}
+              </Link>
+            </li>
+            <li>
+              <Link href="/consulting" className="hover:text-[color:var(--electric-bright)]">
+                Consulting — {SITE.consultingPrice}/hr
               </Link>
             </li>
             <li>

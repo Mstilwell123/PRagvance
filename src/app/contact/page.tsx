@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
+import Link from "next/link";
 import { SITE } from "@/lib/site";
 
 export default function ContactPage() {
@@ -34,7 +35,15 @@ export default function ContactPage() {
         . {SITE.legal} · {SITE.location}.
       </p>
       <p className="mt-2 text-sm text-[color:var(--text-muted)]">
-        Book Shadow Lab ({SITE.labSeat} / {SITE.labMonth}) here — no invented Calendly on this draft.
+        Support and general questions only.{" "}
+        <Link href="/shadow-lab" className="text-[color:var(--electric-bright)] hover:underline">
+          Shadow Lab
+        </Link>{" "}
+        and{" "}
+        <Link href="/consulting" className="text-[color:var(--electric-bright)] hover:underline">
+          Consulting
+        </Link>{" "}
+        are pay-first on their pages — not booked here.
       </p>
 
       <form onSubmit={onSubmit} className="panel mt-10 space-y-4 p-6">
@@ -69,12 +78,14 @@ export default function ContactPage() {
             id="interest"
             name="interest"
             className="mt-1 w-full rounded-lg border border-[color:var(--line)] bg-[color:var(--bg-elevated)] px-3 py-2 text-[color:var(--text)]"
-            defaultValue="Shadow Lab"
+            defaultValue="General"
           >
-            <option>Shadow Lab</option>
-            <option>Agent Swarm</option>
-            <option>Custom app / SaaS</option>
             <option>General</option>
+            <option>Agent Swarm</option>
+            <option>Shadow Lab (question — not booking)</option>
+            <option>Consulting (question — not booking)</option>
+            <option>Custom app / SaaS</option>
+            <option>Other</option>
           </select>
         </div>
         <div>
@@ -87,7 +98,7 @@ export default function ContactPage() {
             rows={5}
             required
             className="mt-1 w-full rounded-lg border border-[color:var(--line)] bg-[color:var(--bg-elevated)] px-3 py-2 text-[color:var(--text)]"
-            placeholder="Tell us what you’re building…"
+            placeholder="How can we help?"
           />
         </div>
         <button
