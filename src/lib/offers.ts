@@ -20,6 +20,8 @@ export type Offer = {
   durationMin: number;
   calendlyKind: CalendlyKind;
   priceEnvKey: string;
+  /** Public CTA path for cancel_url (ROUTE LOCK flat slugs). */
+  cancelPath: string;
 };
 
 export const OFFERS: Record<OfferId, Offer> = {
@@ -31,6 +33,7 @@ export const OFFERS: Record<OfferId, Offer> = {
     durationMin: 120,
     calendlyKind: "group",
     priceEnvKey: "STRIPE_PRICE_SHADOW_LAB_GROUP",
+    cancelPath: "/shadow-lab-group",
   },
   shadow_lab_monthly: {
     id: "shadow_lab_monthly",
@@ -40,6 +43,7 @@ export const OFFERS: Record<OfferId, Offer> = {
     durationMin: 60,
     calendlyKind: "one_on_one",
     priceEnvKey: "STRIPE_PRICE_SHADOW_LAB_MONTHLY",
+    cancelPath: "/shadow-lab-monthly",
   },
   consulting_1hr: {
     id: "consulting_1hr",
@@ -49,6 +53,7 @@ export const OFFERS: Record<OfferId, Offer> = {
     durationMin: 60,
     calendlyKind: "one_on_one",
     priceEnvKey: "STRIPE_PRICE_CONSULTING",
+    cancelPath: "/consulting",
   },
 } as const;
 

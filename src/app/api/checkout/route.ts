@@ -46,7 +46,8 @@ export async function POST(req: Request) {
   }
 
   const successUrl = `${siteUrl}/access/book?session_id={CHECKOUT_SESSION_ID}&offer=${offerId}`;
-  const cancelUrl = `${siteUrl}/access?canceled=1&offer=${offerId}`;
+  // ROUTE LOCK: cancel back to flat public CTA (not /access chooser)
+  const cancelUrl = `${siteUrl}${offer.cancelPath}?canceled=1`;
 
   try {
     const session = await stripe.checkout.sessions.create({

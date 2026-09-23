@@ -1,6 +1,16 @@
 # Pay-first access (Stripe Checkout → Calendly gate)
 
-Scaffold for Pragvance pay-first booking. Marketing pages (`/shadow-lab`, consulting UI) stay owned by Webster — this work does **not** flip live CTAs.
+Scaffold for Pragvance pay-first booking. Public CTA pages are owned by Webster — this work does **not** flip live CTAs.
+
+## Public CTA routes (ROUTE LOCK)
+
+| Path | `offer_id` |
+|---|---|
+| `/shadow-lab-group` | `shadow_lab_group` |
+| `/shadow-lab-monthly` | `shadow_lab_monthly` |
+| `/consulting` | `consulting_1hr` |
+
+Drop `/access` as a public chooser. Keep `/access/book` as the post-pay gate only. Retire nested `/shadow-lab/group` and `/shadow-lab/monthly`.
 
 ## Locked offers
 
@@ -16,14 +26,15 @@ Amounts live in `src/lib/offers.ts` for documentation. Checkout charges via **st
 
 1. **Do not** create Stripe Products or Prices via API or Dashboard from this scaffold. Stub `price_…` IDs in `.env` only; replace when ready.
 2. **Do not** invent Calendly URLs in code. Use `CALENDLY_EVENT_URI_*` / `CALENDLY_URL_*` env stubs.
-3. **Do not** redesign `/shadow-lab` or flip marketing CTAs.
+3. **Do not** redesign the three public CTA pages or flip marketing CTAs until greenlit.
 4. **Stripe Tax OFF** — Checkout sets `automatic_tax: { enabled: false }`. Confirmation-from stub: `CONFIRM_FROM_EMAIL=support@pragvance.ai`.
 
 ## URL contract
 
 - **success_url:** `${NEXT_PUBLIC_SITE_URL}/access/book?session_id={CHECKOUT_SESSION_ID}&offer={offer_id}`  
   (`{CHECKOUT_SESSION_ID}` is the Stripe literal placeholder.)
-- **cancel_url:** `${NEXT_PUBLIC_SITE_URL}/access?canceled=1&offer={offer_id}`
+- **cancel_url:** `${NEXT_PUBLIC_SITE_URL}{cancelPath}?canceled=1`  
+  (`/shadow-lab-group`, `/shadow-lab-monthly`, or `/consulting` — not `/access`)
 
 ## Flow
 
@@ -60,4 +71,4 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 - `src/app/api/checkout/route.ts`
 - `src/app/api/webhooks/stripe/route.ts`
 - `src/app/access/book/page.tsx` — paid gate
-- `src/app/access/page.tsx` — cancel stub
+- `src/app/access/page.tsx` — non-public stub only (not a chooser); cancel returns to CTA slugs

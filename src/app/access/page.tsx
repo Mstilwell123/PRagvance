@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { isOfferId } from "@/lib/offers";
+import { OFFERS, isOfferId } from "@/lib/offers";
 
 export const metadata: Metadata = {
   title: "Access",
@@ -13,7 +13,9 @@ type SearchParams = Promise<{
 }>;
 
 /**
- * Cancel / access stub. Marketing CTAs on /shadow-lab stay untouched (Webster).
+ * Non-public stub only (ROUTE LOCK). Not a public offer chooser.
+ * Cancel returns to flat CTA slugs via Checkout cancel_url.
+ * Keep /access/book as the post-pay gate.
  */
 export default async function AccessPage({
   searchParams,
@@ -24,6 +26,8 @@ export default async function AccessPage({
   const canceled = params.canceled === "1";
   const offer = params.offer?.trim() || "";
   const offerLabel = isOfferId(offer) ? offer : null;
+  const cancelPath =
+    offerLabel && isOfferId(offerLabel) ? OFFERS[offerLabel].cancelPath : null;
 
   return (
     <section className="section-pad mx-auto max-w-xl py-16 md:py-24">
@@ -31,7 +35,7 @@ export default async function AccessPage({
         Access
       </p>
       <h1 className="mt-3 text-3xl font-semibold text-[color:var(--text)] md:text-4xl">
-        {canceled ? "Checkout canceled" : "Pay-first access"}
+        {canceled ? "Checkout canceled" : "Not a public booking page"}
       </h1>
       <div className="mt-6 space-y-4 text-[color:var(--text-muted)]">
         {canceled ? (
@@ -47,21 +51,43 @@ export default async function AccessPage({
           </p>
         ) : (
           <p>
-            After a successful payment, Stripe redirects to the booking gate
-            at <code className="text-sm">/access/book</code>. This page is the
-            cancel / status stub only — marketing pages are unchanged.
+            Public CTAs are{" "}
+            <code className="text-sm">/shadow-lab-group</code>,{" "}
+            <code className="text-sm">/shadow-lab-monthly</code>, and{" "}
+            <code className="text-sm">/consulting</code>. After pay, Stripe
+            redirects to <code className="text-sm">/access/book</code>. This
+            route is not an offer chooser.
           </p>
         )}
-        <p>
-          <Link href="/" className="text-[color:var(--electric-bright)] hover:underline">
-            Return home
-          </Link>
-          {" · "}
+        <p className="flex flex-wrap gap-x-3 gap-y-2">
+          {cancelPath ? (
+            <Link
+              href={cancelPath}
+              className="text-[color:var(--electric-bright)] hover:underline"
+            >
+              Back to offer
+            </Link>
+          ) : null}
           <Link
-            href="/shadow-lab"
+            href="/shadow-lab-group"
             className="text-[color:var(--electric-bright)] hover:underline"
           >
-            Shadow Lab (marketing)
+            Group
+          </Link>
+          <Link
+            href="/shadow-lab-monthly"
+            className="text-[color:var(--electric-bright)] hover:underline"
+          >
+            Monthly
+          </Link>
+          <Link
+            href="/consulting"
+            className="text-[color:var(--electric-bright)] hover:underline"
+          >
+            Consulting
+          </Link>
+          <Link href="/" className="text-[color:var(--electric-bright)] hover:underline">
+            Home
           </Link>
         </p>
       </div>
