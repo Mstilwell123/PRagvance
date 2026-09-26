@@ -19,15 +19,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: "Pragvance — Practical AI for Business | Agent Swarm & Grok Bot Department",
+    default: "Pragvance — Practical AI for Business | AI Workforce & Grok Bot Department",
     template: "%s | Pragvance",
   },
   description:
-    "Staff a Grok Bot department — roles, skills, tools, routines. Join the Agent Swarm ($99/mo) or book Shadow Lab. Practical AI built to advance your business.",
+    "Staff a Grok Bot department — roles, skills, tools, routines. Join AI Workforce ($99/mo) or book Shadow Lab. Practical AI built to advance your business.",
   keywords: [
     "Practical AI",
     "Grok Bot",
-    "Agent Swarm",
+    "AI Workforce",
     "Shadow Lab",
     "AI Assessment",
     "AI apps",

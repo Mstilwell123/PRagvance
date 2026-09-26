@@ -26,16 +26,16 @@ export const FAQ = [
     a: "Pragvance helps you staff a Grok Bot department — roles, skills, tools, and routines — and ships apps & SaaS when the work needs a product. Practical AI built to advance your business.",
   },
   {
-    q: "What is the Agent Swarm?",
-    a: "The Swarm is weekly live training on Skool ($99/mo) to build a Grok Bot agent team for your business — from your first bot to roles and agents that work together. Classroom + community stay on Skool; we teach, you build on your real work.",
+    q: "What is AI Workforce?",
+    a: "AI Workforce is weekly live training on Skool ($99/mo) to build a Grok Bot agent team for your business — from your first bot to roles and agents that work together. Classroom + community stay on Skool; we teach, you build on your real work.",
   },
   {
-    q: "How is Shadow Lab different from The Swarm?",
-    a: "The Swarm is the self-paced / weekly classroom track on Skool. Shadow Lab is live high-touch seats ($497 seat / $997 month) for founders who want closer coaching. Lab is an upsell, not a second school on this site.",
+    q: "How is Shadow Lab different from AI Workforce?",
+    a: "AI Workforce is the self-paced / weekly classroom track on Skool. Shadow Lab is live high-touch seats ($497 seat / $997 month) for founders who want closer coaching. Lab is an upsell, not a second school on this site.",
   },
   {
     q: "What is the AI Assessment?",
-    a: "A free 25-question diagnostic (0–75) that bands how your company uses AI — from chat toys to an operating layer — and points to Agent Swarm or Shadow Lab. It replaces the old Reality Check.",
+    a: "A free 25-question diagnostic (0–75) that bands how your company uses AI — from chat toys to an operating layer — and points to AI Workforce or Shadow Lab. It replaces the old Reality Check.",
   },
   {
     q: "Do you build custom AI apps?",

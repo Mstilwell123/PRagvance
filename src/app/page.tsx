@@ -13,7 +13,7 @@ export default function HomePage() {
         <div className="relative mx-auto w-full max-w-[1600px]">
           <Image
             src={heroBannerSrc}
-            alt="Pragvance.ai — AI Education, Consulting, Strategy. Agent Swarm with Grok Bot."
+            alt="Pragvance.ai — AI Education, Consulting, Strategy. AI Workforce with Grok Bot."
             width={1983}
             height={793}
             priority
@@ -107,7 +107,7 @@ export default function HomePage() {
             <article className="panel gold-glow flex flex-col p-6 md:p-8">
               <p className="text-xs uppercase tracking-wider text-[color:var(--gold)]">Primary</p>
               <h3 className="mt-2 text-2xl font-semibold text-[color:var(--text)]">
-                The Agent Swarm
+                AI Workforce
               </h3>
               <p className="mt-1 text-3xl font-semibold text-[color:var(--gold-bright)]">
                 {SITE.swarmPrice}
@@ -123,13 +123,13 @@ export default function HomePage() {
                 rel="noopener noreferrer"
                 className="mt-8 inline-flex items-center justify-center rounded-full bg-[color:var(--gold)] px-6 py-3 text-sm font-semibold text-black transition hover:bg-[color:var(--gold-bright)]"
               >
-                Join Agent Swarm — {SITE.swarmPrice}
+                Join AI Workforce — {SITE.swarmPrice}
               </a>
               <Link
                 href="/swarm"
                 className="mt-3 text-center text-sm text-[color:var(--electric-bright)] hover:underline"
               >
-                Learn more about The Swarm
+                Learn more about AI Workforce
               </Link>
             </article>
 
@@ -143,7 +143,7 @@ export default function HomePage() {
               </p>
               <ul className="mt-4 space-y-2 text-sm text-[color:var(--text-muted)]">
                 <li>Live high-touch seats for founders who want closer coaching.</li>
-                <li>Separate from The Swarm Skool classroom track.</li>
+                <li>Separate from the AI Workforce classroom track on Skool.</li>
                 <li>Book via contact — no invented booking link.</li>
               </ul>
               <Link

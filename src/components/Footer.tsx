@@ -46,7 +46,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="hover:text-[color:var(--electric-bright)]"
               >
-                Agent Swarm — {SITE.swarmPrice}
+                AI Workforce — {SITE.swarmPrice}
               </a>
             </li>
             <li>
