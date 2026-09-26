@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Image from "next/image";
 import BreadcrumbJsonLd from "@/components/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
@@ -50,17 +50,36 @@ export default function AppsPage() {
               minutesintel.ai →
             </a>
           </article>
-          <article className="panel p-6">
-            <h2 className="text-xl font-semibold text-[color:var(--text)]">Custom build</h2>
+          <article className="panel gold-glow p-6">
+            <a
+              href="https://www.appnsaasbuilder.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block overflow-hidden rounded-lg border border-white/10"
+            >
+              <Image
+                src="/appnsaasbuilder.webp"
+                alt="App N SaaS Builder home page: know exactly how close each app is to shipping"
+                width={1440}
+                height={810}
+                className="h-auto w-full"
+              />
+            </a>
+            <h2 className="mt-4 text-xl font-semibold text-[color:var(--gold-bright)]">
+              App N SaaS Builder
+            </h2>
             <p className="mt-2 text-sm text-[color:var(--text-muted)]">
-              Need a product, not only agents? Start a build conversation.
+              Live app. Reviews your apps through read-only GitHub access, scores verified
+              completion, and tells you the next required work.
             </p>
-            <Link
-              href="/contact#contact"
+            <a
+              href="https://www.appnsaasbuilder.com/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="mt-4 inline-block text-sm text-[color:var(--electric-bright)] hover:underline"
             >
-              Talk about your next app →
-            </Link>
+              appnsaasbuilder.com →
+            </a>
           </article>
         </div>
       </section>
