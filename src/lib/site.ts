@@ -13,7 +13,7 @@ export const SITE = {
 
 export const NAV = [
   { href: "/", label: "Home" },
-  { href: "/swarm", label: "Agent Swarm" },
+  { href: "/swarm", label: "AI Workforce" },
   { href: "/shadow-lab", label: "Shadow Lab" },
   { href: "/assessment", label: "AI Assessment" },
   { href: "/apps", label: "Apps" },
