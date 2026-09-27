@@ -11,7 +11,7 @@ export default function HomePage() {
       <section className="relative overflow-hidden bg-black" aria-label="Hero">
         <div className="relative mx-auto w-full max-w-[1600px]">
           <Image
-            src="/hero-ai-workforce.jpg"
+            src="/hero-ai-workforce-v2.jpg"
             alt="Pragvance.ai — AI Education, Consulting, Strategy. AI Workforce with Grok Bot."
             width={1984}
             height={793}
