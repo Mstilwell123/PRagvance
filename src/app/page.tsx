@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { heroBannerSrc } from "@/assets/hero-banner-data";
 import Link from "next/link";
 import CtaButtons from "@/components/CtaButtons";
 import Faq from "@/components/Faq";
@@ -12,9 +11,9 @@ export default function HomePage() {
       <section className="relative overflow-hidden bg-black" aria-label="Hero">
         <div className="relative mx-auto w-full max-w-[1600px]">
           <Image
-            src={heroBannerSrc}
+            src="/hero-ai-workforce.jpg"
             alt="Pragvance.ai — AI Education, Consulting, Strategy. AI Workforce with Grok Bot."
-            width={1983}
+            width={1984}
             height={793}
             priority
             unoptimized
