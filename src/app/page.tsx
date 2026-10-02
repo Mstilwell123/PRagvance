@@ -117,7 +117,7 @@ export default function HomePage() {
                 <li>Classroom + community on Skool. We teach; you build on your real work.</li>
               </ul>
               <a
-                href={SITE.swarmUrl}
+                href={SITE.skoolUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-8 inline-flex items-center justify-center rounded-full bg-[color:var(--gold)] px-6 py-3 text-sm font-semibold text-black transition hover:bg-[color:var(--gold-bright)]"

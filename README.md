@@ -14,7 +14,7 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000).
 
 ## Locked offers
-- Agent Swarm: $99/mo → https://www.skool.com/the-swarm-2120
+- AI Workforce: $99/mo → https://www.skool.com/aiworkforcebypragvance
 - Shadow Lab: $497 seat / $997 month → /contact
 - Tagline: Practical AI. Built to advance your business.
 

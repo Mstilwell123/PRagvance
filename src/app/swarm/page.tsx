@@ -51,7 +51,7 @@ export default function SwarmPage() {
           </p>
         </div>
         <a
-          href={SITE.swarmUrl}
+          href={SITE.skoolUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-10 inline-flex rounded-full bg-[color:var(--gold)] px-6 py-3 text-sm font-semibold text-black hover:bg-[color:var(--gold-bright)] gold-glow"
