@@ -21,7 +21,7 @@ export default function CtaButtons({
       className={`flex ${stack ? "flex-col" : "flex-col sm:flex-row"} flex-wrap gap-3 ${className}`}
     >
       <a
-        href={SITE.swarmUrl}
+        href={SITE.skoolUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex items-center justify-center rounded-full bg-[color:var(--gold)] px-6 py-3 text-center text-sm font-semibold text-black transition hover:bg-[color:var(--gold-bright)] electric-ring gold-glow"
