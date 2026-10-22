@@ -9,7 +9,7 @@ import { useEffect, useRef } from "react";
  *   Observatory) orthographically projected onto the same disc; the texture scrolls in
  *   longitude while the lighting/limb glow is fixed, so the terminator and flare stay put.
  * Loop: fade canvas in over 1.5s, turn 180deg over 90s, fade back to the original over the
- * last 1.5s, repeat. prefers-reduced-motion: canvas never starts (still original frame).
+ * last 1.5s, repeat. prefers-reduced-motion: still turns, at half speed.
  */
 
 // Geometry from layout.json, in banner source pixels (1984x793).
@@ -19,7 +19,8 @@ const CX = 1997.9;
 const CY = 1651.8;
 const R = 1296.4;
 const TILT = (22 * Math.PI) / 180; // pole tilted toward viewer
-const CYCLE = 90; // seconds for 180deg
+const CYCLE_DEFAULT = 60; // seconds for 180deg
+const CYCLE_REDUCED = 120; // still moves (Mark wants motion) but slower when OS asks for reduced motion
 const FADE = 1.5; // seconds
 
 export default function HeroEarth() {
@@ -28,7 +29,7 @@ export default function HeroEarth() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const CYCLE = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? CYCLE_REDUCED : CYCLE_DEFAULT;
 
     let raf = 0;
     let stopped = false;
@@ -93,7 +94,7 @@ export default function HeroEarth() {
             vRow[k] = Math.min(TH - 1, Math.max(0, Math.floor((0.5 - lat / Math.PI) * TH))) * TW;
             const sun = Math.max(0, (dx * sx + dy * sy + z * sz) / sl);
             const limb = Math.pow(1 - z, 3);
-            lit[k] = 1.5 * (0.7 + 0.3 * z);
+            lit[k] = 3.2 * (0.75 + 0.25 * z);
             const glow = limb * (0.3 + 1.3 * sun) + 0.06 * sun;
             rimR[k] = 40 * glow;
             rimG[k] = 120 * glow;
@@ -140,7 +141,7 @@ export default function HeroEarth() {
           const L = lit[k];
           const q = k * 4;
           // Keep only the city lights (red channel is ~0 over the blue-tinted oceans), warm them.
-          const v = Math.max(0, tex[p] - 18) * L;
+          const v = Math.max(0, tex[p] - 10) * L;
           o[q] = 6 + v * 1.25 + rimR[k];
           o[q + 1] = 12 + v * 1.0 + rimG[k];
           o[q + 2] = 28 + v * 0.6 + rimB[k];
