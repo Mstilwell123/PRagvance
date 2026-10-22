@@ -1,35 +1,24 @@
-import Image from "next/image";
 import Link from "next/link";
 import CtaButtons from "@/components/CtaButtons";
 import Faq from "@/components/Faq";
+import HeroCarousel from "@/components/HeroCarousel";
 import { DESKS, SITE } from "@/lib/site";
 
 export default function HomePage() {
   return (
     <>
-      {/* HERO — Mark's collage is the ONLY hero image; no overlay art/copy on the artwork */}
-      <section className="relative overflow-hidden bg-black" aria-label="Hero">
-        <div className="relative mx-auto w-full max-w-[1600px]">
-          <Image
-            src="/hero-ai-workforce-v2.jpg"
-            alt="Pragvance.ai — AI Education, Consulting, Strategy. AI Workforce with Grok Bot."
-            width={1984}
-            height={793}
-            priority
-            unoptimized
-            className="h-auto w-full object-contain"
-            sizes="100vw"
-          />
-        </div>
+      {/* HERO — six-month AI Workforce carousel (components/HeroCarousel.tsx) */}
+      <section className="relative overflow-hidden bg-[#030b15]" aria-label="Hero">
+        <HeroCarousel />
         <div className="relative z-10 border-t border-[color:var(--line)] bg-black">
           <div className="section-pad mx-auto flex max-w-6xl flex-col gap-5 py-8 md:flex-row md:items-center md:justify-between md:py-10">
             <div className="max-w-2xl">
               <p className="text-xs font-medium uppercase tracking-[0.2em] text-[color:var(--electric-bright)]">
                 Pragvance.ai
               </p>
-              <h1 className="mt-2 text-2xl font-semibold leading-snug text-[color:var(--text)] md:text-3xl">
+              <h2 className="mt-2 text-2xl font-semibold leading-snug text-[color:var(--text)] md:text-3xl">
                 Practical AI. Built to advance your business.
-              </h1>
+              </h2>
               <p className="mt-2 text-sm text-[color:var(--text-muted)] md:text-base">
                 Staff a Grok Bot department — roles, skills, tools, and routines — so agents work
                 together on your real work.
