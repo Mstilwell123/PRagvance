@@ -10,16 +10,26 @@ export default function HomePage() {
       {/* HERO — Mark's collage is the ONLY hero image; no overlay art/copy on the artwork */}
       <section className="relative overflow-hidden bg-black" aria-label="Hero">
         <div className="relative mx-auto w-full max-w-[1600px]">
-          <Image
-            src="/hero-ai-workforce-v2.jpg"
-            alt="Pragvance.ai — AI Education, Consulting, Strategy. AI Workforce with Grok Bot."
-            width={1984}
-            height={793}
-            priority
-            unoptimized
-            className="h-auto w-full object-contain"
-            sizes="100vw"
-          />
+          {/* Banner split: background (no Earth) + Earth layer that slowly spins (see globals.css .hero-earth) */}
+          <div className="relative w-full overflow-hidden" style={{ aspectRatio: "1984 / 793" }}>
+            <Image
+              src="/hero-bg-no-earth.webp"
+              alt="Pragvance.ai — AI Education, Consulting, Strategy. AI Workforce with Grok Bot."
+              fill
+              priority
+              unoptimized
+              className="object-cover"
+              sizes="100vw"
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/hero-earth.webp"
+              alt=""
+              aria-hidden="true"
+              className="hero-earth pointer-events-none absolute max-w-none select-none"
+              style={{ left: "33.972%", top: "41.362%", width: "133.518%", height: "334.048%" }}
+            />
+          </div>
         </div>
         <div className="relative z-10 border-t border-[color:var(--line)] bg-black">
           <div className="section-pad mx-auto flex max-w-6xl flex-col gap-5 py-8 md:flex-row md:items-center md:justify-between md:py-10">
