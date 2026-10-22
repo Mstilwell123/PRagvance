@@ -9,13 +9,14 @@ const INTERVAL = 6500;
 
 const COURSES = [
   { title: "Build Your First AI Agent", description: "Get your first AI employee working and pick one real problem to solve.", src: "/hero-carousel/month-01.webp" },
-  { title: "Build Your AI Helpers", description: "Turn the problems you found into a small personal AI team doing real work for you.", src: "/hero-carousel/month-02.webp" },
-  { title: "Turn a Problem Into a Business", description: "Explore a problem worth solving, a likely customer, and a simple offer.", src: "/hero-carousel/month-03.webp" },
-  { title: "Find Your First Customers", description: "Move from building to real conversations and work toward your first paying customer.", src: "/hero-carousel/month-04.webp" },
-  { title: "Let AI Help Run the Business", description: "Let AI employees handle real business work, with you approving what matters.", src: "/hero-carousel/month-05.webp" },
-  { title: "Build Your AI Workforce", description: "Connect your separate helpers into one organized system and see what AI now handles for you.", src: "/hero-carousel/month-06.webp" },
+  { title: "Build Your AI Helpers", description: "Turn the problems you found into a small personal AI team doing real work for you.", src: "/hero-carousel/month-02.webp", stat: "Workers are interrupted every 2 minutes, 275 times a day.", source: "Microsoft Work Trend Index 2025" },
+  { title: "Turn a Problem Into a Business", description: "Explore a problem worth solving, a likely customer, and a simple offer.", src: "/hero-carousel/month-03.webp", stat: "The cost of GPT-3.5-level AI dropped over 280-fold in two years.", source: "Stanford AI Index 2025" },
+  { title: "Find Your First Customers", description: "Move from building to real conversations and work toward your first paying customer.", src: "/hero-carousel/month-04.webp", stat: "Frontier firms use AI for customer success 66% of the time vs. 44% globally.", source: "Microsoft Work Trend Index 2025" },
+  { title: "Let AI Help Run the Business", description: "Let AI employees handle real business work, with you approving what matters.", src: "/hero-carousel/month-05.webp", stat: "By 2028, at least 15% of day-to-day work decisions will be made autonomously by agentic AI.", source: "Gartner" },
+  { title: "Build Your AI Workforce", description: "Connect your separate helpers into one organized system and see what AI now handles for you.", src: "/hero-carousel/month-06.webp", stat: "78% of organizations used AI in 2024, up from 55% the year before.", source: "Stanford AI Index 2025" },
 ];
 const N = COURSES.length;
+type Course = { title: string; description: string; src: string; stat?: string; source?: string };
 
 export default function HeroCarousel() {
   const [current, setCurrent] = useState(0);
@@ -46,7 +47,7 @@ export default function HeroCarousel() {
     return () => window.clearInterval(id);
   }, [playing, hovered, focused, hidden, tick]);
 
-  const course = COURSES[current];
+  const course: Course = COURSES[current];
 
   return (
     <div className="pragvance-workforce-hero">
@@ -115,6 +116,15 @@ export default function HeroCarousel() {
             <button type="button" className="pwh-arrow pwh-prev" aria-label="Previous month" onClick={() => show(current - 1)}>‹</button>
             <button type="button" className="pwh-arrow pwh-next" aria-label="Next month" onClick={() => show(current + 1)}>›</button>
           </div>
+          <p className="pwh-stat" aria-live="polite">
+            {course.stat ? (
+              <>
+                {course.stat} <span className="pwh-src">Source: {course.source}</span>
+              </>
+            ) : (
+              "\u00a0"
+            )}
+          </p>
           <div className="pwh-controls">
             <div className="pwh-months" aria-label="Choose month">
               {COURSES.map((c, i) => (

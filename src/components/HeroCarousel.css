@@ -46,3 +46,6 @@
 .pragvance-workforce-hero .pwh-carousel{width:80%;margin:0 auto;border:2px solid #d6ac55b3}
 .pragvance-workforce-hero .pwh-stage{border-bottom:1px solid #d6ac5566}
 @media(max-width:760px){.pragvance-workforce-hero .pwh-carousel{width:100%;border-width:1px}}
+.pragvance-workforce-hero .pwh-stat{margin:0;padding:9px 20px;font-size:13px;line-height:1.45;color:#dfe7f1;background:#06111d;border-top:1px solid #d6ac5533;min-height:38px}
+.pragvance-workforce-hero .pwh-src{color:#c9a75a;font-size:11px;letter-spacing:.3px;white-space:nowrap}
+@media(max-width:760px){.pragvance-workforce-hero .pwh-stat{padding:8px 10px;font-size:12px}.pragvance-workforce-hero .pwh-src{white-space:normal}}
