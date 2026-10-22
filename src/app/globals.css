@@ -116,16 +116,3 @@ img {
   }
 }
 
-/* Hero Earth: one slow turn every 90s around its own center */
-@keyframes hero-earth-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-.hero-earth {
-  transform-origin: 50% 50%;
-  will-change: transform;
-  animation: hero-earth-spin 90s linear infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .hero-earth { animation: none; }
-}
