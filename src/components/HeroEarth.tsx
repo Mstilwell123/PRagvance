@@ -18,8 +18,12 @@ const SRC_H = 793;
 const CX = 1997.9;
 const CY = 1651.8;
 const R = 1296.4;
-const TILT = (22 * Math.PI) / 180; // pole tilted toward viewer
-const CYCLE_DEFAULT = 60; // seconds for 180deg
+const TILT = (-15 * Math.PI) / 180; // pole tipped slightly away so ~28-55N (the contiguous USA) fills the visible slice; north stays up
+// Sweep: visible slice is centred ~22deg W of the view meridian; texture longitude = view - shift.
+// Shift 38deg -> 108deg puts the US East Coast in view first and ends on the West Coast.
+const SHIFT_START = 38;
+const SWEEP = 70; // degrees per loop
+const CYCLE_DEFAULT = 60; // seconds per sweep
 const CYCLE_REDUCED = 120; // still moves (Mark wants motion) but slower when OS asks for reduced motion
 const FADE = 1.5; // seconds
 
@@ -132,7 +136,7 @@ export default function HeroEarth() {
         if (now - last < 33) return; // ~30fps is plenty for this speed
         last = now;
         const t = ((now - start) / 1000) % CYCLE;
-        const shift = (t / CYCLE) * (TW / 2); // 180deg over the cycle
+        const shift = ((SHIFT_START + (t / CYCLE) * SWEEP) / 360) * TW;
         for (let k = 0; k < n; k++) {
           if (!inside[k]) continue;
           let u = Math.floor(uBase[k] - shift) % TW;
@@ -142,9 +146,9 @@ export default function HeroEarth() {
           const q = k * 4;
           // Keep only the city lights (red channel is ~0 over the blue-tinted oceans), warm them.
           const v = Math.max(0, tex[p] - 10) * L;
-          o[q] = 6 + v * 1.25 + rimR[k];
-          o[q + 1] = 12 + v * 1.0 + rimG[k];
-          o[q + 2] = 28 + v * 0.6 + rimB[k];
+          o[q] = 1 + v * 1.25 + rimR[k];
+          o[q + 1] = 3 + v * 1.0 + rimG[k];
+          o[q + 2] = 9 + v * 0.6 + rimB[k];
           o[q + 3] = 255;
         }
         ctx.putImageData(out, 0, 0);
