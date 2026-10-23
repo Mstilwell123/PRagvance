@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import BreadcrumbJsonLd from "@/components/BreadcrumbJsonLd";
 import ShadowLabSwitch from "@/components/pricing/ShadowLabSwitch";
-import { PRICING, PRODUCTS } from "@/lib/pricing";
+import { PRICING } from "@/lib/pricing";
 import { SITE } from "@/lib/site";
 
 const DESC =
@@ -40,37 +40,6 @@ function Points({ items }: { items: string[] }) {
     </ul>
   );
 }
-
-const FAQ = [
-  {
-    q: "What is included in the AI Workforce?",
-    a: "AI Workforce is $99/month on Skool: weekly training, practical resources, and a community to help you build a GrokBot agent team for your own business. It teaches you to build; it does not include private consulting or custom build work.",
-  },
-  {
-    q: "How is Shadow Lab different?",
-    a: "Shadow Lab is live coaching for founders who want closer guidance than the AI Workforce classroom. It is $497 for one two-hour session, or $997/month for four two-hour sessions (eight hours total).",
-  },
-  {
-    q: "What does Done-for-You mean?",
-    a: "Done-for-You is an agreed implementation of a defined setup for your business. The implementation scope, handover, and support terms are agreed before work begins.",
-  },
-  {
-    q: "Is monthly support additional to setup?",
-    a: "Yes. Done-for-You is $4,999 one-time setup plus $500/month support. Support terms are confirmed with you before purchase.",
-  },
-  {
-    q: "Are software subscriptions included?",
-    a: "Not unless confirmed in writing. Required third-party software and usage costs may be separate; we identify the actual inclusions and costs with you before purchase.",
-  },
-  {
-    q: "Can you build a company-specific app?",
-    a: "Yes. Custom apps and SaaS are quoted separately. Scope and pricing are agreed before development.",
-  },
-  {
-    q: "Where do I find product subscription prices?",
-    a: "Each product — MinutesIntel.ai, App N SaaS Builder, and My Briefing — lists its own plans on its own website. Product subscriptions are not included in the AI Workforce membership, setup fee, or support plan.",
-  },
-];
 
 export default function PricingPage() {
   return (
@@ -163,72 +132,19 @@ export default function PricingPage() {
             </p>
             <Link href="/contact" className={secondaryBtn}>Request a Consultation</Link>
           </article>
-        </div>
-
-        <p className="mt-6 text-sm text-[color:var(--text-muted)]">
-          AI Workforce teaches you to build. Shadow Lab adds closer live coaching. Done-for-You is an
-          agreed implementation. Custom apps are quoted separately. Required third-party software and
-          usage costs may be separate — we identify actual inclusions and costs before purchase.
-        </p>
-
-        <div className="mt-12 grid gap-6 md:grid-cols-2">
+          {/* 5. Custom app / SaaS */}
           <article className={card} aria-labelledby="p-custom">
             <p className={group}>Need a company-specific app or SaaS?</p>
-            <h2 id="p-custom" className="mt-2 text-xl font-semibold text-[color:var(--text)]">Custom app / SaaS development</h2>
-            <p className="mt-3 text-3xl font-bold text-[#e8bd63]">{PRICING.custom.label}</p>
+            <h3 id="p-custom" className="mt-2 text-xl font-semibold text-[color:var(--text)]">Custom App / SaaS</h3>
+            <p className="mt-4 text-4xl font-bold text-[#e8bd63]">{PRICING.custom.label}</p>
             <p className="mb-6 mt-3 text-sm text-[color:var(--text-muted)]">
-              Discuss software built around your company&apos;s requirements. Scope and pricing are
-              agreed before development.
+              Software built around your company&apos;s requirements. Scope and pricing are agreed before
+              development.
             </p>
             <Link href="/contact" className={secondaryBtn}>Discuss a Custom Build</Link>
           </article>
-          <article className={card} aria-labelledby="p-assess">
-            <p className={group}>Lower-commitment next step</p>
-            <h2 id="p-assess" className="mt-2 text-xl font-semibold text-[color:var(--text)]">Free AI Assessment</h2>
-            <p className="mt-3 text-3xl font-bold text-[#e8bd63]">Free</p>
-            <p className="mb-6 mt-3 text-sm text-[color:var(--text-muted)]">
-              A free diagnostic to see where AI fits your business. No fee, not a paid plan.
-            </p>
-            <Link href="/assessment" className={primaryBtn}>Take the AI Assessment</Link>
-          </article>
         </div>
 
-        <section aria-labelledby="p-products" className="mt-12 rounded-2xl border border-[color:var(--line)] p-6">
-          <h2 id="p-products" className="text-lg font-semibold text-[color:var(--text)]">Product pricing directory</h2>
-          <p className="mt-1 text-sm text-[color:var(--text-muted)]">
-            Standalone products list their own plans and prices on their websites. They are not
-            included in the AI Workforce membership, setup fee, or support plan.
-          </p>
-          <ul className="mt-4 flex flex-wrap gap-3">
-            {PRODUCTS.map((p) => (
-              <li key={p.name}>
-                <a
-                  href={p.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex rounded-full border border-[#d6ac55]/60 px-4 py-2 text-sm font-semibold text-[#e8bd63] hover:bg-[#d6ac55]/10"
-                >
-                  {p.name} — see pricing →
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section aria-labelledby="p-faq" className="mt-14">
-          <h2 id="p-faq" className="text-2xl font-semibold text-[color:var(--gold-bright)]">Pricing questions</h2>
-          <div className="mt-6 space-y-3">
-            {FAQ.map((f) => (
-              <details key={f.q} className="rounded-xl border border-[color:var(--line)] bg-[#06111d] p-5">
-                <summary className="cursor-pointer font-semibold text-[color:var(--text)]">{f.q}</summary>
-                <p className="mt-2 text-sm text-[color:var(--text-muted)]">{f.a}</p>
-              </details>
-            ))}
-          </div>
-          <p className="mt-6 text-sm text-[color:var(--text-muted)]">
-            Other questions about terms? <Link href="/contact" className="text-[#f3cd7d] underline">Contact us</Link> before purchase.
-          </p>
-        </section>
       </section>
     </>
   );
