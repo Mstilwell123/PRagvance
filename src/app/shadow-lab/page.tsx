@@ -5,18 +5,18 @@ import ShadowLabOffers, { FooterNotes, HowItWorks } from "@/components/ShadowLab
 export const metadata: Metadata = {
   title: "Shadow Lab — Live AI Agent Building on Google Meet | Pragvance",
   description:
-    "Shadow Lab: build your own AI agent live with Mark and Grok Bot. Session 1 $497 one-time (up to 10 seats) or Shadow Lab Monthly $997/month.",
+    "Shadow Lab: build your own AI agent live with Mark and Grok Bot. $497 for one two-hour session, or $997/month for four two-hour sessions (eight hours total).",
   alternates: { canonical: "/shadow-lab" },
   openGraph: {
     title: "Shadow Lab — Live AI Agent Building",
-    description: "Session 1 $497 one-time · Monthly $997/month. Live on Google Meet.",
+    description: "$497 for one two-hour session · $997/month for four two-hour sessions. Live on Google Meet.",
     url: "/shadow-lab",
     images: [{ url: "/logo-lockup.png", alt: "Pragvance" }],
   },
 };
 
 const LAB = [
-  { t: "Build your own agent", d: "Session 1 covers basic AI agent building. You build your own agent hands-on during the session." },
+  { t: "Build your own agent", d: "The first session covers basic AI agent building. You build your own agent hands-on during the session." },
   { t: "Mark + Grok Bot guide you", d: "Watch Mark build real apps live with AI helpers and Grok Bot, then follow along on your own." },
   { t: "Ask as you build", d: "Ask questions while Mark builds, plus open Q&A at the end." },
   { t: "Recording + recap", d: "Get the recording and a recap doc afterward so nothing is lost." },
@@ -39,8 +39,7 @@ export default function ShadowLabPage() {
           Build your first AI agent — live, with a guide.
         </h1>
         <p className="mt-4 max-w-2xl text-[color:var(--text-muted)] md:text-lg">
-          Small live group sessions where you build alongside Mark and Grok Bot. Session 1: basic AI
-          agent building. Date to be announced.
+          Small live group sessions where you build alongside Mark and Grok Bot. Sessions are two hours: $497 for one session, or $997/month for four (eight hours total). First session: basic AI agent building. Date to be announced.
         </p>
 
         <h2 className="mt-14 text-2xl font-semibold text-[color:var(--gold-bright)]">What happens in the lab</h2>
@@ -53,7 +52,7 @@ export default function ShadowLabPage() {
           ))}
         </div>
 
-        <h2 className="mt-14 text-2xl font-semibold text-[color:var(--gold-bright)]">Choose your seat</h2>
+        <h2 className="mt-14 text-2xl font-semibold text-[color:var(--gold-bright)]">Choose your option</h2>
         <div className="mt-6">
           <ShadowLabOffers />
         </div>

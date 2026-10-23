@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { PRICING } from "@/lib/pricing";
+
 const SESSION_LINK = process.env.NEXT_PUBLIC_SHADOW_LAB_PAYMENT_LINK || "";
 const MONTHLY_LINK = process.env.NEXT_PUBLIC_SHADOW_LAB_MONTHLY_PAYMENT_LINK || "";
 export const CALENDLY = "https://calendly.com/pragvance/30min";
@@ -8,40 +11,44 @@ type Offer = {
   price: string;
   unit: string;
   badge: string;
+  savings?: string;
+  comparison?: string;
   link: string;
-  cta: string;
+  payCta: string;
   points: string[];
 };
 
 const OFFERS: Offer[] = [
   {
-    name: "Shadow Lab Session 1",
-    sub: "Basic AI agent building · Date to be announced",
-    price: "$497",
-    unit: "one-time",
+    name: "Shadow Lab — Single Session",
+    sub: "One two-hour session · Live on Google Meet · Date to be announced",
+    price: PRICING.shadowLabSingle.amount,
+    unit: "for one two-hour session",
     badge: "Up to 10 seats",
     link: SESSION_LINK,
-    cta: "Reserve your seat — $497",
+    payCta: "Test checkout — $497",
     points: [
-      "One live 2-hour (120 min) group session on Google Meet",
+      "One live two-hour group session on Google Meet",
       "Build your own AI agent hands-on, with Mark and Grok Bot guiding you",
-      "Q&A at the end (last ~12 minutes)",
+      "Q&A at the end",
       "Recording + recap doc afterward",
     ],
   },
   {
-    name: "Shadow Lab Monthly",
-    sub: "Ongoing live labs · Google Meet",
-    price: "$997",
-    unit: "per month",
-    badge: "4 meetings / month",
+    name: "Shadow Lab — Monthly Package",
+    sub: "Four two-hour sessions per month · Google Meet",
+    price: PRICING.shadowLabMonthly.amount,
+    unit: "/month for four two-hour sessions (eight hours total)",
+    badge: "4 × 2 hours / month",
+    savings: PRICING.shadowLabMonthly.savings,
+    comparison: `Compared with ${PRICING.shadowLabMonthly.comparison} for four individual sessions`,
     link: MONTHLY_LINK,
-    cta: "Start monthly — $997/mo",
+    payCta: "Test checkout — $997/month",
     points: [
-      "Four live meetings a month on Google Meet",
+      "Four live two-hour sessions a month on Google Meet (eight hours total)",
       "Keep building with AI helpers, with Mark and Grok Bot guiding you",
       "Ask questions as you build, plus Q&A at the end",
-      "Recording + recap doc after every meeting",
+      "Recording + recap doc after every session",
     ],
   },
 ];
@@ -58,10 +65,16 @@ function OfferCard({ o }: { o: Offer }) {
           {o.badge}
         </span>
       </div>
-      <p className="mt-6 flex items-baseline gap-2">
+      <div className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="text-5xl font-bold text-[#e8bd63]">{o.price}</span>
         <span className="text-sm text-[color:var(--text-muted)]">{o.unit}</span>
-      </p>
+      </div>
+      {o.savings && (
+        <p className="mt-2 text-sm font-semibold text-[#f3cd7d]">
+          {o.savings}
+          <span className="block text-xs font-normal text-[color:var(--text-muted)]">{o.comparison}</span>
+        </p>
+      )}
       <ul className="mt-6 flex-1 space-y-3 text-sm text-[color:var(--text)]">
         {o.points.map((p) => (
           <li key={p} className="flex gap-3">
@@ -71,21 +84,25 @@ function OfferCard({ o }: { o: Offer }) {
         ))}
       </ul>
       <div className="mt-8">
-        {o.link ? (
-          <a
-            href={o.link}
-            className="flex w-full items-center justify-center rounded-lg bg-[#e8bd63] px-6 py-4 text-base font-bold text-[#08111d] hover:bg-[#f3cd7d]"
-          >
-            {o.cta}
-          </a>
-        ) : (
-          <span className="flex w-full items-center justify-center rounded-lg border border-[#d6ac55]/40 px-6 py-4 text-base text-[color:var(--text-muted)]">
-            Checkout opening soon
-          </span>
+        <Link
+          href="/contact"
+          className="flex w-full items-center justify-center rounded-lg bg-[#e8bd63] px-6 py-4 text-base font-bold text-[#08111d] hover:bg-[#f3cd7d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f5f4f1]"
+        >
+          Discuss Shadow Lab
+        </Link>
+        {o.link && (
+          <>
+            <a
+              href={o.link}
+              className="mt-3 flex w-full items-center justify-center rounded-lg border border-[#d6ac55]/60 px-6 py-3 text-sm font-semibold text-[#e8bd63] hover:bg-[#d6ac55]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f5f4f1]"
+            >
+              {o.payCta}
+            </a>
+            <p className="mt-2 text-center text-xs text-[color:var(--text-muted)]">
+              All sales are final. No refunds. · Secure checkout by Stripe
+            </p>
+          </>
         )}
-        <p className="mt-3 text-center text-xs text-[color:var(--text-muted)]">
-          All sales are final. No refunds. · Secure checkout by Stripe
-        </p>
       </div>
     </div>
   );
@@ -103,8 +120,8 @@ export default function ShadowLabOffers() {
 
 export function HowItWorks() {
   const steps = [
-    { n: "1", t: "Pay", d: "Reserve your seat with secure Stripe checkout." },
-    { n: "2", t: "Book in Calendly", d: "You land on Calendly right after payment to book your time." },
+    { n: "1", t: "Discuss", d: "Tell us what you want to build through the contact page." },
+    { n: "2", t: "Pick your option", d: "Single two-hour session or the monthly package of four two-hour sessions." },
     { n: "3", t: "Confirmation", d: "Get your confirmation and Google Meet details by email." },
   ];
   return (
@@ -131,9 +148,9 @@ export function FooterNotes() {
           Book your session
         </a>{" "}
         · Questions?{" "}
-        <a href={CALENDLY} className="font-semibold text-[#f3cd7d] hover:underline">
-          Book a call
-        </a>
+        <Link href="/contact" className="font-semibold text-[#f3cd7d] hover:underline">
+          Contact us
+        </Link>
       </p>
       <p className="mt-3 text-center text-xs text-[color:var(--text-muted)] opacity-80">
         Came from TikTok? DM AGENT for the link.

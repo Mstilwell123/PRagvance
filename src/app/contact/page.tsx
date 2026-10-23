@@ -34,7 +34,7 @@ export default function ContactPage() {
         . {SITE.legal} · {SITE.location}.
       </p>
       <p className="mt-2 text-sm text-[color:var(--text-muted)]">
-        Book Shadow Lab ({SITE.labSeat} / {SITE.labMonth}) here — no invented Calendly on this draft.
+        Shadow Lab: {SITE.labPrices}. Choose “Shadow Lab” below to discuss it.
       </p>
 
       <form onSubmit={onSubmit} className="panel mt-10 space-y-4 p-6">

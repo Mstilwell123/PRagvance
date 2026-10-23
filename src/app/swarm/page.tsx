@@ -43,7 +43,7 @@ export default function SwarmPage() {
             Classroom + community on Skool. We teach; you build on your real work.
           </p>
           <p>
-            Want live high-touch seats? That’s{" "}
+            Want closer live coaching? That’s{" "}
             <Link href="/shadow-lab" className="text-[color:var(--electric-bright)] hover:underline">
               Shadow Lab
             </Link>{" "}

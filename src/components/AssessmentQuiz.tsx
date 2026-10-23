@@ -32,7 +32,7 @@ function bandFromScore(total: number, nextWant: NextWant): BandResult {
     return {
       band: "Operating layer",
       title: "Operating layer — custom app conversation",
-      body: `Score ${total} / 75. You asked about a custom app. Talk through what to ship — or stay in Shadow Lab (${SITE.labSeat} / ${SITE.labMonth}) if you want high-touch seats first.`,
+      body: `Score ${total} / 75. You asked about a custom app. Talk through what to ship — or stay in Shadow Lab (${SITE.labPrices}) if you want closer coaching first.`,
       href: "/contact#contact",
       cta: "Talk about a custom app",
     };
@@ -52,7 +52,7 @@ function bandFromScore(total: number, nextWant: NextWant): BandResult {
     return {
       band: "Operating layer",
       title: "Operating layer — Shadow Lab",
-      body: `Score ${total} / 75. High-touch seats for founders who want a closer desk — ${SITE.labSeat} / ${SITE.labMonth}.`,
+      body: `Score ${total} / 75. Live coaching for founders who want closer guidance — ${SITE.labPrices}.`,
       href: "/shadow-lab",
       cta: "Explore Shadow Lab",
     };
@@ -63,7 +63,7 @@ function bandFromScore(total: number, nextWant: NextWant): BandResult {
       return {
         band: "Real workflows, weak ops",
         title: "Real workflows, weak ops — Shadow Lab if you want a closer desk",
-        body: `Score ${total} / 75. Production workflows exist; ops are thin. AI Workforce builds the system; Shadow Lab (${SITE.labSeat} / ${SITE.labMonth}) if you want closer coaching.`,
+        body: `Score ${total} / 75. Production workflows exist; ops are thin. AI Workforce builds the system; Shadow Lab (${SITE.labPrices}) if you want closer coaching.`,
         href: "/shadow-lab",
         cta: "Explore Shadow Lab",
       };
@@ -105,7 +105,7 @@ function bandFromScore(total: number, nextWant: NextWant): BandResult {
       return {
         band: bandLabel,
         title: `${bandLabel} — AI Workforce first`,
-        body: `Score ${total} / 75. Scattered pilots. Start with AI Workforce (${SITE.swarmPrice}). Shadow Lab (${SITE.labSeat} / ${SITE.labMonth}) is available when the foundation is in place.`,
+        body: `Score ${total} / 75. Scattered pilots. Start with AI Workforce (${SITE.swarmPrice}). Shadow Lab (${SITE.labPrices}) is available when the foundation is in place.`,
         href: SITE.skoolUrl,
         cta: `Join AI Workforce — ${SITE.swarmPrice}`,
         external: true,
