@@ -6,6 +6,7 @@ import { SITE } from "@/lib/site";
 
 export default function ContactPage() {
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -14,10 +15,20 @@ export default function ContactPage() {
     const name = String(data.get("name") || "");
     const email = String(data.get("email") || "");
     const interest = String(data.get("interest") || "");
+    const building = String(data.get("building") || "").trim();
     const message = String(data.get("message") || "");
+    if (!building) {
+      setError("Please tell us what you’re building.");
+      return;
+    }
+    if (building.length > 2000) {
+      setError("Please keep “What are you building?” under 2,000 characters.");
+      return;
+    }
+    setError("");
     const subject = encodeURIComponent(`[Pragvance] ${interest} — ${name}`);
     const body = encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\nInterest: ${interest}\n\n${message}`,
+      `Name: ${name}\nEmail: ${email}\nInterest: ${interest}\nWhat they're building: ${building}\n\n${message}`,
     );
     window.location.href = `mailto:${SITE.email}?subject=${subject}&body=${body}`;
     setSent(true);
@@ -78,6 +89,20 @@ export default function ContactPage() {
           </select>
         </div>
         <div>
+          <label htmlFor="building" className="block text-sm text-[color:var(--text-muted)]">
+            What are you building?
+          </label>
+          <textarea
+            id="building"
+            name="building"
+            rows={3}
+            required
+            maxLength={2000}
+            className="mt-1 w-full rounded-lg border border-[color:var(--line)] bg-[color:var(--bg-elevated)] px-3 py-2 text-[color:var(--text)]"
+            placeholder="An app, a SaaS, an AI agent team for your business..."
+          />
+        </div>
+        <div>
           <label htmlFor="message" className="block text-sm text-[color:var(--text-muted)]">
             Message
           </label>
@@ -96,6 +121,7 @@ export default function ContactPage() {
         >
           Open email to {SITE.email}
         </button>
+        {error && <p className="text-sm text-red-400">{error}</p>}
         {sent && (
           <p className="text-sm text-[color:var(--electric-bright)]">
             Your mail client should open — if not, write us at {SITE.email}.
