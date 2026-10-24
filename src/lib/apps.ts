@@ -30,7 +30,7 @@ export const APPS: ShowcaseApp[] = [
   {
     name: "ShowPiece.Pro",
     url: "https://showpiece.pro/",
-    logo: "/apps/showpiece.svg",
+    logo: "/apps/showpiece.png",
     description: "Turn contractor project photos and clips into branded, narrated videos.",
   },
   {
