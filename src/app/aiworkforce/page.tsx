@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: "AI Workforce — Grok Bot Training on Skool | $99/mo",
   description:
     "Join AI Workforce on Skool — $99/mo. Weekly live training to build a Grok Bot agent team for your business. Classroom stays on Skool.",
-  alternates: { canonical: "/swarm" },
+  alternates: { canonical: "/aiworkforce" },
   openGraph: {
     title: "AI Workforce — Grok Bot Training | $99/mo",
     description:
       "Weekly live training to staff a Grok Bot department. Join AI Workforce on Skool.",
-    url: "/swarm",
+    url: "/aiworkforce",
     images: [{ url: "/logo-lockup.png", alt: "Pragvance" }],
   },
 };
@@ -23,7 +23,7 @@ export default function SwarmPage() {
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "/" },
-          { name: "AI Workforce", path: "/swarm" },
+          { name: "AI Workforce", path: "/aiworkforce" },
         ]}
       />
       <section className="section-pad mx-auto max-w-3xl py-16 md:py-24">
