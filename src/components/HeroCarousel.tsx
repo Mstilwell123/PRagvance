@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import "./HeroCarousel.css";
 
-const CLASSROOM = "https://www.skool.com/aiworkforcebypragvance/classroom";
-const JOIN = "https://www.skool.com/aiworkforcebypragvance";
+const CLASSROOM = "https://www.skool.com/aiworkforce/classroom";
+const JOIN = "https://www.skool.com/aiworkforce";
 const INTERVAL = 6500;
 
 const COURSES = [
