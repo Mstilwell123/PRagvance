@@ -127,18 +127,18 @@ export default function HomePage() {
               </p>
               <h3 className="mt-2 text-2xl font-semibold text-[color:var(--text)]">Shadow Lab</h3>
               <p className="mt-1 text-lg font-semibold text-[color:var(--electric-bright)]">
-                {SITE.labSeat} / {SITE.labMonth}
+                {SITE.labPrices}
               </p>
               <ul className="mt-4 space-y-2 text-sm text-[color:var(--text-muted)]">
-                <li>Live high-touch seats for founders who want closer coaching.</li>
+                <li>Live coaching for founders who want closer guidance.</li>
                 <li>Separate from the AI Workforce classroom track on Skool.</li>
-                <li>Book via contact — no invented booking link.</li>
+                <li>Discuss via the contact page.</li>
               </ul>
               <Link
                 href="/contact#contact"
                 className="mt-8 inline-flex items-center justify-center rounded-full border border-[color:var(--electric)] px-6 py-3 text-sm font-semibold text-[color:var(--electric-bright)] transition hover:bg-[color:rgba(9,155,228,0.12)]"
               >
-                Book Shadow Lab — {SITE.labSeat} / {SITE.labMonth}
+                Discuss Shadow Lab
               </Link>
               <Link
                 href="/shadow-lab"
@@ -148,6 +148,13 @@ export default function HomePage() {
               </Link>
             </article>
           </div>
+          <p className="mt-6 text-center text-sm text-[color:var(--text-muted)]">
+            Compare every option — including Done-for-You setup —{" "}
+            <Link href="/pricing" className="font-semibold text-[color:var(--electric-bright)] hover:underline">
+              see pricing
+            </Link>
+            .
+          </p>
         </div>
       </section>
 

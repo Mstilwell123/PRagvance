@@ -51,7 +51,7 @@ export default function Footer() {
             </li>
             <li>
               <Link href="/shadow-lab" className="hover:text-[color:var(--electric-bright)]">
-                Shadow Lab — {SITE.labSeat} / {SITE.labMonth}
+                Shadow Lab — {SITE.labPrices}
               </Link>
             </li>
             <li>

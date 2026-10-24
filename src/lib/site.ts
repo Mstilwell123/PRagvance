@@ -1,3 +1,5 @@
+import { PRICING, SHADOW_LAB_SUMMARY } from "./pricing";
+
 export const SITE = {
   name: "Pragvance",
   legal: "PRAGVANCE LLC",
@@ -6,9 +8,8 @@ export const SITE = {
   email: "support@pragvance.ai",
   location: "Oregon, USA",
   skoolUrl: "https://www.skool.com/aiworkforcebypragvance",
-  swarmPrice: "$99/mo",
-  labSeat: "$497 seat",
-  labMonth: "$997 month",
+  swarmPrice: PRICING.aiWorkforce.short,
+  labPrices: SHADOW_LAB_SUMMARY,
 } as const;
 
 export const NAV = [
@@ -17,6 +18,7 @@ export const NAV = [
   { href: "/shadow-lab", label: "Shadow Lab" },
   { href: "/assessment", label: "AI Assessment" },
   { href: "/apps", label: "Apps" },
+  { href: "/pricing", label: "Pricing" },
   { href: "/contact", label: "Contact" },
 ] as const;
 
@@ -31,7 +33,7 @@ export const FAQ = [
   },
   {
     q: "How is Shadow Lab different from AI Workforce?",
-    a: "AI Workforce is the self-paced / weekly classroom track on Skool. Shadow Lab is live high-touch seats ($497 seat / $997 month) for founders who want closer coaching. Lab is an upsell, not a second school on this site.",
+    a: "AI Workforce is the self-paced / weekly classroom track on Skool. Shadow Lab is live coaching for founders who want closer guidance — " + SHADOW_LAB_SUMMARY + ". It is separate from the AI Workforce classroom.",
   },
   {
     q: "What is the AI Assessment?",
