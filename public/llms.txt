@@ -6,7 +6,7 @@ Pragvance helps you staff a Grok Bot department — roles, skills, tools, routin
 
 ## Site
 - Home: https://pragvance.ai/
-- AI Workforce: https://pragvance.ai/swarm
+- AI Workforce: https://pragvance.ai/aiworkforce
 - Shadow Lab: https://pragvance.ai/shadow-lab
 - AI Assessment: https://pragvance.ai/assessment
 - Apps & SaaS: https://pragvance.ai/apps
