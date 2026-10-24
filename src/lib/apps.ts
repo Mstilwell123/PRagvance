@@ -11,7 +11,7 @@ export const APPS: ShowcaseApp[] = [
   {
     name: "MinutesIntel.ai",
     url: "https://www.minutesintel.ai/",
-    logo: "/apps/minutesintel.svg",
+    logo: "/apps/minutesintel.png",
     description:
       "Privacy-first, on-device meeting recording and AI-generated board-quality minutes for CEOs and business consultants.",
   },
