@@ -7,7 +7,7 @@ export const SITE = {
   url: "https://pragvance.ai",
   email: "support@pragvance.ai",
   location: "Oregon, USA",
-  skoolUrl: "https://www.skool.com/aiworkforcebypragvance",
+  skoolUrl: "https://www.skool.com/aiworkforce",
   swarmPrice: PRICING.aiWorkforce.short,
   labPrices: SHADOW_LAB_SUMMARY,
 } as const;
