@@ -42,7 +42,7 @@ export const APPS: ShowcaseApp[] = [
   {
     name: "AppDemo.live",
     url: "https://appdemo-live.vercel.app/",
-    logo: null,
+    logo: "/apps/appdemo-live.png",
     description: "Launch your software live.",
   },
   {
