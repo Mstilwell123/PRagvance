@@ -114,7 +114,7 @@ export default function HomePage() {
                 Join AI Workforce — {SITE.swarmPrice}
               </a>
               <Link
-                href="/swarm"
+                href="/aiworkforce"
                 className="mt-3 text-center text-sm text-[color:var(--electric-bright)] hover:underline"
               >
                 Learn more about AI Workforce
