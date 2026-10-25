@@ -74,7 +74,7 @@ export default function AppsPage() {
               Need a product, not only agents? Start a build conversation.
             </p>
             <Link
-              href="/contact#contact"
+              href="/contact?interest=custom#contact"
               className="mt-4 inline-block text-sm text-[color:var(--electric-bright)] hover:underline"
             >
               Talk about your next app →

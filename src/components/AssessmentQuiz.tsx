@@ -33,7 +33,7 @@ function bandFromScore(total: number, nextWant: NextWant): BandResult {
       band: "Operating layer",
       title: "Operating layer — custom app conversation",
       body: `Score ${total} / 75. You asked about a custom app. Talk through what to ship — or stay in Shadow Lab (${SITE.labPrices}) if you want closer coaching first.`,
-      href: "/contact#contact",
+      href: "/contact?interest=custom#contact",
       cta: "Talk about a custom app",
     };
   }
@@ -73,7 +73,7 @@ function bandFromScore(total: number, nextWant: NextWant): BandResult {
         band: "Real workflows, weak ops",
         title: "Real workflows, weak ops — custom conversation",
         body: `Score ${total} / 75. You may need a product, not only agents. Or start with AI Workforce (${SITE.swarmPrice}) to tighten ops first.`,
-        href: "/contact#contact",
+        href: "/contact?interest=custom#contact",
         cta: "Talk about a custom app",
       };
     }

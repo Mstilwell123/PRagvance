@@ -85,7 +85,7 @@ function OfferCard({ o }: { o: Offer }) {
       </ul>
       <div className="mt-8">
         <Link
-          href="/contact"
+          href="/contact?interest=shadow-lab#contact"
           className="flex w-full items-center justify-center rounded-lg bg-[#e8bd63] px-6 py-4 text-base font-bold text-[#08111d] hover:bg-[#f3cd7d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f5f4f1]"
         >
           Discuss Shadow Lab
@@ -148,7 +148,7 @@ export function FooterNotes() {
           Book your session
         </a>{" "}
         · Questions?{" "}
-        <Link href="/contact" className="font-semibold text-[#f3cd7d] hover:underline">
+        <Link href="/contact?interest=shadow-lab#contact" className="font-semibold text-[#f3cd7d] hover:underline">
           Contact us
         </Link>
       </p>

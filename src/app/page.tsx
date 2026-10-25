@@ -135,7 +135,7 @@ export default function HomePage() {
                 <li>Discuss via the contact page.</li>
               </ul>
               <Link
-                href="/contact#contact"
+                href="/contact?interest=shadow-lab#contact"
                 className="mt-8 inline-flex items-center justify-center rounded-full border border-[color:var(--electric)] px-6 py-3 text-sm font-semibold text-[color:var(--electric-bright)] transition hover:bg-[color:rgba(9,155,228,0.12)]"
               >
                 Discuss Shadow Lab
@@ -234,7 +234,7 @@ export default function HomePage() {
                 product, not only agents.
               </p>
               <Link
-                href="/contact#contact"
+                href="/contact?interest=custom#contact"
                 className="mt-4 inline-block text-sm text-[color:var(--electric-bright)] hover:underline"
               >
                 Talk about your next app →

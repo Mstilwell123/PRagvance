@@ -1,10 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { SITE } from "@/lib/site";
 
+const INTERESTS: { slug: string; label: string }[] = [
+  { slug: "shadow-lab", label: "Shadow Lab" },
+  { slug: "done-for-you", label: "Done-for-You Setup" },
+  { slug: "consultation", label: "One-on-One AI Consultation" },
+  { slug: "ai-workforce", label: "AI Workforce" },
+  { slug: "custom", label: "Custom app / SaaS" },
+  { slug: "general", label: "General" },
+];
+
 export default function ContactPage() {
+  const [interest, setInterest] = useState("Shadow Lab");
+  useEffect(() => {
+    const slug = new URLSearchParams(window.location.search).get("interest");
+    const match = INTERESTS.find((i) => i.slug === slug);
+    if (match) setInterest(match.label);
+  }, []);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
 
@@ -80,12 +95,14 @@ export default function ContactPage() {
             id="interest"
             name="interest"
             className="mt-1 w-full rounded-lg border border-[color:var(--line)] bg-[color:var(--bg-elevated)] px-3 py-2 text-[color:var(--text)]"
-            defaultValue="Shadow Lab"
+            value={interest}
+            onChange={(e) => setInterest(e.target.value)}
           >
-            <option>Shadow Lab</option>
-            <option>AI Workforce</option>
-            <option>Custom app / SaaS</option>
-            <option>General</option>
+            {INTERESTS.map((i) => (
+              <option key={i.slug} value={i.label}>
+                {i.label}
+              </option>
+            ))}
           </select>
         </div>
         <div>
