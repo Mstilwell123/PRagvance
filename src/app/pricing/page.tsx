@@ -92,7 +92,7 @@ export default function PricingPage() {
             </p>
             <ShadowLabSwitch />
             <div className="mt-6 flex flex-1 flex-col">
-              <Link href="/contact" className={secondaryBtn}>Discuss Shadow Lab</Link>
+              <Link href="/contact?interest=shadow-lab#contact" className={secondaryBtn}>Discuss Shadow Lab</Link>
             </div>
           </article>
 
@@ -115,7 +115,7 @@ export default function PricingPage() {
               A defined setup for your business, with the implementation scope, handover, and support
               terms agreed before work begins.
             </p>
-            <Link href="/contact" className={secondaryBtn}>Request Done-for-You Setup</Link>
+            <Link href="/contact?interest=done-for-you#contact" className={secondaryBtn}>Request Done-for-You Setup</Link>
           </article>
 
           {/* 4. One-on-One AI Consultation */}
@@ -130,7 +130,7 @@ export default function PricingPage() {
             <p className="mb-6 mt-3 text-sm text-[color:var(--text-muted)]">
               One-on-one guidance. Focused on your business priorities and questions.
             </p>
-            <Link href="/contact" className={secondaryBtn}>Request a Consultation</Link>
+            <Link href="/contact?interest=consultation#contact" className={secondaryBtn}>Request a Consultation</Link>
           </article>
           {/* 5. Custom app / SaaS */}
           <article className={card} aria-labelledby="p-custom">
@@ -141,7 +141,7 @@ export default function PricingPage() {
               Software built around your company&apos;s requirements. Scope and pricing are agreed before
               development.
             </p>
-            <Link href="/contact" className={secondaryBtn}>Discuss a Custom Build</Link>
+            <Link href="/contact?interest=custom#contact" className={secondaryBtn}>Discuss a Custom Build</Link>
           </article>
         </div>
 
