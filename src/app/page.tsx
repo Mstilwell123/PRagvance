@@ -1,4 +1,5 @@
 import Link from "next/link";
+import GrokBotNote from "@/components/GrokBotNote";
 import CtaButtons from "@/components/CtaButtons";
 import Faq from "@/components/Faq";
 import HeroCarousel from "@/components/HeroCarousel";
@@ -91,6 +92,9 @@ export default function HomePage() {
           >
             Live offers
           </h2>
+          <div className="mt-6">
+            <GrokBotNote boxClass="border border-[color:var(--line)] bg-[color:var(--bg-void)]" accent="text-[color:var(--gold-bright)]" />
+          </div>
           <div className="mt-10 grid gap-6 md:grid-cols-2">
             <article className="panel gold-glow flex flex-col p-6 md:p-8">
               <p className="text-xs uppercase tracking-wider text-[color:var(--gold)]">Primary</p>

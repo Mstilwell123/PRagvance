@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import GrokBotNote from "@/components/GrokBotNote";
 import BreadcrumbJsonLd from "@/components/BreadcrumbJsonLd";
 import ShadowLabSwitch from "@/components/pricing/ShadowLabSwitch";
 import { PRICING } from "@/lib/pricing";
@@ -60,6 +61,10 @@ export default function PricingPage() {
           business. Choose the level of help that fits your needs.
         </p>
 
+        <div className="mt-8">
+          <GrokBotNote boxClass="border border-[#d6ac55]/40 bg-[#071321]" accent="text-[#e8bd63]" />
+        </div>
+
         <h2 className="sr-only">Plans</h2>
         <div className="mt-10 grid grid-cols-1 gap-6 min-[801px]:grid-cols-2 min-[1121px]:grid-cols-4">
           {/* 1. AI Workforce — primary emphasis */}
@@ -74,7 +79,7 @@ export default function PricingPage() {
               <span className="text-sm text-[color:var(--text-muted)]">/month</span>
             </p>
             <p className="mt-2 text-sm text-[color:var(--text-muted)]">
-              Weekly training, practical resources, and a Skool community to help you build a GrokBot
+              Weekly training, practical resources, and a Skool community to help you build a Grok Bot
               agent team for your own business.
             </p>
             <Points items={["Weekly training", "Practical resources", "Skool community"]} />
