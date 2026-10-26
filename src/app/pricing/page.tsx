@@ -60,6 +60,14 @@ export default function PricingPage() {
           business. Choose the level of help that fits your needs.
         </p>
 
+        <p className="mt-8 rounded-xl border border-[#d6ac55]/40 bg-[#071321] p-4 text-sm text-[color:var(--text)] md:text-base">
+          We work exclusively with{" "}
+          <a href="https://x.ai/bot" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#e8bd63] hover:underline">Grok Bot</a>
+          . You may want to set up your own ChatGPT account and your own{" "}
+          <a href="https://x.ai/bot" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#e8bd63] hover:underline">Grok Bot</a>
+          {" "}account.
+        </p>
+
         <h2 className="sr-only">Plans</h2>
         <div className="mt-10 grid grid-cols-1 gap-6 min-[801px]:grid-cols-2 min-[1121px]:grid-cols-4">
           {/* 1. AI Workforce — primary emphasis */}

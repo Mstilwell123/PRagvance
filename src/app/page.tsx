@@ -91,6 +91,13 @@ export default function HomePage() {
           >
             Live offers
           </h2>
+          <p className="mt-6 rounded-xl border border-[color:var(--line)] bg-[color:var(--bg-void)] p-4 text-sm text-[color:var(--text)] md:text-base">
+            We work exclusively with{" "}
+            <a href="https://x.ai/bot" target="_blank" rel="noopener noreferrer" className="font-semibold text-[color:var(--gold-bright)] hover:underline">Grok Bot</a>
+            . You may want to set up your own ChatGPT account and your own{" "}
+            <a href="https://x.ai/bot" target="_blank" rel="noopener noreferrer" className="font-semibold text-[color:var(--gold-bright)] hover:underline">Grok Bot</a>
+            {" "}account.
+          </p>
           <div className="mt-10 grid gap-6 md:grid-cols-2">
             <article className="panel gold-glow flex flex-col p-6 md:p-8">
               <p className="text-xs uppercase tracking-wider text-[color:var(--gold)]">Primary</p>
