@@ -3,6 +3,8 @@ import type Stripe from "stripe";
 import { isOfferId } from "@/lib/offers";
 import { resolveCalendlyBookingUrl } from "@/lib/calendly";
 import { getStripe } from "@/lib/stripe";
+import { getOffer } from "@/lib/offers";
+import { handlePaidSession } from "@/lib/paid-handoff.server";
 
 export const runtime = "nodejs";
 
@@ -42,7 +44,8 @@ export async function POST(req: Request) {
 
   try {
     switch (event.type) {
-      case "checkout.session.completed": {
+      case "checkout.session.completed":
+      case "checkout.session.async_payment_succeeded": {
         const session = event.data.object as Stripe.Checkout.Session;
         await handleCheckoutCompleted(session);
         break;
@@ -84,26 +87,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     customerEmail,
   });
 
-  if (session.payment_status !== "paid") {
-    console.info("[checkout.session.completed] not paid yet; skipping booking resolve");
-    return;
-  }
-
-  let bookingUrl: string | null = null;
-  if (offerId) {
-    bookingUrl = await resolveCalendlyBookingUrl(offerId);
-  }
-
-  const confirmFrom =
-    process.env.CONFIRM_FROM_EMAIL?.trim() || "support@pragvance.ai";
-
-  // Stub confirmation: log only until mailer is wired for pay-first.
-  console.info("[pay-first confirm stub]", {
-    from: confirmFrom,
-    to: customerEmail,
-    offer_id: offerId,
-    calendlyConfigured: Boolean(bookingUrl),
-    // Do not log the booking URL itself in production logs if sensitive;
-    // scaffold logs presence only.
+  const result = await handlePaidSession(session, {
+    offerLabel: offerId ? getOffer(offerId).label : null,
+    resolveBooking: () => (offerId ? resolveCalendlyBookingUrl(offerId) : Promise.resolve(null)),
   });
+  console.info("[paid handoff]", { eventSession: session.id, ...result });
 }

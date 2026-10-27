@@ -36,8 +36,8 @@ export async function POST(req: Request) {
   const v = validateLead(body);
   if (!v.ok) return NextResponse.json({ ok: false, error: v.error }, { status: 400 });
   try {
-    await sendLeadToCrm(v.lead);
-    return NextResponse.json({ ok: true });
+    const contactId = await sendLeadToCrm(v.lead);
+    return NextResponse.json({ ok: true, contactId });
   } catch (err) {
     console.error("[lead] CRM handoff failed:", err instanceof Error ? err.message : err);
     return NextResponse.json({ ok: false, error: GENERIC_ERROR }, { status: 502 });

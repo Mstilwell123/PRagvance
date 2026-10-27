@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { getOffer, isOfferId } from "@/lib/offers";
+import { CONTACT_ID_RE } from "@/lib/paid-handoff.server";
 import { getSiteUrl, getStripe } from "@/lib/stripe";
 
 export const runtime = "nodejs";
 
 type Body = {
   offer_id?: unknown;
+  ghl_contact_id?: unknown;
+  email?: unknown;
 };
 
 /**
@@ -26,6 +29,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid offer_id" }, { status: 400 });
   }
 
+  const contactId =
+    typeof body.ghl_contact_id === "string" && CONTACT_ID_RE.test(body.ghl_contact_id)
+      ? body.ghl_contact_id
+      : null;
+  const email =
+    typeof body.email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email) ? body.email : null;
   const offer = getOffer(offerId);
   const priceId = process.env[offer.priceEnvKey]?.trim();
   if (!priceId) {
@@ -56,7 +65,9 @@ export async function POST(req: Request) {
       success_url: successUrl,
       cancel_url: cancelUrl,
       automatic_tax: { enabled: false },
-      metadata: { offer_id: offerId },
+      metadata: { offer_id: offerId, ...(contactId ? { ghl_contact_id: contactId } : {}) },
+      ...(contactId ? { client_reference_id: contactId } : {}),
+      ...(email ? { customer_email: email } : {}),
       // Omit payment_method_types — let Stripe choose defaults.
     });
 
