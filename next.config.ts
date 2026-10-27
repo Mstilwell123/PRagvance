@@ -2,10 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: { unoptimized: true },
-  async rewrites() {
+  async redirects() {
     return [
-      { source: "/md-map", destination: "/md-map.html" },
-      { source: "/progress-map", destination: "/md-map.html" },
+      { source: "/swarm", destination: "/aiworkforce", permanent: true },
+      { source: "/swarm/:path*", destination: "/aiworkforce", permanent: true },
     ];
   },
 };

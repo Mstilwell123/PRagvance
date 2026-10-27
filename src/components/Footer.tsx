@@ -41,7 +41,7 @@ export default function Footer() {
           <ul className="mt-3 space-y-2 text-sm text-[color:var(--text-muted)]">
             <li>
               <a
-                href={SITE.swarmUrl}
+                href={SITE.skoolUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-[color:var(--electric-bright)]"
@@ -51,7 +51,7 @@ export default function Footer() {
             </li>
             <li>
               <Link href="/shadow-lab" className="hover:text-[color:var(--electric-bright)]">
-                Shadow Lab — {SITE.labSeat} / {SITE.labMonth}
+                Shadow Lab — {SITE.labPrices}
               </Link>
             </li>
             <li>

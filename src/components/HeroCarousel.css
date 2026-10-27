@@ -1,0 +1,51 @@
+.pragvance-workforce-hero{--g:#e8bd63;max-width:1440px;margin:0 auto;padding:24px 4% 0;color:#f5f7fb;font-family:inherit;box-sizing:border-box}
+.pragvance-workforce-hero *{box-sizing:border-box}
+.pragvance-workforce-hero .pwh-intro{display:flex;justify-content:space-between;align-items:end;gap:30px;padding:12px 0 24px}
+.pragvance-workforce-hero .pwh-eyebrow{color:var(--g);font-size:12px;letter-spacing:2.5px;font-weight:700;margin:0 0 12px}
+.pragvance-workforce-hero .pwh-h{font-size:clamp(26px,3.1vw,46px);letter-spacing:-1.4px;margin:0;line-height:1.08;font-weight:700}
+.pragvance-workforce-hero .pwh-lede{font-size:15px;color:#adbbce;line-height:1.6;max-width:410px;margin:0}
+.pragvance-workforce-hero .pwh-carousel{position:relative;background:#071321;overflow:hidden;border:1px solid #d6ac5540;border-radius:10px;box-shadow:0 20px 80px #0006;outline-offset:5px}
+.pragvance-workforce-hero .pwh-stage{aspect-ratio:1747/900;position:relative;touch-action:pan-y}
+.pragvance-workforce-hero .pwh-slide{position:absolute;inset:0;opacity:0;transition:opacity .7s ease;pointer-events:none}
+.pragvance-workforce-hero .pwh-slide.active{opacity:1}
+.pragvance-workforce-hero .pwh-slide img{width:100%;height:100%;object-fit:contain;display:block}
+.pragvance-workforce-hero .pwh-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:40px;height:48px;border:1px solid #ffffff55;background:#04101cbe;color:#fff;border-radius:6px;cursor:pointer;font-size:28px;line-height:1}
+.pragvance-workforce-hero .pwh-arrow:hover{background:#0c2942}
+.pragvance-workforce-hero .pwh-prev{left:12px}.pragvance-workforce-hero .pwh-next{right:12px}
+.pragvance-workforce-hero .pwh-controls{padding:16px 20px;display:flex;align-items:center;gap:20px;background:#081522;border-top:1px solid #ffffff12}
+.pragvance-workforce-hero .pwh-months{display:flex;gap:7px;flex:1}
+.pragvance-workforce-hero .pwh-month{cursor:pointer;border:1px solid #ffffff22;background:transparent;color:#a8b8cc;padding:11px 14px;border-radius:4px;font-size:12px;white-space:nowrap}
+.pragvance-workforce-hero .pwh-month[aria-current="true"]{background:var(--g);color:#071321;border-color:var(--g);font-weight:700}
+.pragvance-workforce-hero .pwh-pause{color:#c8d3e1;background:transparent;border:1px solid #ffffff30;cursor:pointer;padding:10px 12px;border-radius:4px;min-width:76px;font-size:13px}
+.pragvance-workforce-hero .pwh-count{font-size:12px;color:#8a9cb2;font-variant-numeric:tabular-nums}
+.pragvance-workforce-hero .pwh-detail{padding:24px 0 30px;display:flex;justify-content:space-between;gap:35px;align-items:center}
+.pragvance-workforce-hero .pwh-detail h2{font-size:20px;margin:0 0 8px;font-weight:700}
+.pragvance-workforce-hero .pwh-detail p{font-size:15px;color:#aebed0;line-height:1.6;max-width:780px;margin:0}
+.pragvance-workforce-hero .pwh-cta{white-space:nowrap;border-bottom:1px solid var(--g);color:#f3cd7d;padding:12px 0;font-size:15px;text-decoration:none}
+.pragvance-workforce-hero button:focus-visible,.pragvance-workforce-hero a:focus-visible{outline:3px solid #38baff;outline-offset:4px}
+@media(max-width:760px){
+.pragvance-workforce-hero{padding:16px 2% 0}
+.pragvance-workforce-hero .pwh-intro{display:block;padding:12px 3% 20px}
+.pragvance-workforce-hero .pwh-lede{margin-top:15px;max-width:100%}
+.pragvance-workforce-hero .pwh-carousel{border-radius:5px}
+.pragvance-workforce-hero .pwh-arrow{width:28px;height:36px;font-size:22px}
+.pragvance-workforce-hero .pwh-prev{left:5px}.pragvance-workforce-hero .pwh-next{right:5px}
+.pragvance-workforce-hero .pwh-controls{padding:12px 9px;gap:9px;flex-wrap:wrap}
+.pragvance-workforce-hero .pwh-months{width:100%;flex-basis:100%;display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.pragvance-workforce-hero .pwh-month{padding:10px 0;font-size:10px}
+.pragvance-workforce-hero .pwh-count{margin-left:auto}
+.pragvance-workforce-hero .pwh-detail{display:block;padding:21px 3% 30px}
+.pragvance-workforce-hero .pwh-detail h2{font-size:19px}
+.pragvance-workforce-hero .pwh-detail p{font-size:14px}
+.pragvance-workforce-hero .pwh-cta{display:inline-block;margin-top:15px}}
+@media(prefers-reduced-motion:reduce){.pragvance-workforce-hero .pwh-slide{transition:none}}
+.pragvance-workforce-hero .pwh-ctas{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.pragvance-workforce-hero .pwh-join{background:var(--g);color:#08111d;padding:12px 18px;font-weight:700;border-radius:5px;font-size:14px;text-decoration:none;white-space:nowrap}
+@media(max-width:760px){.pragvance-workforce-hero .pwh-ctas{margin-top:12px;gap:16px}}
+/* v2: image area 80% of previous width, centered; gold perimeter border */
+.pragvance-workforce-hero .pwh-carousel{width:80%;margin:0 auto;border:2px solid #d6ac55b3}
+.pragvance-workforce-hero .pwh-stage{border-bottom:1px solid #d6ac5566}
+@media(max-width:760px){.pragvance-workforce-hero .pwh-carousel{width:100%;border-width:1px}}
+.pragvance-workforce-hero .pwh-stat{margin:0;padding:9px 20px;font-size:13px;line-height:1.45;color:#dfe7f1;background:#06111d;border-top:1px solid #d6ac5533;min-height:38px}
+.pragvance-workforce-hero .pwh-src{color:#c9a75a;font-size:11px;letter-spacing:.3px;white-space:nowrap}
+@media(max-width:760px){.pragvance-workforce-hero .pwh-stat{padding:8px 10px;font-size:12px}.pragvance-workforce-hero .pwh-src{white-space:normal}}
