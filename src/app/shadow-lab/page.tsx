@@ -6,7 +6,7 @@ import { SITE } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Shadow Lab — Live High-Touch Seats | Pragvance",
   description:
-    "Shadow Lab: live high-touch seats at $497 seat / $997 month. Upsell from The Swarm — book via contact.",
+    "Shadow Lab: live high-touch seats at $497 seat / $997 month. Upsell from AI Workforce — book via contact.",
   alternates: { canonical: "/shadow-lab" },
   openGraph: {
     title: "Shadow Lab — Live High-Touch Seats",
@@ -41,7 +41,7 @@ export default function ShadowLabPage() {
           <p>
             Prefer the classroom track first? Start with{" "}
             <Link href="/swarm" className="text-[color:var(--electric-bright)] hover:underline">
-              The Agent Swarm
+              AI Workforce
             </Link>{" "}
             at {SITE.swarmPrice}.
           </p>

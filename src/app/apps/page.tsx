@@ -50,6 +50,39 @@ export default function AppsPage() {
               minutesintel.ai →
             </a>
           </article>
+          <article className="panel gold-glow p-6">
+            <h2 className="text-xl font-semibold text-[color:var(--gold-bright)]">
+              App N SaaS Builder
+            </h2>
+            <p className="mt-2 text-sm text-[color:var(--text-muted)]">
+              Know exactly how close each app is to shipping. Live on its own domain.
+            </p>
+            <a
+              href="https://www.appnsaasbuilder.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-block text-sm text-[color:var(--electric-bright)] hover:underline"
+            >
+              appnsaasbuilder.com →
+            </a>
+          </article>
+          <article className="panel gold-glow p-6">
+            <h2 className="text-xl font-semibold text-[color:var(--gold-bright)]">
+              My Briefing
+            </h2>
+            <p className="mt-2 text-sm text-[color:var(--text-muted)]">
+              Turn one spoken thought into an organized day, with a daily briefing email. Live on
+              its own domain.
+            </p>
+            <a
+              href="https://mybriefing.us"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-block text-sm text-[color:var(--electric-bright)] hover:underline"
+            >
+              mybriefing.us →
+            </a>
+          </article>
           <article className="panel p-6">
             <h2 className="text-xl font-semibold text-[color:var(--text)]">Custom build</h2>
             <p className="mt-2 text-sm text-[color:var(--text-muted)]">

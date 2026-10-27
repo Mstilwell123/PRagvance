@@ -89,7 +89,7 @@ export async function POST(req: Request) {
 
   const nextLabel =
     nextWant === "swarm"
-      ? "Weekly classroom (Swarm)"
+      ? "Weekly classroom (AI Workforce)"
       : nextWant === "lab"
         ? "High-touch seats (Lab)"
         : nextWant === "custom"

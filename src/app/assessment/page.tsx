@@ -6,11 +6,11 @@ import { FAQ } from "@/lib/site";
 export const metadata: Metadata = {
   title: { absolute: "AI Assessment — How well does your company use AI? | Pragvance" },
   description:
-    "Free AI Assessment: a 25-question diagnostic (score 0–75) that bands how your company uses AI — and where Agent Swarm or Shadow Lab fits. Replaces the old Reality Check.",
+    "Free AI Assessment: a 25-question diagnostic (score 0–75) that bands how your company uses AI — and where AI Workforce or Shadow Lab fits. Replaces the old Reality Check.",
   alternates: { canonical: "/assessment" },
   openGraph: {
     title: "AI Assessment — How well does your company use AI?",
-    description: "25 questions. Honest bands (0–75). No fake percentages — Swarm, Lab, apps, or clarity.",
+    description: "25 questions. Honest bands (0–75). No fake percentages — AI Workforce, Lab, apps, or clarity.",
     url: "/assessment",
     images: [{ url: "/logo-lockup.png", alt: "Pragvance" }],
   },
@@ -34,7 +34,7 @@ export default function AssessmentPage() {
         name: "Is the assessment free?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Yes. The AI Assessment is free. It scores 0–75 across 25 questions and recommends Agent Swarm, Shadow Lab, a custom build conversation, or contact-only clarity — with band labels only, no fake percentages.",
+          text: "Yes. The AI Assessment is free. It scores 0–75 across 25 questions and recommends AI Workforce, Shadow Lab, a custom build conversation, or contact-only clarity — with band labels only, no fake percentages.",
         },
       },
     ],
@@ -75,7 +75,7 @@ export default function AssessmentPage() {
             <div className="panel p-4">
               <h3 className="font-medium text-[color:var(--text)]">Is it free?</h3>
               <p className="mt-2 text-sm text-[color:var(--text-muted)]">
-                Yes. Free diagnostic — then join Swarm, explore Lab, talk apps, or just email us.
+                Yes. Free diagnostic — then join AI Workforce, explore Lab, talk apps, or just email us.
               </p>
             </div>
           </div>

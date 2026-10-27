@@ -32,7 +32,7 @@ export default function Header() {
             rel="noopener noreferrer"
             className="ml-2 rounded-full bg-[color:var(--gold)] px-4 py-2 text-sm font-semibold text-black transition hover:bg-[color:var(--gold-bright)] electric-ring"
           >
-            Join Agent Swarm
+            Join AI Workforce
           </a>
         </nav>
 
@@ -70,7 +70,7 @@ export default function Header() {
               className="mt-2 rounded-full bg-[color:var(--gold)] px-4 py-3 text-center font-semibold text-black"
               onClick={() => setOpen(false)}
             >
-              Join Agent Swarm — {SITE.swarmPrice}
+              Join AI Workforce — {SITE.swarmPrice}
             </a>
           </nav>
         </div>

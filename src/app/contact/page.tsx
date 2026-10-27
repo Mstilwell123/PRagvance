@@ -72,7 +72,7 @@ export default function ContactPage() {
             defaultValue="Shadow Lab"
           >
             <option>Shadow Lab</option>
-            <option>Agent Swarm</option>
+            <option>AI Workforce</option>
             <option>Custom app / SaaS</option>
             <option>General</option>
           </select>

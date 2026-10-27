@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/contact" },
   openGraph: {
     title: "Contact Pragvance",
-    description: "support@pragvance.ai — Shadow Lab, Swarm, and custom builds.",
+    description: "support@pragvance.ai — Shadow Lab, AI Workforce, and custom builds.",
     url: "/contact",
     images: [{ url: "/logo-lockup.png", alt: "Pragvance" }],
   },
