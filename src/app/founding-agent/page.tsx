@@ -1,0 +1,42 @@
+import { AGENTS } from "@/lib/foundingAgent";
+
+export default function FoundingAgentPage() {
+  return (
+    <>
+      <p className="text-xs font-medium uppercase tracking-[0.2em] text-[color:var(--gold-bright)]">Founding offer · [N spots]</p>
+      <h1 className="mt-3 text-3xl font-semibold leading-tight text-[color:var(--text)] md:text-5xl">
+        One custom Grok Bot agent, built for your business.
+      </h1>
+      <p className="mt-4 text-lg text-[color:var(--text-muted,#aaa)]">
+        Pick the job you want handled. Pragvance builds the agent around your business and walks you through it on a 30-minute consultation.
+      </p>
+      <div className="mt-8 rounded-2xl border border-white/10 p-6">
+        <p className="text-sm uppercase tracking-wider opacity-70">Founding price</p>
+        <p className="mt-1 text-4xl font-semibold">
+          $99 <span className="ml-2 text-xl line-through opacity-60">$198</span>
+        </p>
+        <p className="mt-2 text-sm opacity-80">Includes a 30-minute consultation. Limited to [N spots].</p>
+        <form action="/api/founding-agent/checkout" method="POST" className="mt-6">
+          <button type="submit" className="rounded-full bg-[color:var(--gold-bright,#d4af37)] px-6 py-3 font-semibold text-black">
+            Claim a founding spot: $99
+          </button>
+        </form>
+      </div>
+      <h2 className="mt-12 text-2xl font-semibold">Choose your agent</h2>
+      <ul className="mt-4 grid gap-4 sm:grid-cols-2">
+        {AGENTS.map((a) => (
+          <li key={a.id} className="rounded-xl border border-white/10 p-5">
+            <p className="text-lg font-semibold">{a.name}</p>
+            <p className="mt-1 opacity-80">{a.d}</p>
+          </li>
+        ))}
+      </ul>
+      <h2 className="mt-12 text-2xl font-semibold">How it works</h2>
+      <ol className="mt-4 list-decimal space-y-2 pl-6 opacity-90">
+        <li>Check out at the $99 founding price.</li>
+        <li>Answer four short questions about your business.</li>
+        <li>Book your 30-minute consultation.</li>
+      </ol>
+    </>
+  );
+}
