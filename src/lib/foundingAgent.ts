@@ -1,5 +1,5 @@
 export const AGENTS = [
-  { id: "booker", name: "Booker", d: "Appointment booking" },
+  { id: "crow", name: "CROW", d: "Chief Revenue Officer Winston: tracks your revenue goal, flags stalled leads, drafts follow-ups and offers, and names the next money move every day" },
   { id: "helpline", name: "Helpline", d: "FAQ and inquiry replies" },
   { id: "follow-up", name: "Follow-up", d: "Quote and lead follow-up" },
   { id: "megaphone", name: "Megaphone", d: "Content repurposing" },

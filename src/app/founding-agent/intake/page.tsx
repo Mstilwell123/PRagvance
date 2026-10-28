@@ -28,8 +28,7 @@ export default function IntakePage() {
       <form onSubmit={submit} noValidate className="mt-8 space-y-6">
         <label className="block">Business type<input name="businessType" className={field} />{err("businessType")}</label>
         <label className="block">Which agent?
-          <select name="agent" defaultValue="" className={field}>
-            <option value="" disabled>Choose one</option>
+          <select name="agent" defaultValue="crow" className={field}>
             {AGENTS.map((a) => <option key={a.id} value={a.id} className="text-black">{a.name}: {a.d}</option>)}
           </select>{err("agent")}
         </label>

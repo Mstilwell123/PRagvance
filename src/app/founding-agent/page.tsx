@@ -5,10 +5,10 @@ export default function FoundingAgentPage() {
     <>
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-[color:var(--gold-bright)]">Founding offer · [N spots]</p>
       <h1 className="mt-3 text-3xl font-semibold leading-tight text-[color:var(--text)] md:text-5xl">
-        One custom Grok Bot agent, built for your business.
+        I build an AI Chief Revenue Officer for your business.
       </h1>
       <p className="mt-4 text-lg text-[color:var(--text-muted,#aaa)]">
-        Pick the job you want handled. Pragvance builds the agent around your business and walks you through it on a 30-minute consultation.
+        Leads go cold. Follow-ups slip. Nobody owns the number every day.
       </p>
       <div className="mt-8 rounded-2xl border border-white/10 p-6">
         <p className="text-sm uppercase tracking-wider opacity-70">Founding price</p>
@@ -22,9 +22,14 @@ export default function FoundingAgentPage() {
           </button>
         </form>
       </div>
-      <h2 className="mt-12 text-2xl font-semibold">Choose your agent</h2>
-      <ul className="mt-4 grid gap-4 sm:grid-cols-2">
-        {AGENTS.map((a) => (
+      <h2 className="mt-12 text-2xl font-semibold">Meet CROW: Chief Revenue Officer Winston</h2>
+      <p className="mt-3 opacity-90">
+        A custom AI Chief Revenue Officer for your business. CROW tracks your revenue goal, flags stalled leads,
+        drafts follow-ups and offers, and names the next money move every day.
+      </p>
+      <h3 className="mt-10 text-lg font-semibold">Prefer a different agent? Other options</h3>
+      <ul className="mt-4 grid gap-4 sm:grid-cols-3">
+        {AGENTS.filter((a) => a.id !== "crow").map((a) => (
           <li key={a.id} className="rounded-xl border border-white/10 p-5">
             <p className="text-lg font-semibold">{a.name}</p>
             <p className="mt-1 opacity-80">{a.d}</p>
@@ -35,7 +40,7 @@ export default function FoundingAgentPage() {
       <ol className="mt-4 list-decimal space-y-2 pl-6 opacity-90">
         <li>Check out at the $99 founding price.</li>
         <li>Answer four short questions about your business.</li>
-        <li>Book your 30-minute consultation.</li>
+        <li>Schedule your 30-minute consultation.</li>
       </ol>
     </>
   );
