@@ -30,8 +30,8 @@ export default function FoundingAgentPage() {
           <p className="mt-3 font-semibold text-amber-400">His focus: helping you build wealth by earning more and saving more.</p>
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/founding-agent-crow.webp" width={800} height={800} loading="lazy" className="w-full rounded-xl"
-          alt="CROW, Chief Revenue Officer Winston: a robot agent at a desk surrounded by icons for contacts, documents, tasks and calendar" />
+        <img src="/founding-agent-crow.webp" width={800} height={792} loading="lazy" className="w-full rounded-xl"
+          alt="CROW, Chief Revenue Officer Winston: a lead robot agent at a glowing desk with icons for contacts, documents, tasks and calendar, working alongside other robot agents" />
       </div>
       <h3 className="mt-10 text-lg font-semibold">Prefer a different agent? Other options</h3>
       <ul className="mt-4 grid gap-4 sm:grid-cols-3">
