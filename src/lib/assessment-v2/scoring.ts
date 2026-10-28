@@ -1,6 +1,6 @@
 // PREVIEW ONLY: scoring and routing for /assessment-v2. Pure functions; used by the API route and tests.
-import { AREA_ORDER, BRANCHES, OFFERS, QUESTION_SETS, RULES } from "./config";
-import type { AreaId, BranchId, Offer, OfferId } from "./config";
+import { AREA_ORDER, BRANCHES, OFFERS, QUESTION_SETS, RULES, SIGNAL_QUESTIONS, SIGNAL_THRESHOLDS, SOLO_TEAM_SIGNALS, TEMPLATES, WHY_LIMITS } from "./config";
+import type { AreaId, BranchId, Offer, OfferId, WhyCondition } from "./config";
 
 export type Answers = Record<string, number>;
 export type RouteReason = "dfy_branch" | "dfy_answer" | "app_branch" | "app_answer" | "band_low" | "band_mid" | "band_high" | "band_high_low_hands_on";
@@ -12,6 +12,9 @@ export type Result = {
   topTasks: string[];
   offer: Offer;
   reason: RouteReason;
+  headline: string;
+  why: string[];
+  teamSize: "solo" | "team" | "unknown";
 };
 
 export function isBranch(x: unknown): x is BranchId {
@@ -87,5 +90,69 @@ export function score(branch: BranchId, answers: Answers): Result {
     topTasks: topTasks(branch, answers),
     offer: OFFERS[r.offer],
     reason: r.reason,
+    ...tailor(branch, answers, r.offer),
+  };
+}
+
+export function soloOrTeam(answers: Answers): "solo" | "team" | "unknown" {
+  let solo = 0, team = 0;
+  for (const [id, map] of Object.entries(SOLO_TEAM_SIGNALS)) {
+    const v = answers[id];
+    if (v === undefined) continue;
+    const s = map[v as 0 | 1 | 2 | 3];
+    if (s === "solo") solo++;
+    else if (s === "team") team++;
+  }
+  return solo > team ? "solo" : team > solo ? "team" : "unknown";
+}
+
+/** Which why-line conditions are true for these answers. */
+export function conditions(branch: BranchId, answers: Answers): Set<WhyCondition> {
+  const c = new Set<WhyCondition>(["always"]);
+  const areas = areaScores(branch, answers);
+  const sq = SIGNAL_QUESTIONS[branch];
+  const size = soloOrTeam(answers);
+  if (size !== "unknown") c.add(size);
+  const h = answers[sq.hours], b = answers[sq.budget];
+  if (h !== undefined) c.add(h <= 1 ? "hours_low" : "hours_high");
+  if (b !== undefined) c.add(b <= 1 ? "budget_low" : "budget_high");
+  if (areas.hands_on >= SIGNAL_THRESHOLDS.handsOnHigh) c.add("hands_on_high");
+  if (areas.hands_on <= SIGNAL_THRESHOLDS.handsOnLow) c.add("hands_on_low");
+  if (areas.ai_today >= SIGNAL_THRESHOLDS.readyHigh) c.add("ready_high");
+  if (areas.ai_today <= SIGNAL_THRESHOLDS.readyLow) c.add("ready_low");
+  if (topTasks(branch, answers).length > 0) c.add("has_tasks");
+  return c;
+}
+
+function joinList(xs: string[]): string {
+  const l = xs.map((x) => x.toLowerCase());
+  if (l.length <= 1) return l[0] ?? "";
+  return l.slice(0, -1).join(", ") + " and " + l[l.length - 1];
+}
+
+function fillText(text: string, ctx: { tasks: string[]; offer: Offer }): string {
+  const t = ctx.tasks;
+  const out = text
+    .replaceAll("{tasks}", joinList(t))
+    .replaceAll("{task1}", t[0] ?? "")
+    .replaceAll("{offer}", ctx.offer.title)
+    .replaceAll("{price}", ctx.offer.price ?? "");
+  return out.charAt(0).toUpperCase() + out.slice(1);
+}
+
+/** Deterministic headline + 2–3 why-lines from the offer's templates. */
+export function tailor(branch: BranchId, answers: Answers, offerId: OfferId) {
+  const tpl = TEMPLATES[offerId];
+  const c = conditions(branch, answers);
+  const ctx = { tasks: topTasks(branch, answers), offer: OFFERS[offerId] };
+  const head = tpl.headlines.find((h) => c.has(h.when)) ?? tpl.headlines[tpl.headlines.length - 1];
+  const matched = tpl.why.filter((w) => w.when !== "always" && c.has(w.when));
+  const fallback = tpl.why.filter((w) => w.when === "always");
+  const picked = [...matched.slice(0, WHY_LIMITS.max)];
+  for (const f of fallback) if (picked.length < WHY_LIMITS.min) picked.push(f);
+  return {
+    headline: fillText(head.text, ctx),
+    why: picked.slice(0, WHY_LIMITS.max).map((w) => fillText(w.text, ctx)),
+    teamSize: soloOrTeam(answers),
   };
 }

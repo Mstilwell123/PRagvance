@@ -168,11 +168,24 @@ export default function AssessmentV2() {
           <p className="mt-2 text-sm text-[color:var(--text-muted)]" data-testid="score">
             Score {result.total} / {result.max}
           </p>
-          <h2 className="mt-2 text-2xl font-semibold text-[color:var(--gold-bright)]">
+          <h2 className="mt-2 text-2xl font-semibold text-[color:var(--gold-bright)]" data-testid="headline">
+            {result.headline}
+          </h2>
+          <p className="mt-3 text-sm font-medium text-[color:var(--text)]">
             {result.offer.title}
             {result.offer.price ? ` · ${result.offer.price}` : ""}
-          </h2>
-          <p className="mt-3 text-[color:var(--text-muted)]">{result.offer.body}</p>
+          </p>
+          <p className="mt-1 text-sm text-[color:var(--text-muted)]">{result.offer.body}</p>
+          {result.why?.length > 0 && (
+            <div className="mt-5">
+              <p className="text-sm font-medium text-[color:var(--text)]">Why we recommend this</p>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-[color:var(--text-muted)]" data-testid="why">
+                {result.why.map((w) => (
+                  <li key={w}>{w}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           {result.topTasks.length > 0 && (
             <div className="mt-5">
               <p className="text-sm font-medium text-[color:var(--text)]">Your top tasks to automate</p>

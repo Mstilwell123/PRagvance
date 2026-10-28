@@ -234,3 +234,148 @@ const APPQ: QuestionDef[] = [
 ];
 
 export const QUESTION_SETS: Record<BranchId, readonly QuestionDef[]> = { save: SAVE, learn: LEARN, dfy: DFYQ, app: APPQ };
+
+// =====================================================================
+// Tailored recommendation screen (deterministic templates, no AI).
+// Mark: edit the wording below freely. Placeholders: {tasks}, {task1}, {offer}, {price}.
+// =====================================================================
+
+/** Which question in each branch measures hours available and budget (answer index 0–3). */
+export const SIGNAL_QUESTIONS: Record<BranchId, { hours: string; budget: string }> = {
+  save: { hours: "s_hours", budget: "s_budget" },
+  learn: { hours: "l_hours", budget: "l_budget" },
+  dfy: { hours: "d_time", budget: "d_budget" },
+  app: { hours: "a_time", budget: "a_budget" },
+};
+
+/**
+ * Solo vs team detection. Each listed answer adds one "solo" or "team" vote.
+ * More solo votes than team = solo; more team = team; tie or none = unknown.
+ */
+export const SOLO_TEAM_SIGNALS: Record<string, Partial<Record<0 | 1 | 2 | 3, "solo" | "team">>> = {
+  // Save time
+  s_owner: { 1: "team", 2: "team" }, // "A few people on their own", "A manager who also handles AI"
+  s_review: { 2: "solo", 3: "team" }, // "Me, on a set day" vs "A named person, with a checklist"
+  s_change: { 2: "solo" }, // "Me, when something breaks"
+  s_runbook: { 1: "team", 3: "team" }, // thinking about a new hire running it
+  // Learn
+  l_change: { 2: "solo", 3: "solo" }, // "Me, when it breaks" / "Me, with a change log"
+  l_runbook: { 3: "team" }, // written for someone else, several workflows
+  // Get it done for me
+  d_owner: { 2: "team", 3: "team" }, // a manager / named owner
+  d_review: { 2: "team", 3: "team" },
+  d_train: { 2: "team", 3: "team" }, // wants their team trained
+  // Build an app
+  a_users: { 1: "solo", 2: "team" }, // "Just me" vs "My team"
+  a_spec: { 2: "solo", 3: "team" }, // "Me" vs "Me, with named reviewers"
+  a_test: { 1: "solo", 3: "team" },
+};
+
+/** Area thresholds (each area is 0–15). */
+export const SIGNAL_THRESHOLDS = { handsOnHigh: 10, handsOnLow: 5, readyHigh: 10, readyLow: 5 } as const;
+
+/**
+ * Conditions a why-line can use:
+ *  solo, team, hours_low (answer 0–1), hours_high (2–3), budget_low (0–1), budget_high (2–3),
+ *  hands_on_high, hands_on_low, ready_high, ready_low (ready = "How you use AI today" area),
+ *  has_tasks (at least one top task), always.
+ */
+export type WhyCondition =
+  | "solo" | "team" | "hours_low" | "hours_high" | "budget_low" | "budget_high"
+  | "hands_on_high" | "hands_on_low" | "ready_high" | "ready_low" | "has_tasks" | "always";
+
+export type OfferTemplates = {
+  /** Headline: first entry whose condition matches wins. Last one should be "always". */
+  headlines: { when: WhyCondition; text: string }[];
+  /** Why-lines in priority order. Up to 3 matching lines are shown; "always" lines fill in when fewer than 2 match. Keep two "always" lines per offer. */
+  why: { when: WhyCondition; text: string }[];
+};
+
+export const WHY_LIMITS = { min: 2, max: 3 } as const;
+
+export const TEMPLATES: Record<OfferId, OfferTemplates> = {
+  // Tone: friendly, practical, low-pressure starter.
+  workforce: {
+    headlines: [
+      { when: "solo", text: "Based on your answers, you're running this solo, so AI Workforce is the right start." },
+      { when: "team", text: "Based on your answers, AI Workforce is the right start for you and your team." },
+      { when: "always", text: "Based on your answers, AI Workforce is the right place to start." },
+    ],
+    why: [
+      { when: "has_tasks", text: "You named {tasks} as work that keeps coming back. Those make good first agents to build in class." },
+      { when: "ready_low", text: "You're early with AI, so a weekly class that walks you through it step by step fits better than a big setup." },
+      { when: "hours_low", text: "You have limited hours right now, and AI Workforce lets you go at your own pace each week." },
+      { when: "budget_low", text: "At {price}, it keeps your spend small while you learn what works for your business." },
+      { when: "solo", text: "As a solo operator, you'll build on your own real work, with a community on Skool to ask when you're stuck." },
+      { when: "always", text: "You can start small, build one agent, and grow from there." },
+      { when: "always", text: "Classes and the community live on Skool, so help is there between sessions." },
+    ],
+  },
+  // Tone: encouraging, "you're ready for a real build".
+  workforce_bot: {
+    headlines: [
+      { when: "solo", text: "Based on your answers, you're ready for more: join AI Workforce and let us build your first custom agent." },
+      { when: "team", text: "Based on your answers, your team is ready for a custom agent alongside AI Workforce." },
+      { when: "always", text: "Based on your answers, we recommend AI Workforce plus a custom Grok Bot agent." },
+    ],
+    why: [
+      { when: "has_tasks", text: "{task1} came up most often in your answers. That's a strong first job for a custom agent." },
+      { when: "hands_on_high", text: "You want to stay hands-on, so you'll keep learning in AI Workforce while we build the first agent with you." },
+      { when: "hours_low", text: "Your time is tight, so having the first agent built for you saves you the trial and error." },
+      { when: "team", text: "Others in your business touch this work, so one shared agent with a clear job keeps everyone on the same page." },
+      { when: "solo", text: "You're carrying this yourself, so one agent that takes a repeat task off your plate is the quickest win." },
+      { when: "always", text: "The 30-minute consultation turns your answers into a clear job for your agent." },
+      { when: "always", text: "Pricing is {price}, and the custom agent includes the 30-minute consultation." },
+    ],
+  },
+  // Tone: direct, confident, peer-to-peer coaching.
+  shadow_lab: {
+    headlines: [
+      { when: "solo", text: "Based on your answers, we really recommend Shadow Lab, so you're not building this alone." },
+      { when: "team", text: "Based on your answers, we really recommend Shadow Lab for you and the people building with you." },
+      { when: "always", text: "Based on your answers, we really recommend Shadow Lab." },
+    ],
+    why: [
+      { when: "ready_high", text: "You already run AI on real work. Live coaching is where you'll tighten it, not a beginner class." },
+      { when: "hands_on_high", text: "You want to build it yourself, and Shadow Lab gives you a coach next to you while you do." },
+      { when: "hours_high", text: "You have hours to put in each week, so a two-hour working session gets used, not wasted." },
+      { when: "budget_high", text: "The budget you described leaves room for {price}." },
+      { when: "has_tasks", text: "We'd start with {tasks}, the work you said repeats most." },
+      { when: "always", text: "Each session works on your own business, not on examples." },
+      { when: "always", text: "Start with one session or go monthly: {price}." },
+    ],
+  },
+  // Tone: reassuring, "we handle it".
+  dfy: {
+    headlines: [
+      { when: "solo", text: "Based on your answers, you're running this solo, so let us set it up for you with Done-for-You." },
+      { when: "team", text: "Based on your answers, Done-for-You is the right fit: we set it up and hand it to your team." },
+      { when: "always", text: "Based on your answers, we recommend Done-for-You. We set it up for you." },
+    ],
+    why: [
+      { when: "hands_on_low", text: "You told us you'd rather not do the setup yourself, so we take it off your plate." },
+      { when: "has_tasks", text: "We'd start by handing {tasks} to AI." },
+      { when: "hours_low", text: "You don't have hours to spare for setup, and with Done-for-You you mostly don't need them." },
+      { when: "team", text: "Your team gets a working setup plus a handover, instead of learning it from scratch." },
+      { when: "solo", text: "You're already doing everything yourself; this is one less thing to learn." },
+      { when: "always", text: "It's a {price} one-time setup, and you approve what goes live." },
+      { when: "always", text: "We start from your answers here, so the first call is about your business from minute one." },
+    ],
+  },
+  // Tone: thoughtful, scoping-first; never names a price.
+  app: {
+    headlines: [
+      { when: "team", text: "Based on your answers, your team needs its own app, and the next step is a planning sprint." },
+      { when: "always", text: "Based on your answers, what you need is your own app. Let's plan it properly first." },
+    ],
+    why: [
+      { when: "has_tasks", text: "{tasks} keep coming up, and an app built around how you work could handle them in one place." },
+      { when: "ready_high", text: "You already have a clear idea and some groundwork, so a sprint can lock the spec quickly." },
+      { when: "ready_low", text: "The idea is still forming, and the planning sprint turns it into a written spec before anyone writes code." },
+      { when: "solo", text: "It's mainly for you right now, so we'll keep the first version small." },
+      { when: "team", text: "Several people would use it, so we'll map who does what before building." },
+      { when: "always", text: "The sprint ends with a locked spec and a quote, so you know the scope before you commit." },
+      { when: "always", text: "There's no price yet: the quote comes from the locked spec, not a guess." },
+    ],
+  },
+};

@@ -112,3 +112,66 @@ test("validation", () => {
   assert.equal(validate({ branch: "save", answers: { ...a, extra: 1 } }).ok, false);
   assert.equal(validate(null).ok, false);
 });
+
+// ---- Tailored recommendation screen ----
+import { soloOrTeam, tailor, conditions } from "../src/lib/assessment-v2/scoring.ts";
+import { TEMPLATES } from "../src/lib/assessment-v2/config.ts";
+
+test("solo vs team detection", () => {
+  assert.equal(soloOrTeam({ s_review: 2, s_change: 2 }), "solo");
+  assert.equal(soloOrTeam({ s_owner: 2, s_review: 3 }), "team");
+  assert.equal(soloOrTeam({ s_review: 2, s_owner: 1 }), "unknown");
+  assert.equal(soloOrTeam({}), "unknown");
+  assert.equal(soloOrTeam({ a_users: 1, a_spec: 2 }), "solo");
+});
+
+test("why-lines: always 2–3, deterministic, placeholders filled, no banned words", () => {
+  for (const b of BRANCHES) for (const v of [0, 1, 2, 3]) {
+    const a = fill(b.id, () => v, true);
+    for (const offer of Object.keys(TEMPLATES) as (keyof typeof TEMPLATES)[]) {
+      const t1 = tailor(b.id, a, offer), t2 = tailor(b.id, a, offer);
+      assert.deepEqual(t1, t2);
+      assert.ok(t1.why.length >= 2 && t1.why.length <= 3, `${b.id}/${v}/${offer}: ${t1.why.length}`);
+      const all = [t1.headline, ...t1.why].join(" ");
+      assert.ok(!/[{}]/.test(all), all);
+      assert.ok(!/sw[a]rm|home [i]mprovement/i.test(all));
+      assert.ok(t1.headline.startsWith("Based on your answers"));
+    }
+  }
+});
+
+test("why-lines: solo workforce headline and task/budget lines", () => {
+  const a = { ...fill("save", () => 0), s_review: 2, s_change: 2, s_t_followup: 3 };
+  const r = score("save", a);
+  assert.equal(r.offer.id, "workforce");
+  assert.equal(r.teamSize, "solo");
+  assert.match(r.headline, /running this solo, so AI Workforce is the right start/);
+  assert.match(r.why[0], /^You named quote and lead follow-up/);
+  assert.equal(r.why.length, 3);
+});
+
+test("why-lines: shadow lab picks readiness + hands-on + hours, in priority order", () => {
+  const r = score("save", fill("save", () => 3));
+  assert.equal(r.offer.id, "shadow_lab");
+  assert.match(r.headline, /we really recommend Shadow Lab/);
+  assert.match(r.why[0], /already run AI on real work/);
+  assert.match(r.why[1], /build it yourself/);
+  assert.match(r.why[2], /hours to put in/);
+});
+
+test("why-lines: done-for-you low hands-on line, app never shows a price", () => {
+  const d = score("save", fill("save", (area) => (area === "hands_on" ? 1 : 3)));
+  assert.equal(d.offer.id, "dfy");
+  assert.match(d.why[0], /rather not do the setup yourself/);
+  const ap = score("app", fill("app", () => 1));
+  assert.ok(!/\$/.test([ap.headline, ...ap.why].join(" ")));
+});
+
+test("why-lines: fallback 'always' line fills to the minimum", () => {
+  // no tasks, mid readiness, hours/budget high, unknown size -> few matches for workforce
+  const a = fill("learn", () => 2);
+  const c = conditions("learn", a);
+  assert.ok(c.has("always"));
+  const t = tailor("learn", a, "workforce");
+  assert.ok(t.why.length >= 2);
+});
