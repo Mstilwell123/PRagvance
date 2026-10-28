@@ -22,11 +22,17 @@ export default function FoundingAgentPage() {
           </button>
         </form>
       </div>
-      <h2 className="mt-12 text-2xl font-semibold">Meet CROW: Chief Revenue Officer Winston</h2>
-      <p className="mt-3 opacity-90">
-        A custom AI Chief Revenue Officer for your business. CROW tracks your revenue goal, flags stalled leads,
-        drafts follow-ups and offers, and names the next money move every day.
-      </p>
+      <div className="mt-12 grid items-center gap-6 md:grid-cols-2">
+        <div>
+          <h2 className="text-2xl font-semibold">Meet CROW</h2>
+          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.15em] text-sky-400">Chief Revenue Officer Winston</p>
+          <p className="mt-3 opacity-90">your Chief Revenue Officer: tracks your revenue goal, flags stalled leads, drafts follow-ups and offers, and tells you the next money move every day.</p>
+          <p className="mt-3 font-semibold text-amber-400">His focus: helping you build wealth by earning more and saving more.</p>
+        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/founding-agent-crow.webp" width={800} height={800} loading="lazy" className="w-full rounded-xl"
+          alt="CROW, Chief Revenue Officer Winston: a robot agent at a desk surrounded by icons for contacts, documents, tasks and calendar" />
+      </div>
       <h3 className="mt-10 text-lg font-semibold">Prefer a different agent? Other options</h3>
       <ul className="mt-4 grid gap-4 sm:grid-cols-3">
         {AGENTS.filter((a) => a.id !== "crow").map((a) => (
