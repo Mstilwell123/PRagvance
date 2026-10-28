@@ -127,7 +127,7 @@ export function conditions(branch: BranchId, answers: Answers): Set<WhyCondition
 function joinList(xs: string[]): string {
   const l = xs.map((x) => x.toLowerCase());
   if (l.length <= 1) return l[0] ?? "";
-  return l.slice(0, -1).join(", ") + " and " + l[l.length - 1];
+  return l.length === 2 ? `${l[0]} and ${l[1]}` : l.slice(0, -1).join(", ") + ", and " + l[l.length - 1];
 }
 
 function fillText(text: string, ctx: { tasks: string[]; offer: Offer }): string {
