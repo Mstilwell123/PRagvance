@@ -12,10 +12,15 @@ export const SITE = {
   labPrices: SHADOW_LAB_SUMMARY,
 } as const;
 
+// Package name: "First Agent" (Mark confirmed Oct 28, 2026). Rename here only.
+export const FIRST_AGENT_LABEL = "First Agent";
+export const FIRST_AGENT_PATH = "/first-agent";
+
 export const NAV = [
   { href: "/", label: "Home" },
   { href: "/aiworkforce", label: "AI Workforce" },
   { href: "/shadow-lab", label: "Shadow Lab" },
+  { href: FIRST_AGENT_PATH, label: FIRST_AGENT_LABEL },
   { href: "/assessment", label: "AI Assessment" },
   { href: "/apps", label: "Apps" },
   { href: "/pricing", label: "Pricing" },

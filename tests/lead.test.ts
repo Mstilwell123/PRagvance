@@ -11,7 +11,8 @@ test("offer mapping", () => {
   assert.equal(offerFromSlug("custom"), "Custom app / SaaS");
   assert.equal(offerFromSlug(null), "General");
   assert.equal(offerFromSlug("bogus"), "General");
-  assert.equal(OFFERS.length, 6);
+  assert.equal(OFFERS.length, 7);
+  assert.equal(offerFromSlug("first-agent"), "First Agent");
 });
 
 const good = { name: "A B", email: "a@b.co", offer: "Shadow Lab", building: "x", message: "hi" };
