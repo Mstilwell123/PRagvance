@@ -10,7 +10,7 @@ import { FIRST_AGENT_LABEL, FIRST_AGENT_PATH } from "@/lib/site";
 export const metadata: Metadata = {
   title: `${FIRST_AGENT_LABEL}: Your First AI Agent for $99 | Pragvance`,
   description:
-    "Five AI agents: Builder, Folderbot, Deep Dive, Chief Revenue Officer and Lead Magnet Marketer. Your first AI agent is $99, or unlock all five for $499 one-time.",
+    "Five AI agents: Builder, Folderbot, Deep Dive, Chief Revenue Officer and Lead Magnet Marketer. Your first AI agent is $99 for the first 10 businesses (regular $198), or unlock all five for $499 one-time.",
   alternates: { canonical: FIRST_AGENT_PATH },
 };
 
@@ -27,7 +27,7 @@ const SLIDES = [
   { src: "/first-agent/slide2.webp", alt: "Leads go cold. Follow-ups slip. Nobody owns the number every day." },
   { src: "/first-agent/slide3.webp", alt: "Meet CROW, Chief Revenue Officer Winston: tracks your revenue goal, flags stalled leads, drafts follow-ups and offers, and tells you the next money move every day." },
   { src: "/first-agent/slide4.webp", alt: "What you get: one custom revenue agent built for your business, plus a 30-minute strategy consultation." },
-  { src: "/first-agent/slide5.webp", alt: "Five AI agents. Start with one: Builder, Folderbot, Deep Dive, Chief Revenue Officer, Lead Magnet Marketer. Your first AI agent, $99, or unlock all five for $499 one-time." },
+  { src: "/first-agent/slide5.webp", alt: "Five AI agents. Start with one: Builder, Folderbot, Deep Dive, Chief Revenue Officer, Lead Magnet Marketer. Your first AI agent, $99 for the first 10 businesses, regular $198, or unlock all five for $499 one-time." },
 ];
 
 export default function FirstAgentPage() {
@@ -48,7 +48,7 @@ export default function FirstAgentPage() {
             ))}
           </ul>
           <p className="mt-6 text-lg text-[color:var(--text)]">
-            Your first AI agent, <strong>$99</strong>. Or unlock all five for <strong>$499 one-time</strong>.
+            Your first AI agent, <strong>$99</strong> for the first 10 businesses (regular $198). Or unlock all five for <strong>$499 one-time</strong>.
           </p>
           <p className="mt-2 text-[color:var(--text-muted)]">
             Your agents arrive as ready-to-use bot template links, customized for your business.
