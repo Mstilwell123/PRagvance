@@ -5,6 +5,7 @@ import { resolveCalendlyBookingUrl } from "@/lib/calendly";
 import { getStripe } from "@/lib/stripe";
 import { getOffer } from "@/lib/offers";
 import { handlePaidSession } from "@/lib/paid-handoff.server";
+import { oncePerEvent } from "@/lib/webhook-once.server";
 
 export const runtime = "nodejs";
 
@@ -42,32 +43,39 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
+  let outcome: "done" | "duplicate";
   try {
-    switch (event.type) {
-      case "checkout.session.completed":
-      case "checkout.session.async_payment_succeeded": {
-        const session = event.data.object as Stripe.Checkout.Session;
-        await handleCheckoutCompleted(session);
-        break;
+    outcome = await oncePerEvent(event.id, async () => {
+      switch (event.type) {
+        case "checkout.session.completed":
+        case "checkout.session.async_payment_succeeded": {
+          const session = event.data.object as Stripe.Checkout.Session;
+          await handleCheckoutCompleted(session);
+          break;
+        }
+        case "customer.subscription.created":
+        case "customer.subscription.updated":
+        case "customer.subscription.deleted":
+        case "invoice.paid":
+        case "invoice.payment_failed": {
+          // Stub: log for future entitlement / dunning wiring.
+          console.info(`[stripe webhook stub] ${event.type}`, {
+            id: event.id,
+            objectId: (event.data.object as { id?: string }).id,
+          });
+          break;
+        }
+        default:
+          console.info(`[stripe webhook] unhandled type: ${event.type}`);
       }
-      case "customer.subscription.created":
-      case "customer.subscription.updated":
-      case "customer.subscription.deleted":
-      case "invoice.paid":
-      case "invoice.payment_failed": {
-        // Stub: log for future entitlement / dunning wiring.
-        console.info(`[stripe webhook stub] ${event.type}`, {
-          id: event.id,
-          objectId: (event.data.object as { id?: string }).id,
-        });
-        break;
-      }
-      default:
-        console.info(`[stripe webhook] unhandled type: ${event.type}`);
-    }
+    });
   } catch (err) {
     console.error("Webhook handler error:", err);
     return NextResponse.json({ error: "Handler failed" }, { status: 500 });
+  }
+  if (outcome === "duplicate") {
+    console.info("[stripe webhook] duplicate event skipped", { id: event.id, type: event.type });
+    return NextResponse.json({ received: true, duplicate: true });
   }
 
   return NextResponse.json({ received: true });
