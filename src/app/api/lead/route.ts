@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { clientIp } from "@/lib/client-ip";
-import { incrWindow } from "@/lib/kv.server";
+import { incrWindow, kvBackend } from "@/lib/kv.server";
 
 // Shared-store limiter (Upstash/Vercel KV when configured, else per-instance memory).
 // Keyed on Vercel's x-real-ip, never the client-supplied x-forwarded-for.
@@ -26,6 +26,7 @@ const GENERIC_ERROR = "Something went wrong sending your message. Please email s
 export async function POST(req: Request) {
   const ip = clientIp(req.headers);
   const byIp = await incrWindow(`lead:ip:${ip}`, WINDOW_SEC);
+  if (process.env.VERCEL_ENV !== "production") console.log("[lead-rl]", JSON.stringify({ backend: kvBackend(), count: byIp.count, ipLen: ip.length, ipTail: ip.slice(-4), hasReal: !!req.headers.get("x-real-ip") }));
   if (byIp.count > MAX_PER_IP) return tooMany(byIp.ttl);
   let body: unknown;
   try {
