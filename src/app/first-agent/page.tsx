@@ -50,6 +50,9 @@ export default function FirstAgentPage() {
           <p className="mt-6 text-lg text-[color:var(--text)]">
             Your first AI agent, <strong>$99</strong>. Or unlock all five for <strong>$499 one-time</strong>.
           </p>
+          <p className="mt-2 text-[color:var(--text-muted)]">
+            Your agents arrive as ready-to-use bot template links, customized for your business.
+          </p>
           <Link href="/contact?interest=first-agent#contact"
             className="mt-6 inline-block rounded-full bg-[color:var(--gold)] px-6 py-3 font-semibold text-black hover:bg-[color:var(--gold-bright)]">
             Get your first agent
