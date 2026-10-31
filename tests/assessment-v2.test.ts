@@ -175,3 +175,19 @@ test("why-lines: fallback 'always' line fills to the minimum", () => {
   const t = tailor("learn", a, "workforce");
   assert.ok(t.why.length >= 2);
 });
+
+// ---- Option-to-question-set routing ----
+test("every option opens its own 25-question set, starting with its own first question", () => {
+  const prefix: Record<BranchId, string> = { save: "s_", learn: "l_", dfy: "d_", app: "a_" };
+  assert.deepEqual(BRANCHES.map((b) => b.id).sort(), Object.keys(QUESTION_SETS).sort());
+  const firsts = new Set<string>();
+  for (const b of BRANCHES) {
+    const qs = QUESTION_SETS[b.id];
+    assert.ok(qs, `no set for ${b.id}`);
+    assert.equal(qs.length, 25, `${b.id} should have 25 questions`);
+    assert.ok(qs.every((q) => q.id.startsWith(prefix[b.id])), `${b.id} set has a foreign question`);
+    firsts.add(qs[0].q);
+  }
+  assert.equal(firsts.size, 4, "each option must open on a distinct first question");
+  assert.match(QUESTION_SETS.app[0].q, /app/i, "Build an app must open on an app question");
+});
