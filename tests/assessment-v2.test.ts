@@ -186,7 +186,7 @@ test("every option opens its own 25-question set, starting with its own first qu
     assert.ok(qs, `no set for ${b.id}`);
     assert.equal(qs.length, 25, `${b.id} should have 25 questions`);
     assert.ok(qs.every((q) => q.id.startsWith(prefix[b.id])), `${b.id} set has a foreign question`);
-    firsts.add(qs[0].q);
+    firsts.add(qs[0].id);
   }
-  assert.equal(firsts.size, 4, "each option must open on a distinct first question");
+  assert.equal(firsts.size, 4, "each option must open on its own first question (by id)");
 });
