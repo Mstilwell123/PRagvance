@@ -43,3 +43,11 @@ Server-only env vars (Vercel; currently set for **Preview** only):
 | `GHL_LOCATION_ID` | CRM sub-account/location id |
 
 Before going live, add both to the Production environment. Tests: `npm test`; typecheck: `npm run typecheck`.
+
+## Abuse limits (env, all optional)
+
+| Var | Default | Meaning |
+|---|---|---|
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` (or `KV_REST_API_URL` / `KV_REST_API_TOKEN`) | unset | Shared store for limits + dedupe across serverless instances. Unset = per-instance memory (OK for preview, **set for production**). |
+| `LEAD_RL_PER_IP` | 5 | `/api/lead` posts per IP (Vercel `x-real-ip`) per 10 min |
+| `LEAD_RL_PER_EMAIL` | 3 | `/api/lead` posts per email per 10 min |

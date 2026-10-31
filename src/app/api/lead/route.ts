@@ -5,24 +5,28 @@ import { sendLeadToCrm } from "@/lib/crm.server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Simple in-memory per-IP limiter (per server instance): 5 requests / 10 minutes.
-const WINDOW_MS = 10 * 60 * 1000;
-const MAX = 5;
-const hits = new Map<string, number[]>();
-function limited(ip: string) {
-  const now = Date.now();
-  const arr = (hits.get(ip) || []).filter((t) => now - t < WINDOW_MS);
-  arr.push(now);
-  hits.set(ip, arr);
-  if (hits.size > 5000) hits.clear();
-  return arr.length > MAX;
+import { clientIp } from "@/lib/client-ip";
+import { incrWindow } from "@/lib/kv.server";
+
+// Shared-store limiter (Upstash/Vercel KV when configured, else per-instance memory).
+// Keyed on Vercel's x-real-ip, never the client-supplied x-forwarded-for.
+const WINDOW_SEC = 10 * 60;
+const MAX_PER_IP = Number(process.env.LEAD_RL_PER_IP) > 0 ? Number(process.env.LEAD_RL_PER_IP) : 5;
+const MAX_PER_EMAIL = Number(process.env.LEAD_RL_PER_EMAIL) > 0 ? Number(process.env.LEAD_RL_PER_EMAIL) : 3;
+
+function tooMany(ttl: number) {
+  return NextResponse.json(
+    { ok: false, error: "Too many requests. Please try again later." },
+    { status: 429, headers: { "Retry-After": String(ttl) } },
+  );
 }
 
 const GENERIC_ERROR = "Something went wrong sending your message. Please email support@pragvance.ai.";
 
 export async function POST(req: Request) {
-  const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
-  if (limited(ip)) return NextResponse.json({ ok: false, error: "Too many requests. Please try again later." }, { status: 429 });
+  const ip = clientIp(req.headers);
+  const byIp = await incrWindow(`lead:ip:${ip}`, WINDOW_SEC);
+  if (byIp.count > MAX_PER_IP) return tooMany(byIp.ttl);
   let body: unknown;
   try {
     body = await req.json();
@@ -35,6 +39,9 @@ export async function POST(req: Request) {
   }
   const v = validateLead(body);
   if (!v.ok) return NextResponse.json({ ok: false, error: v.error }, { status: 400 });
+  // Second key the client can't rotate by changing headers.
+  const byEmail = await incrWindow(`lead:email:${v.lead.email.toLowerCase()}`, WINDOW_SEC);
+  if (byEmail.count > MAX_PER_EMAIL) return tooMany(byEmail.ttl);
   try {
     await sendLeadToCrm(v.lead);
     return NextResponse.json({ ok: true });
