@@ -206,8 +206,8 @@ const DFYQ: QuestionDef[] = [
 
 // ===== Branch: Build an app =====
 const APPQ: QuestionDef[] = [
-  q("a_idea", "ai_today", "How clear is the app idea?", ["A rough feeling", "A problem, no solution yet", "A written list of features", "A written spec with users and screens"]),
   q("a_use", "ai_today", "How do you use AI today?", ["Not at all", "Chat for one-off questions", "A few repeatable jobs", "AI is part of how we run"]),
+  q("a_idea", "ai_today", "How clear is the app idea?", ["A rough feeling", "A problem, no solution yet", "A written list of features", "A written spec with users and screens"]),
   q("a_users", "ai_today", "Who would use the app?", ["Not sure", "Just me", "My team", "Customers or the public"]),
   q("a_tried", "ai_today", "Have you tried building it already (no-code, AI builders, freelancers)?", ["No", "Looked into it", "Started, then stalled", "Have a working prototype"]),
   q("a_qa", "ai_today", "How would you know the app works?", ["Not sure", "I'd try it", "A few people would test it", "A written list of what must work"]),

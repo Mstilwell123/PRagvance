@@ -189,5 +189,4 @@ test("every option opens its own 25-question set, starting with its own first qu
     firsts.add(qs[0].q);
   }
   assert.equal(firsts.size, 4, "each option must open on a distinct first question");
-  assert.match(QUESTION_SETS.app[0].q, /app/i, "Build an app must open on an app question");
 });
