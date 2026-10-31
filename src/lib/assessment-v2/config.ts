@@ -119,7 +119,7 @@ function t(id: string, task: string, text: string): QuestionDef {
 
 // ===== Branch: Save time in my business =====
 const SAVE: QuestionDef[] = [
-  q("s_owner", "ai_today", "Who in your business owns how AI gets used?", ["No one / whoever is curious", "A few people on their own", "A manager who also handles AI", "A named owner with a weekly review"]),
+  q("s_owner", "ai_today", "What are your current business challenges that take up the most time?", ["No one / whoever is curious", "A few people on their own", "A manager who also handles AI", "A named owner with a weekly review"]),
   q("s_mix", "ai_today", "Of last month's AI use, how much was one-off chat vs a repeatable job?", ["Almost all one-off prompting", "A few saved prompts people reuse", "Several jobs run the same way every week", "Named roles with skills, tools and a routine"]),
   q("s_qa", "ai_today", "When AI gets something wrong, how do you usually find out?", ["A customer complains", "Someone notices eventually", "Spot checks when we remember", "Someone reviews before it goes out"]),
   q("s_allow", "ai_today", "Can you name the jobs where AI is allowed to act, not just suggest?", ["No, everything is experimental", "A vague mental list", "1–2 jobs, still unofficial", "A written list with owners and stop rules"]),
@@ -148,7 +148,7 @@ const SAVE: QuestionDef[] = [
 
 // ===== Branch: Learn to build with AI =====
 const LEARN: QuestionDef[] = [
-  q("l_use", "ai_today", "How do you use AI today?", ["I've barely tried it", "Chat for one-off questions", "Saved prompts I reuse", "Agents with set jobs and tools"]),
+  q("l_use", "ai_today", "What do you currently know about AI and what are you using to build with AI?", ["I've barely tried it", "Chat for one-off questions", "Saved prompts I reuse", "Agents with set jobs and tools"]),
   q("l_mix", "ai_today", "How much of your AI use is a repeatable job vs one-off chat?", ["All one-off", "A few reused prompts", "Some weekly jobs", "Most of it runs the same way each week"]),
   q("l_qa", "ai_today", "When the model is wrong, how do you catch it?", ["I usually don't", "Eventually, by accident", "I spot check", "I test against examples before trusting it"]),
   q("l_version", "ai_today", "How do you keep track of prompts and skills that work?", ["I don't", "Scattered notes", "One doc that drifts", "Versioned skills; old ones retired"]),
@@ -177,7 +177,7 @@ const LEARN: QuestionDef[] = [
 
 // ===== Branch: Get it done for me =====
 const DFYQ: QuestionDef[] = [
-  q("d_use", "ai_today", "How does your business use AI today?", ["It doesn't", "A few people use chat tools", "A couple of repeatable jobs", "Several jobs with owners"]),
+  q("d_use", "ai_today", "What items do you want completed for you to grow your business? Or what do you want an AI agent to do for you to grow your business?", ["It doesn't", "A few people use chat tools", "A couple of repeatable jobs", "Several jobs with owners"]),
   q("d_owner", "ai_today", "Who would be our main contact for the setup?", ["Not sure yet", "Whoever is free", "A manager, part-time", "A named owner with time set aside"]),
   q("d_qa", "ai_today", "How do you check work before it reaches a customer?", ["We don't", "The author rereads it", "A second person reviews", "A checklist for each channel"]),
   q("d_allow", "ai_today", "Do you know which jobs you'd let AI do on its own?", ["No idea", "A rough idea", "1–2 jobs", "A written list with limits"]),
@@ -206,7 +206,7 @@ const DFYQ: QuestionDef[] = [
 
 // ===== Branch: Build an app =====
 const APPQ: QuestionDef[] = [
-  q("a_use", "ai_today", "How do you use AI today?", ["Not at all", "Chat for one-off questions", "A few repeatable jobs", "AI is part of how we run"]),
+  q("a_use", "ai_today", "What is your app idea?", ["Not at all", "Chat for one-off questions", "A few repeatable jobs", "AI is part of how we run"]),
   q("a_idea", "ai_today", "How clear is the app idea?", ["A rough feeling", "A problem, no solution yet", "A written list of features", "A written spec with users and screens"]),
   q("a_users", "ai_today", "Who would use the app?", ["Not sure", "Just me", "My team", "Customers or the public"]),
   q("a_tried", "ai_today", "Have you tried building it already (no-code, AI builders, freelancers)?", ["No", "Looked into it", "Started, then stalled", "Have a working prototype"]),
