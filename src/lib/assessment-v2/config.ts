@@ -35,7 +35,7 @@ export const BRANCHES: { id: BranchId; label: string }[] = [
   { id: "app", label: "Build an app" },
 ];
 
-export const Q0 = "What are you after?";
+export const Q0 = "What is your area of interest?";
 
 // ---- Scoring / routing rules ----
 export const RULES = {
