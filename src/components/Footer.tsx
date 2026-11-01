@@ -63,7 +63,9 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-[color:var(--line)] py-4 text-center text-xs text-[color:var(--text-muted)]">
-        © {new Date().getFullYear()} {SITE.legal}.
+        © {new Date().getFullYear()} {SITE.legal}. ·{" "}
+        <Link href="/privacy" className="hover:text-[color:var(--electric-bright)]">Privacy</Link> ·{" "}
+        <Link href="/terms" className="hover:text-[color:var(--electric-bright)]">Terms</Link>
       </div>
     </footer>
   );
