@@ -96,3 +96,28 @@ export async function release(key: string): Promise<void> {
 export function _resetMemory() {
   mem.clear();
 }
+
+const memStr = new Map<string, string>();
+
+/** Store a JSON value (no TTL). Used for entitlement records. */
+export async function setJson(key: string, value: unknown): Promise<void> {
+  const s = JSON.stringify(value);
+  if (restCfg()) {
+    await pipeline([["SET", key, s]]);
+    return;
+  }
+  memStr.set(key, s);
+}
+
+export async function getJson<T>(key: string): Promise<T | null> {
+  if (restCfg()) {
+    const [r] = await pipeline([["GET", key]]);
+    return typeof r === "string" ? (JSON.parse(r) as T) : null;
+  }
+  const s = memStr.get(key);
+  return s ? (JSON.parse(s) as T) : null;
+}
+
+export function _resetJsonMemory() {
+  memStr.clear();
+}
