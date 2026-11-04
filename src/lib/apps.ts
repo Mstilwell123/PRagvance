@@ -41,9 +41,15 @@ export const APPS: ShowcaseApp[] = [
   },
   {
     name: "AppDemo.live",
-    url: "https://appdemo-live.vercel.app/",
+    url: "https://appdemo.live/",
     logo: "/apps/appdemo-live.png",
     description: "Launch your software live.",
+  },
+  {
+    name: "VoiceTalk.app",
+    url: "https://voicetalk.app/",
+    logo: "/apps/voicetalk.png",
+    description: "Speak your language. Hear theirs.",
   },
   {
     name: "ID-Clare",
