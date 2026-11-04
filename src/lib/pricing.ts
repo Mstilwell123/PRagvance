@@ -9,7 +9,7 @@ export const PRICING = {
     savings: "Save $991 — nearly 50% compared with four individual sessions",
     comparison: "4 × $497 = $1,988",
   },
-  doneForYou: { setup: "$4,999", setupBasis: "one-time setup", support: "$500", supportBasis: "/month support" },
+  doneForYou: { setup: "$5,000", setupBasis: "one-time setup", support: "$500", supportBasis: "/month support" },
   consultation: { amount: "$199", basis: "/ session", duration: "60 minutes" },
   custom: { label: "Custom quote" },
   assessment: { label: "Free" },
