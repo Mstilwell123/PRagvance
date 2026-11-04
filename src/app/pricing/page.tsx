@@ -118,10 +118,11 @@ export default function PricingPage() {
                 <span className="text-sm text-[color:var(--text-muted)]">/month support</span>
               </p>
             </div>
-            <p className="mb-6 mt-3 text-sm text-[color:var(--text-muted)]">
+            <p className="mt-3 text-sm text-[color:var(--text-muted)]">
               A defined setup for your business, with the implementation scope, handover, and support
               terms agreed before work begins.
             </p>
+            <p className="mb-6 mt-2 text-sm font-semibold text-[#f3cd7d]">$2,500 down, $2,500 on completion.</p>
             <a href="https://buy.stripe.com/28E8wJ7D91iv3UlbJP9MY03" className={primaryBtn}>Pay $2,500 Deposit</a>
             <p className="mb-3 mt-2 text-center text-xs text-[color:var(--text-muted)]">50% deposit. Remaining $2,500 billed on completion.</p>
             <Link href="/contact?interest=done-for-you#contact" className={secondaryBtn}>Request Done-for-You Setup</Link>
