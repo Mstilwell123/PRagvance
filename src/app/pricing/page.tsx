@@ -122,6 +122,8 @@ export default function PricingPage() {
               A defined setup for your business, with the implementation scope, handover, and support
               terms agreed before work begins.
             </p>
+            <a href="https://buy.stripe.com/28E8wJ7D91iv3UlbJP9MY03" className={primaryBtn}>Pay $2,500 Deposit</a>
+            <p className="mb-3 mt-2 text-center text-xs text-[color:var(--text-muted)]">50% deposit. Remaining $2,500 billed on completion.</p>
             <Link href="/contact?interest=done-for-you#contact" className={secondaryBtn}>Request Done-for-You Setup</Link>
           </article>
 
