@@ -51,3 +51,12 @@ Before going live, add both to the Production environment. Tests: `npm test`; ty
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` (or `KV_REST_API_URL` / `KV_REST_API_TOKEN`) | unset | Shared store for limits + dedupe across serverless instances. Unset = per-instance memory (OK for preview, **set for production**). |
 | `LEAD_RL_PER_IP` | 5 | `/api/lead` posts per IP (Vercel `x-real-ip`) per 10 min |
 | `LEAD_RL_PER_EMAIL` | 3 | `/api/lead` posts per email per 10 min |
+
+## Gated Stripe checkout
+
+Off by default. Set `CHECKOUT_ENABLED=true` to enable; otherwise pricing/summary buttons go to `/contact` and `POST /api/checkout` returns 403.
+
+- `POST /api/checkout` body `{ "product": "shadow_lab_group" | "shadow_lab_monthly" | "consulting_1hr" }` → `{ url }`. The price ID is looked up server-side from `STRIPE_PRICE_*`; the client never sends a price or amount. Unknown product → 400.
+- `POST /api/webhooks/stripe` verifies `stripe-signature` with `STRIPE_WEBHOOK_SECRET` (bad/missing → 400). Each event id is processed once; `checkout.session.completed` writes an entitlement record.
+- Env vars: see `.env.example`. Keys only via env. Test keys only on previews.
+- Store: Upstash/Vercel KV if configured, else in-memory. Reference Postgres schema: `db/migrations/0001_checkout.{up,down}.sql` (not applied).

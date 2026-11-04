@@ -5,6 +5,8 @@ import BreadcrumbJsonLd from "@/components/BreadcrumbJsonLd";
 import ShadowLabSwitch from "@/components/pricing/ShadowLabSwitch";
 import { PRICING } from "@/lib/pricing";
 import { SITE } from "@/lib/site";
+import CheckoutButton from "@/components/CheckoutButton";
+import { checkoutEnabled } from "@/lib/checkout/products";
 
 const DESC =
   "Compare AI Workforce training, Shadow Lab coaching, Done-for-You setup, and custom app development.";
@@ -135,7 +137,11 @@ export default function PricingPage() {
             <p className="mb-6 mt-3 text-sm text-[color:var(--text-muted)]">
               One-on-one guidance. Focused on your business priorities and questions.
             </p>
-            <Link href="/contact?interest=consultation#contact" className={secondaryBtn}>Request a Consultation</Link>
+            {checkoutEnabled() ? (
+              <CheckoutButton product="consulting_1hr" fallbackHref="/contact?interest=consultation#contact" className={secondaryBtn}>Request a Consultation</CheckoutButton>
+            ) : (
+              <Link href="/contact?interest=consultation#contact" className={secondaryBtn}>Request a Consultation</Link>
+            )}
           </article>
           {/* 5. Custom app / SaaS */}
           <article className={card} aria-labelledby="p-custom">
