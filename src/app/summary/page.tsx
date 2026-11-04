@@ -22,7 +22,7 @@ const OFFERS: { name: string; price: string; text: string; href: string; cta: st
   { name: "AI Workforce", price: `${PRICING.aiWorkforce.amount}/month`, text: "Weekly training, practical resources, and a Skool community to help you build a Grok Bot agent team for your own business.", href: SITE.skoolUrl, cta: "Join AI Workforce", ext: true },
   { name: "Shadow Lab", price: "See pricing", text: "Live coaching for founders who want closer guidance than the AI Workforce classroom.", href: "/contact?interest=shadow-lab#contact", cta: "Discuss Shadow Lab", product: "shadow_lab_group" },
   { name: "One-on-One AI Consultation", price: `${PRICING.consultation.amount} / session`, text: "60 minutes, one-on-one by video. Focused on your business priorities and questions.", href: "/contact?interest=consultation#contact", cta: "Request a Consultation", product: "consulting_1hr" },
-  { name: "Done-for-You Complete Setup", price: `${PRICING.doneForYou.setup} + ${PRICING.doneForYou.support}/month`, text: "A defined setup for your business, with the implementation scope, handover, and support terms agreed before work begins.", href: "/contact?interest=done-for-you#contact", cta: "Request Done-for-You Setup" },
+  { name: "Done-for-You Complete Setup", price: `${PRICING.doneForYou.setup} + ${PRICING.doneForYou.support}/month`, text: "A defined setup for your business, with the implementation scope, handover, and support terms agreed before work begins. The $2,500 deposit is non-refundable.", href: "https://buy.stripe.com/28E8wJ7D91iv3UlbJP9MY03", cta: "Pay $2,500 Deposit", ext: true },
 ];
 
 export default function SummaryPage() {

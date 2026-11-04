@@ -79,6 +79,32 @@ export default function ContactPage() {
         Shadow Lab: {SITE.labPrices}. Choose “Shadow Lab” below to discuss it.
       </p>
 
+      {interest === "Done-for-You Setup" && (
+        <div className="panel mt-8 space-y-3 p-6">
+          <h2 className="text-xl font-semibold text-[color:var(--text)]">Ready to start Done-for-You Setup?</h2>
+          <p className="text-sm text-[color:var(--text-muted)]">
+            $5,000 one-time setup plus $500/month support.
+          </p>
+          <p className="text-sm font-semibold text-[color:var(--text)]">
+            $2,500 deposit
+            <br />
+            $2,500 on completion
+          </p>
+          <p className="text-sm text-[color:var(--text-muted)]">
+            We invoice the final $2,500 when your setup is handed over. The $2,500 deposit is non-refundable.
+          </p>
+          <a
+            href="https://buy.stripe.com/28E8wJ7D91iv3UlbJP9MY03"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex w-full items-center justify-center rounded-full bg-[color:var(--gold)] px-6 py-3 text-sm font-semibold text-black hover:bg-[color:var(--gold-bright)]"
+          >
+            Pay $2,500 Deposit
+          </a>
+          <p className="text-xs text-[color:var(--text-muted)]">Have questions first? Send us a message below.</p>
+        </div>
+      )}
+
       {status === "sent" ? (
         <div className="panel mt-10 space-y-3 p-6" role="status">
           <h2 className="text-2xl font-semibold text-[color:var(--text)]">Thanks — we’ve got it.</h2>
