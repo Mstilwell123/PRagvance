@@ -83,8 +83,15 @@ export default function ContactPage() {
         <div className="panel mt-8 space-y-3 p-6">
           <h2 className="text-xl font-semibold text-[color:var(--text)]">Ready to start Done-for-You Setup?</h2>
           <p className="text-sm text-[color:var(--text-muted)]">
-            $5,000 one-time setup plus $500/month support. $2,500 deposit, $2,500 on completion. We invoice the final
-            $2,500 when your setup is handed over. The $2,500 deposit is non-refundable.
+            $5,000 one-time setup plus $500/month support.
+          </p>
+          <p className="text-sm font-semibold text-[color:var(--text)]">
+            $2,500 deposit.
+            <br />
+            $2,500 on completion.
+          </p>
+          <p className="text-sm text-[color:var(--text-muted)]">
+            We invoice the final $2,500 when your setup is handed over. The $2,500 deposit is non-refundable.
           </p>
           <a
             href="https://buy.stripe.com/28E8wJ7D91iv3UlbJP9MY03"
