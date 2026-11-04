@@ -86,9 +86,9 @@ export default function ContactPage() {
             $5,000 one-time setup plus $500/month support.
           </p>
           <p className="text-sm font-semibold text-[color:var(--text)]">
-            $2,500 deposit.
+            $2,500 deposit
             <br />
-            $2,500 on completion.
+            $2,500 on completion
           </p>
           <p className="text-sm text-[color:var(--text-muted)]">
             We invoice the final $2,500 when your setup is handed over. The $2,500 deposit is non-refundable.

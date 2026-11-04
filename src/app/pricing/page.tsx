@@ -122,7 +122,7 @@ export default function PricingPage() {
               A defined setup for your business, with the implementation scope, handover, and support
               terms agreed before work begins.
             </p>
-            <p className="mb-6 mt-2 text-sm font-semibold text-[#f3cd7d]">$2,500 deposit.<br />$2,500 on completion.</p>
+            <p className="mb-6 mt-2 text-sm font-semibold text-[#f3cd7d]">$2,500 deposit<br />$2,500 on completion</p>
             <a href="https://buy.stripe.com/28E8wJ7D91iv3UlbJP9MY03" className={primaryBtn}>Pay $2,500 Deposit</a>
             <p className="mb-3 mt-2 text-center text-xs text-[color:var(--text-muted)]">50% deposit. Remaining $2,500 billed on completion. The $2,500 deposit is non-refundable.</p>
           </article>
