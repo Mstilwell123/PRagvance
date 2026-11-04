@@ -83,7 +83,7 @@ export default function ContactPage() {
         <div className="panel mt-8 space-y-3 p-6">
           <h2 className="text-xl font-semibold text-[color:var(--text)]">Ready to start Done-for-You Setup?</h2>
           <p className="text-sm text-[color:var(--text-muted)]">
-            $5,000 one-time setup plus $500/month support. $2,500 down, $2,500 on completion. We invoice the final
+            $5,000 one-time setup plus $500/month support. $2,500 deposit, $2,500 on completion. We invoice the final
             $2,500 when your setup is handed over. The $2,500 deposit is non-refundable.
           </p>
           <a
