@@ -75,9 +75,6 @@ export default function ContactPage() {
         </a>
         . {SITE.legal} · {SITE.location}.
       </p>
-      <p className="mt-2 text-sm text-[color:var(--text-muted)]">
-        Shadow Lab: {SITE.labPrices}. Choose “Shadow Lab” below to discuss it.
-      </p>
 
       {interest === "Done-for-You Setup" && (
         <div className="panel mt-8 space-y-3 p-6">
