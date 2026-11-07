@@ -1,7 +1,9 @@
+/** @jsxRuntime automatic */
 import Link from "next/link";
-import { SITE } from "@/lib/site";
 import { PRODUCTS } from "@/lib/checkout/products";
 import type { ConfirmState } from "@/lib/checkout/confirm.server";
+
+export const CONTACT_URL = "https://www.pragvance.ai/contact";
 
 const box = "mb-10 rounded-2xl border p-6";
 const link = "font-semibold text-[#e8bd63] hover:underline";
@@ -21,7 +23,7 @@ export default function CheckoutStatus({ state }: { state: ConfirmState }) {
           </p>
         ) : (
           <p className="mt-4 text-[color:var(--text-muted)]" data-booking-pending>
-            To schedule your session, email <a href={`mailto:${SITE.email}`} className={link}>{SITE.email}</a>.
+            Payment confirmed. Use our <Link href={CONTACT_URL} className={link} data-contact-link>contact page</Link> to schedule your session.
           </p>
         )}
       </div>
@@ -40,7 +42,7 @@ export default function CheckoutStatus({ state }: { state: ConfirmState }) {
     <div role="status" data-checkout-state={state.kind} className={`${box} border-white/15`}>
       <h2 className="text-xl font-semibold text-[color:var(--text)]">We couldn’t confirm a payment.</h2>
       <p className="mt-2 text-[color:var(--text-muted)]">
-        If you were charged, email <a href={`mailto:${SITE.email}`} className={link}>{SITE.email}</a>. Otherwise <Link href={retry} className={link}>try again</Link>.
+        If you were charged, reach us through our <Link href={CONTACT_URL} className={link}>contact page</Link>. Otherwise <Link href={retry} className={link}>try again</Link>.
       </p>
     </div>
   );
