@@ -2,6 +2,19 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: { unoptimized: true },
+  outputFileTracingIncludes: {
+    "/api/crow-template/file": ["./storage/crow/crow-template.md"],
+  },
+  async headers() {
+    const draft = [
+      { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+      { key: "Cache-Control", value: "private, no-store" },
+    ];
+    return [
+      { source: "/crow-template", headers: draft },
+      { source: "/api/crow-template/:path*", headers: draft },
+    ];
+  },
   async redirects() {
     return [
       { source: "/swarm", destination: "/aiworkforce", permanent: true },

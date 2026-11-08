@@ -57,6 +57,27 @@ Before going live, add both to the Production environment. Tests: `npm test`; ty
 Off by default. Set `CHECKOUT_ENABLED=true` to enable; otherwise pricing/summary buttons go to `/contact` and `POST /api/checkout` returns 403.
 
 - `POST /api/checkout` body `{ "product": "shadow_lab_group" | "shadow_lab_monthly" | "consulting_1hr" }` → `{ url }`. The price ID is looked up server-side from `STRIPE_PRICE_*`; the client never sends a price or amount. Unknown product → 400.
-- `POST /api/webhooks/stripe` verifies `stripe-signature` with `STRIPE_WEBHOOK_SECRET` (bad/missing → 400). Each event id is processed once; `checkout.session.completed` writes an entitlement record.
+- `POST /api/webhooks/stripe` verifies `stripe-signature` with `STRIPE_WEBHOOK_SECRET` (bad/missing → 400). Each event id is processed once. A paid `checkout.session.completed` for an allowlisted product writes an entitlement record. A `crow_template` event is recorded on its own key prefix and is not an allowlisted checkout product. Other products are unchanged. Refunds revoke only a matching CROW entitlement.
 - Env vars: see `.env.example`. Keys only via env. Test keys only on previews.
 - Store: Upstash/Vercel KV if configured, else in-memory. Reference Postgres schema: `db/migrations/0001_checkout.{up,down}.sql` (not applied).
+
+## CROW Template (draft, not for sale)
+
+Route `/crow-template` is a noindex draft. It is not in the header, footer, or sitemap. `robots.txt` disallows `/crow-template` and `/api/crow-template`. `VERCEL_ENV=production` returns 404 for the page and its APIs.
+
+- The only purchase CTA is `Buy & download — $99`. It posts to `/api/crow-template/checkout`, which always refuses. It does not call Stripe.
+- `crow_template` is not in the checkout allowlist. `POST /api/checkout` cannot sell it. The client never sends the price.
+- The Markdown file is `storage/crow/crow-template.md`, read by the server file route. It is not in `public/`.
+- Download is deny-by-default. A short-lived link is issued only for a verified customer whose id matches the owner on an entitlement written by the signed, idempotent webhook for a paid $99 USD session. A success redirect or a client flag does not grant the file. Refunds and failed payments revoke later links, and redemption checks the entitlement again. Links expire after 5 minutes.
+- There is no customer login in this repo. `resolveCrowCustomer` returns no identity except a local fixture. That fixture requires `CROW_LOCAL_PREVIEW=1`, a non-production `NODE_ENV`, `VERCEL_ENV` other than `preview` or `production`, and no live Stripe secret. Production and preview ignore the fixture.
+
+Not done, and required before any sale:
+
+1. Approve license, duration, update, and refund terms. The page marks them as proposed.
+2. Owner approval to leave draft. Do not enable checkout until then.
+3. Create the $99 one-time Price on the existing Pragvance Stripe account and store only the Price ID in server env.
+4. Create Checkout Sessions server-side for that Price, with `client_reference_id` taken from the verified customer id. Set payment-intent metadata `product_key=crow_template` so a refund can be matched if it arrives before the paid event.
+5. Replace `resolveCrowCustomer` with the real verified-customer provider. Do not add a second login system here.
+6. Set `CROW_DOWNLOAD_TOKEN_SECRET` on the server (16+ characters, not the local sentinel).
+7. Keep the existing webhook secret for this same account. No new Stripe account, product, or price is created by this draft.
+8. Use Redis/KV for the shared store in production. The reference SQL migration is not applied and does not list this product.
