@@ -2,6 +2,17 @@
 
 import { useState } from "react";
 
+const LICENSE_NOTICE =
+  "Licensed for use within your business only. You may not transfer, share, resell, or redistribute this template to others.";
+
+function LicenseNotice({ id }: { id: string }) {
+  return (
+    <p id={id} className="mb-3 max-w-xl text-base leading-6 text-[color:var(--text)]">
+      {LICENSE_NOTICE}
+    </p>
+  );
+}
+
 function safeFilePath(url: unknown): string | null {
   if (typeof url !== "string") return null;
   if (!url.startsWith("/api/crow-template/file?token=")) return null;
@@ -65,11 +76,12 @@ export default function CrowPurchase({ cta, preview }: { cta: string; preview: b
 
   return (
     <div className="mt-6">
+      <LicenseNotice id="crow-license-notice" />
       <button
         type="button"
         onClick={() => void onBuy()}
         aria-busy={busy === "buy"}
-        aria-describedby="crow-checkout-note"
+        aria-describedby="crow-license-notice crow-checkout-note"
         className="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-[#e8bd63] px-5 py-3 text-center text-sm font-bold text-[#08111d] hover:bg-[#f3cd7d] sm:w-auto"
       >
         {cta}
@@ -83,11 +95,12 @@ export default function CrowPurchase({ cta, preview }: { cta: string; preview: b
           <p id="crow-preview-note" role="status" aria-live="polite" className="mt-1 text-sm text-[color:var(--text-muted)]">
             {previewNote}
           </p>
+          <LicenseNotice id="crow-preview-license" />
           <button
             type="button"
             onClick={() => void onPreview()}
-            aria-describedby="crow-preview-note"
-            className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-[color:var(--line)] px-5 py-3 text-sm font-semibold text-[color:var(--text)] hover:border-[color:var(--electric-bright)] sm:w-auto"
+            aria-describedby="crow-preview-license crow-preview-note"
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-[color:var(--line)] px-5 py-3 text-sm font-semibold text-[color:var(--text)] hover:border-[color:var(--electric-bright)] sm:w-auto"
           >
             Download template file (local test only)
           </button>

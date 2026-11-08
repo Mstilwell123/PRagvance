@@ -153,6 +153,24 @@ describe("CROW template draft gate", { concurrency: false }, () => {
     assert.equal(isProductKey("crow_template"), false);
   });
 
+  test("license restriction is rendered immediately before both download actions", () => {
+    const notice =
+      "Licensed for use within your business only. You may not transfer, share, resell, or redistribute this template to others.";
+    const src = readFileSync("src/components/crow/CrowPurchase.tsx", "utf8");
+    assert.equal(src.includes(notice), true);
+    const buy = src.indexOf("onClick={() => void onBuy()}");
+    const previewClick = src.indexOf("onClick={() => void onPreview()}");
+    const buyNotice = src.indexOf('id="crow-license-notice"');
+    const previewNotice = src.indexOf('id="crow-preview-license"');
+    assert.ok(buyNotice > 0 && buyNotice < buy);
+    assert.ok(previewNotice > buy && previewNotice < previewClick);
+    assert.match(src, /aria-describedby="crow-license-notice crow-checkout-note"/);
+    assert.match(src, /aria-describedby="crow-preview-license crow-preview-note"/);
+    const page = readFileSync("src/app/crow-template/page.tsx", "utf8");
+    assert.match(page, /Proposed terms — pending approval/);
+    assert.match(page, /index:\s*false/);
+  });
+
   test("shared checkout cannot sell CROW and the draft route never returns a url", async () => {
     let created = 0;
     const denied = await handleCheckout(
