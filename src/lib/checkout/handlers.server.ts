@@ -1,5 +1,6 @@
 import type Stripe from "stripe";
 import { checkoutEnabled, isProductKey, priceIdFor, PRODUCTS } from "./products";
+import { applyCrowStripeEvent } from "../crow/stripe-event.server";
 import { oncePerEvent, recordEntitlement } from "./entitlements.server";
 
 type Json = { status: number; body: Record<string, unknown> };
@@ -51,6 +52,7 @@ export async function handleWebhook(rawBody: string, signature: string | null, d
     return { status: 400, body: { error: "Invalid signature" } };
   }
   const outcome = await oncePerEvent(event.id, async () => {
+    if (await applyCrowStripeEvent(event)) return;
     if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
       const s = event.data.object as Stripe.Checkout.Session;
       const key = s.metadata?.product_key;
