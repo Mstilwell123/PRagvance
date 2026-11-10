@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
+import { completeAssessmentCapture } from "@/lib/assessment-lead";
 import { SITE } from "@/lib/site";
 import { QUESTIONS } from "@/lib/assessment-questions";
 
@@ -148,6 +149,7 @@ export default function AssessmentQuiz() {
   const [nextWant, setNextWant] = useState<NextWant>(null);
   const [phase, setPhase] = useState<"quiz" | "capture" | "result">("quiz");
 
+  const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -169,6 +171,7 @@ export default function AssessmentQuiz() {
     setNextWant(null);
     setStep(0);
     setPhase("quiz");
+    setName("");
     setCompany("");
     setPhone("");
     setEmail("");
@@ -181,55 +184,31 @@ export default function AssessmentQuiz() {
     e.preventDefault();
     if (submitting) return;
 
-    const companyTrim = company.trim();
-    const phoneTrim = phone.trim();
-    const emailTrim = email.trim();
-    if (!companyTrim || !phoneTrim || !emailTrim) {
-      setSubmitError("Company, phone, and email are required.");
-      return;
-    }
-
     setSubmitting(true);
     setSubmitError(null);
 
-    try {
-      const res = await fetch("/api/assessment-lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          company: companyTrim,
-          phone: phoneTrim,
-          email: emailTrim,
-          score: total,
-          band: previewBand,
-          nextWant,
-          website: honeypot,
-        }),
-      });
+    // Score and band are already computed here. Show them after a valid form
+    // even when the lead API errors, times out, or never responds.
+    const outcome = await completeAssessmentCapture(
+      { name, company, phone, email, score: total, band: previewBand, nextWant, honeypot },
+      (body) => {
+        void fetch("/api/assessment-lead", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+          keepalive: true,
+        }).catch(() => undefined);
+      },
+    );
 
-      let data: { ok?: boolean; error?: string } = {};
-      try {
-        data = (await res.json()) as { ok?: boolean; error?: string };
-      } catch {
-        data = {};
-      }
-
-      if (!res.ok || !data.ok) {
-        setSubmitError(
-          data.error === "Mailer not configured"
-            ? "Results are temporarily unavailable. Please try again later."
-            : "Could not submit. Check your details and try again."
-        );
-        setSubmitting(false);
-        return;
-      }
-
-      setPhase("result");
+    if (outcome.phase === "capture") {
+      setSubmitError(outcome.error);
       setSubmitting(false);
-    } catch {
-      setSubmitError("Could not submit. Check your connection and try again.");
-      setSubmitting(false);
+      return;
     }
+
+    setPhase("result");
+    setSubmitting(false);
   }
 
   return (
@@ -273,10 +252,30 @@ export default function AssessmentQuiz() {
             See your results
           </h2>
           <p className="mt-2 text-sm text-[color:var(--text-muted)]">
-            Leave your company, phone, and email — then we show your score and band.
+            Leave your name, company, phone, and email — then we show your score and band.
           </p>
 
           <div className="mt-6 grid gap-4">
+            <div>
+              <label
+                htmlFor="assess-name"
+                className="block text-xs uppercase tracking-wider text-[color:var(--electric-bright)]"
+              >
+                Name
+              </label>
+              <input
+                id="assess-name"
+                name="name"
+                type="text"
+                required
+                autoComplete="name"
+                maxLength={120}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className={inputClass}
+                disabled={submitting}
+              />
+            </div>
             <div>
               <label
                 htmlFor="assess-company"

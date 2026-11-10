@@ -2,6 +2,12 @@ import type { LeadInput } from "./lead";
 import type { ProductKey } from "./checkout/products";
 import { paidCheckoutNote, paidTags, safeLogDetail } from "./checkout/paid";
 import {
+  ASSESSMENT_SOURCE,
+  assessmentLeadNote,
+  assessmentLeadTags,
+  type AssessmentLead,
+} from "./assessment-lead";
+import {
   SHADOW_LAB_LEAD_SOURCE,
   shadowLabLeadNote,
   shadowLabLeadTags,
@@ -250,6 +256,87 @@ export async function recordShadowLabLead(input: ShadowLabSignup): Promise<void>
       };
     },
   });
+}
+
+/** Whole AI Assessment lead write. The results screen does not wait on this. */
+export const ASSESSMENT_LEAD_TIMEOUT_MS = 4_000;
+
+/**
+ * Upsert an assessment lead, tag the band, and save the score note.
+ * No custom fields. Throws on failure; callers decide whether to keep going.
+ */
+export async function upsertAssessmentLead(
+  input: AssessmentLead,
+  deps: {
+    locationId: string;
+    post: (path: string, body: unknown, timeoutMs: number) => Promise<ShadowLabCrmResponse>;
+    now?: () => number;
+  },
+): Promise<void> {
+  const clock = deps.now ?? Date.now;
+  const budgetEnd = clock() + ASSESSMENT_LEAD_TIMEOUT_MS;
+  const post = (path: string, body: unknown) => {
+    const left = budgetEnd - clock();
+    if (left < 200) throw new Error("ghl timeout");
+    return deps.post(path, body, left);
+  };
+
+  const res = await post("/contacts/upsert", {
+    locationId: deps.locationId,
+    email: input.email,
+    phone: input.phone,
+    companyName: input.company,
+    source: ASSESSMENT_SOURCE,
+    ...nameFields(input.name),
+  });
+  if (!res.ok) throw new Error(`ghl upsert ${res.status}`);
+  const id = (await res.json())?.contact?.id;
+  if (typeof id !== "string" || !CONTACT_ID.test(id)) throw new Error("ghl upsert returned no contact id");
+
+  const tagRes = await post(`/contacts/${id}/tags`, { tags: [...assessmentLeadTags(input.band)] });
+  if (!tagRes.ok) throw new Error(`ghl tags ${tagRes.status}`);
+
+  const noteRes = await post(`/contacts/${id}/notes`, { body: assessmentLeadNote(input) });
+  if (!noteRes.ok) throw new Error(`ghl note ${noteRes.status}`);
+}
+
+/** Live CRM write. Returns without throwing when GHL env is unset. */
+export async function recordAssessmentLead(input: AssessmentLead): Promise<void> {
+  const cfg = crmConfig();
+  if (!cfg) {
+    console.warn("[crm] assessment lead skipped: GHL_PRIVATE_TOKEN or GHL_LOCATION_ID unset");
+    return;
+  }
+  await upsertAssessmentLead(input, {
+    locationId: cfg.locationId,
+    post: async (path, body, timeoutMs) => {
+      const res = await ghlPost(cfg.token, path, body, timeoutMs);
+      if (!res.ok) await res.body?.cancel().catch(() => undefined);
+      return {
+        ok: res.ok,
+        status: res.status,
+        json: async () => {
+          try {
+            return (await res.json()) as { contact?: { id?: string } } | null;
+          } catch {
+            return null;
+          }
+        },
+      };
+    },
+  });
+}
+
+/** Log and swallow CRM failures so the assessment results screen is never blocked. */
+export async function runAssessmentLead(
+  input: AssessmentLead,
+  upsert: (input: AssessmentLead) => Promise<void>,
+): Promise<void> {
+  try {
+    await upsert(input);
+  } catch (err) {
+    console.error("[crm] assessment lead failed", safeLogDetail(err));
+  }
 }
 
 /** Log and swallow CRM failures so checkout is never blocked. */
