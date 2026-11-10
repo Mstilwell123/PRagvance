@@ -45,13 +45,45 @@ test("bad signature -> 400", async () => {
 test("duplicate event -> processed once, entitlement recorded", async () => {
   _resetMemory();
   _resetJsonMemory();
-  const body = JSON.stringify({ id: "evt_dup", object: "event", type: "checkout.session.completed", data: { object: { id: "cs_test_1", payment_status: "paid", metadata: { product_key: "consulting_1hr" }, customer_details: { email: "a@b.co" } } } });
-  const r1 = await handleWebhook(body, sign(body), wh);
-  const r2 = await handleWebhook(body, sign(body), wh);
-  assert.equal(r1.status, 200);
-  assert.equal(r1.body.duplicate, undefined);
-  assert.equal(r2.body.duplicate, true);
-  const e = await getEntitlement("cs_test_1");
-  assert.equal(e?.product_key, "consulting_1hr");
-  assert.equal(e?.stripe_event_id, "evt_dup");
+  const prevToken = process.env.GHL_PRIVATE_TOKEN;
+  const prevLocation = process.env.GHL_LOCATION_ID;
+  delete process.env.GHL_PRIVATE_TOKEN;
+  delete process.env.GHL_LOCATION_ID;
+  const prevWarn = console.warn;
+  console.warn = () => {};
+  try {
+    const body = JSON.stringify({ id: "evt_dup", object: "event", type: "checkout.session.completed", data: { object: { id: "cs_test_1", payment_status: "paid", metadata: { product_key: "consulting_1hr" }, customer_details: { email: "a@b.co" } } } });
+    const r1 = await handleWebhook(body, sign(body), wh);
+    const r2 = await handleWebhook(body, sign(body), wh);
+    assert.equal(r1.status, 200);
+    assert.equal(r1.body.duplicate, undefined);
+    assert.equal(r2.body.duplicate, true);
+    const e = await getEntitlement("cs_test_1");
+    assert.equal(e?.product_key, "consulting_1hr");
+    assert.equal(e?.stripe_event_id, "evt_dup");
+  } finally {
+    console.warn = prevWarn;
+    if (prevToken === undefined) delete process.env.GHL_PRIVATE_TOKEN;
+    else process.env.GHL_PRIVATE_TOKEN = prevToken;
+    if (prevLocation === undefined) delete process.env.GHL_LOCATION_ID;
+    else process.env.GHL_LOCATION_ID = prevLocation;
+  }
+});
+
+test("consulting success url is the booking page; other products stay on summary", async () => {
+  created = [];
+  const env = {
+    ...on,
+    STRIPE_PRICE_SHADOW_LAB_GROUP: "price_group",
+    STRIPE_PRICE_SHADOW_LAB_MONTHLY: "price_month",
+  } as NodeJS.ProcessEnv;
+  assert.equal((await handleCheckout({ product: "consulting_1hr" }, deps(env))).status, 200);
+  assert.equal((await handleCheckout({ product: "shadow_lab_group" }, deps(env))).status, 200);
+  assert.equal((await handleCheckout({ product: "shadow_lab_monthly" }, deps(env))).status, 200);
+  assert.equal(created[0].success_url, "https://example.test/access/book?session_id={CHECKOUT_SESSION_ID}");
+  assert.equal(created[0].cancel_url, "https://example.test/summary?checkout=canceled");
+  assert.equal(created[0].metadata?.product_key, "consulting_1hr");
+  assert.equal(created[1].success_url, "https://example.test/summary?checkout=success&session_id={CHECKOUT_SESSION_ID}");
+  assert.equal(created[2].success_url, "https://example.test/summary?checkout=success&session_id={CHECKOUT_SESSION_ID}");
+  assert.equal(created[2].mode, "subscription");
 });

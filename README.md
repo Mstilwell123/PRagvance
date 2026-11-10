@@ -42,13 +42,13 @@ Server-only env vars (Vercel; currently set for **Preview** only):
 | `GHL_PRIVATE_TOKEN` | CRM private integration token (never expose to the client) |
 | `GHL_LOCATION_ID` | CRM sub-account/location id |
 
-Before going live, add both to the Production environment. Tests: `npm test`; typecheck: `npm run typecheck`.
+Before going live, add both to the Production environment. Paid checkout uses the same two variables (see below). Tests: `npm test`; typecheck: `npm run typecheck`.
 
 ## Abuse limits (env, all optional)
 
 | Var | Default | Meaning |
 |---|---|---|
-| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` (or `KV_REST_API_URL` / `KV_REST_API_TOKEN`) | unset | Shared store for limits + dedupe across serverless instances. Unset = per-instance memory (OK for preview, **set for production**). |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` (or `KV_REST_API_URL` / `KV_REST_API_TOKEN`) | unset | Shared store for limits, Stripe event dedupe, entitlements, and paid-CRM markers. Unset = per-instance memory (OK for preview, **set for production**). |
 | `LEAD_RL_PER_IP` | 5 | `/api/lead` posts per IP (Vercel `x-real-ip`) per 10 min |
 | `LEAD_RL_PER_EMAIL` | 3 | `/api/lead` posts per email per 10 min |
 
@@ -57,6 +57,41 @@ Before going live, add both to the Production environment. Tests: `npm test`; ty
 Off by default. Set `CHECKOUT_ENABLED=true` to enable; otherwise pricing/summary buttons go to `/contact` and `POST /api/checkout` returns 403.
 
 - `POST /api/checkout` body `{ "product": "shadow_lab_group" | "shadow_lab_monthly" | "consulting_1hr" }` → `{ url }`. The price ID is looked up server-side from `STRIPE_PRICE_*`; the client never sends a price or amount. Unknown product → 400.
-- `POST /api/webhooks/stripe` verifies `stripe-signature` with `STRIPE_WEBHOOK_SECRET` (bad/missing → 400). Each event id is processed once; `checkout.session.completed` writes an entitlement record.
-- Env vars: see `.env.example`. Keys only via env. Test keys only on previews.
-- Store: Upstash/Vercel KV if configured, else in-memory. Reference Postgres schema: `db/migrations/0001_checkout.{up,down}.sql` (not applied).
+- `consulting_1hr` success URL: `{SITE}/access/book?session_id={CHECKOUT_SESSION_ID}`. Shadow Lab success URLs stay `{SITE}/summary?checkout=success&session_id={CHECKOUT_SESSION_ID}`. Cancel stays `/summary?checkout=canceled`.
+- `POST /api/webhooks/stripe` verifies `stripe-signature` with `STRIPE_WEBHOOK_SECRET` (bad or missing → 400). Each event id is processed once.
+- On `checkout.session.completed` or `checkout.session.async_payment_succeeded`, a known `metadata.product_key` with `payment_status` `paid` or `no_payment_required` writes an idempotent KV entitlement `entitlement:{session_id}`.
+- A **paid** known product also upserts the buyer in GoHighLevel through the same CRM client as the contact form. Email and name come from `customer_details`. Unknown products, including Done-for-You payment-link checkouts (they have no known product key), do not get an entitlement or a CRM write.
+- Tags (both, in one request): `paid` and a product tag.
+  - `consulting_1hr`: `paid - consulting (60 min 1:1)`
+  - `shadow_lab_group`: `paid - shadow lab (session)`
+  - `shadow_lab_monthly`: `paid - shadow lab (monthly)`
+- Note, written once, exact lines:
+
+  ```
+  Amount: 199.00 USD
+  Product: consulting_1hr
+  Stripe session: cs_...
+  ```
+
+  Amount is `amount_total` converted out of Stripe minor units, plus the uppercase currency. Product is the product key.
+- Idempotency: KV marker `crm:{session_id}` (`{ at }`) is set only after the upsert, the tags, and the note all succeed. A second event for that session, or a Stripe retry of one that already succeeded, does not add another note. Overlapping deliveries take a short lock `crm:lock:{session_id}` (30s). The one that loses the lock gets a 500 so Stripe retries.
+- Failure: the entitlement is written first. If GoHighLevel errors, times out, or the lock is busy, the marker stays unset, the lock is released, and the webhook returns **500**. Stripe retries. The entitlement overwrite is the same record. Each CRM request aborts after 8s; the paid sync gives up after a 12s budget.
+- Missing `GHL_PRIVATE_TOKEN` or `GHL_LOCATION_ID`: CRM is skipped, a warning is logged with no token and no email, the entitlement is kept, and the webhook returns **200**. Stripe will not retry that event, and a resend of the same event id is ignored. Set both variables before checkout is enabled in that environment.
+- A paid session with no usable `customer_details.email` skips CRM the same way (200, entitlement kept). `no_payment_required` records the entitlement and does not call CRM.
+- Logs for the paid path are status and session id only. Response bodies are discarded.
+- Env vars: see `.env.example`. Keys only via env. Test keys only on previews. Do not change live Stripe prices, payment links, or Dashboard objects from this app.
+- Store: Upstash/Vercel KV if configured, else in-memory. Without a shared store, CRM dedupe is per instance, so production needs KV. Reference Postgres schema: `db/migrations/0001_checkout.{up,down}.sql` (not applied).
+
+## Consultation booking page
+
+`/access/book` is server-rendered and `noindex` (page metadata and `X-Robots-Tag`). It is not in the nav or the sitemap. `/access` is disallowed in `robots.txt`.
+
+The page loads the Checkout Session with the server Stripe secret. It confirms the payment only when the id matches `cs_test_` or `cs_live_` plus 8–200 letters or digits, `payment_status` is `paid`, and the product is `consulting_1hr`. The confirmation shows the amount, the product name (One-on-One AI Consultation (60 min)), and the buyer email with the local part masked (`b***@example.com`).
+
+| Var | Purpose |
+| --- | --- |
+| `CONSULTATION_BOOKING_URL` | https URL of the **60-minute** scheduling page. Not set in this repo. Do not point it at the free 30-minute event. |
+
+If that variable is unset, or is not an https URL, the page tells the buyer to email [support@pragvance.ai](mailto:support@pragvance.ai) to schedule. It does not promise a reply time.
+
+Missing, invalid, unpaid, or wrong-product sessions get one message — we couldn't confirm a paid consultation — and a link to `/contact`. The page does not say the payment succeeded unless Stripe says it was paid.
