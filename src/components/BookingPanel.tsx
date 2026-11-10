@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BookingRedirect from "@/components/BookingRedirect";
 import type { BookingView } from "@/lib/checkout/paid";
 import { SITE } from "@/lib/site";
 
@@ -15,10 +16,10 @@ export default function BookingPanel({ view }: { view: BookingView }) {
   if (view.state !== "confirmed") {
     return (
       <section className="section-pad mx-auto max-w-2xl py-16 md:py-24">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-[color:var(--gold-bright)]">Consultation</p>
-        <h1 className="mt-3 text-3xl font-semibold text-[color:var(--text)] md:text-5xl">Consultation booking</h1>
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-[color:var(--gold-bright)]">Booking</p>
+        <h1 className="mt-3 text-3xl font-semibold text-[color:var(--text)] md:text-5xl">Booking</h1>
         <div className="panel mt-8 space-y-4 p-6">
-          <p className="text-[color:var(--text-muted)]">We couldn&apos;t confirm a paid consultation for this link.</p>
+          <p className="text-[color:var(--text-muted)]">We couldn&apos;t confirm a paid session for this link.</p>
           <p className="text-sm text-[color:var(--text-muted)]">
             Use the link from your checkout confirmation, or contact Pragvance.
           </p>
@@ -32,7 +33,7 @@ export default function BookingPanel({ view }: { view: BookingView }) {
 
   return (
     <section className="section-pad mx-auto max-w-2xl py-16 md:py-24">
-      <p className="text-xs font-medium uppercase tracking-[0.2em] text-[color:var(--gold-bright)]">Consultation</p>
+      <p className="text-xs font-medium uppercase tracking-[0.2em] text-[color:var(--gold-bright)]">Booking</p>
       <h1 className="mt-3 text-3xl font-semibold text-[color:var(--text)] md:text-5xl">Payment confirmed</h1>
       <div className="panel mt-8 space-y-6 p-6">
         <p className="text-[color:var(--text-muted)]">
@@ -51,10 +52,13 @@ export default function BookingPanel({ view }: { view: BookingView }) {
         <div className="space-y-3">
           <h2 className="text-xl font-semibold text-[color:var(--text)]">Schedule your 60-minute session</h2>
           {view.bookingUrl ? (
-            <a href={view.bookingUrl} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer" className={btn}>
-              Schedule your session
-              <span className="sr-only"> (opens in a new tab)</span>
-            </a>
+            <>
+              <BookingRedirect url={view.bookingUrl} />
+              <a href={view.bookingUrl} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer" className={btn}>
+                Schedule your session
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            </>
           ) : (
             <p className="text-sm text-[color:var(--text-muted)]">
               Email{" "}

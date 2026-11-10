@@ -1,8 +1,14 @@
 import type Stripe from "stripe";
 import { checkoutEnabled, isProductKey, priceIdFor, PRODUCTS, type ProductKey } from "./products";
 import { oncePerEvent, recordEntitlement } from "./entitlements.server";
-import { syncPaidCheckoutToCrm } from "../crm.server";
+import { recordShadowLabLead, runShadowLabLead, syncPaidCheckoutToCrm } from "../crm.server";
 import { safeLogDetail } from "./paid";
+import {
+  isShadowLabProduct,
+  shadowLabMetadata,
+  validateShadowLabSignup,
+  type ShadowLabSignup,
+} from "./shadow-lab-signup";
 
 type Json = { status: number; body: Record<string, unknown> };
 
@@ -10,22 +16,34 @@ export type CheckoutDeps = {
   env?: NodeJS.ProcessEnv;
   siteUrl: () => string;
   createSession: (p: Stripe.Checkout.SessionCreateParams) => Promise<{ url: string | null }>;
+  /** Shadow Lab only. Defaults to the GoHighLevel upsert. Failures must not block checkout. */
+  recordLead?: (lead: ShadowLabSignup) => Promise<void>;
 };
 
+const BOOKING_PRODUCTS = new Set<ProductKey>(["consulting_1hr", "shadow_lab_group", "shadow_lab_monthly"]);
+
 function successUrl(site: string, product: ProductKey): string {
-  const path =
-    product === "consulting_1hr"
-      ? "/access/book?session_id={CHECKOUT_SESSION_ID}"
-      : "/summary?checkout=success&session_id={CHECKOUT_SESSION_ID}";
+  const path = BOOKING_PRODUCTS.has(product)
+    ? "/access/book?session_id={CHECKOUT_SESSION_ID}"
+    : "/summary?checkout=success&session_id={CHECKOUT_SESSION_ID}";
   return `${site}${path}`;
 }
 
-/** POST { product } -> { url }. Client never sends price or amount. */
+/** POST { product } -> { url }. Client never sends a price or amount. */
 export async function handleCheckout(raw: unknown, deps: CheckoutDeps): Promise<Json> {
   const env = deps.env ?? process.env;
-  if (!checkoutEnabled(env)) return { status: 403, body: { error: "Checkout is not enabled" } };
   const product = (raw as { product?: unknown } | null)?.product;
   if (!isProductKey(product)) return { status: 400, body: { error: "Unknown product" } };
+
+  let lead: ShadowLabSignup | null = null;
+  if (isShadowLabProduct(product)) {
+    const parsed = validateShadowLabSignup(raw);
+    if (!parsed.ok) return { status: 400, body: { error: parsed.error } };
+    lead = parsed.lead;
+  }
+
+  if (!checkoutEnabled(env)) return { status: 403, body: { error: "Checkout is not enabled" } };
+
   const price = priceIdFor(product, env);
   if (!price) return { status: 503, body: { error: "Price not configured" } };
   const p = PRODUCTS[product];
@@ -35,13 +53,21 @@ export async function handleCheckout(raw: unknown, deps: CheckoutDeps): Promise<
   } catch {
     return { status: 503, body: { error: "Checkout not configured" } };
   }
-  const session = await deps.createSession({
+
+  if (lead) await runShadowLabLead(lead, deps.recordLead ?? recordShadowLabLead);
+
+  const metadata = lead ? shadowLabMetadata(lead) : { product_key: product };
+  const params: Stripe.Checkout.SessionCreateParams = {
     mode: p.mode,
     line_items: [{ price, quantity: 1 }],
     success_url: successUrl(site, product),
     cancel_url: `${site}/summary?checkout=canceled`,
-    metadata: { product_key: product },
-  });
+    metadata,
+  };
+  if (lead) params.customer_email = lead.email;
+  if (lead && p.mode === "subscription") params.subscription_data = { metadata: { ...metadata } };
+
+  const session = await deps.createSession(params);
   if (!session.url) return { status: 502, body: { error: "Checkout session missing url" } };
   return { status: 200, body: { url: session.url } };
 }

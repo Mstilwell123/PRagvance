@@ -5,9 +5,7 @@ import BreadcrumbJsonLd from "@/components/BreadcrumbJsonLd";
 import ShadowLabSwitch from "@/components/pricing/ShadowLabSwitch";
 import { PRICING, PRODUCT_PAGES } from "@/lib/pricing";
 import StartHereLink from "@/components/StartHereLink";
-import { SITE } from "@/lib/site";
 import CheckoutButton from "@/components/CheckoutButton";
-import { checkoutEnabled } from "@/lib/checkout/products";
 
 const DESC =
   "Compare AI Workforce training, Shadow Lab coaching, Done-for-You setup, and custom app development.";
@@ -86,10 +84,7 @@ export default function PricingPage() {
               agent team for your own business.
             </p>
             <Points items={["Weekly training", "Practical resources", "Skool community"]} />
-            <a href={SITE.skoolUrl} target="_blank" rel="noopener noreferrer" className={primaryBtn}>
-              Join AI Workforce
-            </a>
-            <StartHereLink href={PRODUCT_PAGES.aiWorkforce} label="AI Workforce" />
+            <StartHereLink href={PRODUCT_PAGES.aiWorkforce} label="AI Workforce" variant="button" className={primaryBtn} />
           </article>
 
           {/* 2. Shadow Lab */}
@@ -101,8 +96,7 @@ export default function PricingPage() {
             </p>
             <ShadowLabSwitch />
             <div className="mt-6 flex flex-1 flex-col">
-              <Link href="/contact?interest=shadow-lab#contact" className={secondaryBtn}>Discuss Shadow Lab</Link>
-              <StartHereLink href={PRODUCT_PAGES.shadowLab} label="Shadow Lab" />
+              <StartHereLink href={PRODUCT_PAGES.shadowLab} label="Shadow Lab" variant="button" className={primaryBtn} />
             </div>
           </article>
 
@@ -143,12 +137,9 @@ export default function PricingPage() {
             <p className="mb-6 mt-3 text-sm text-[color:var(--text-muted)]">
               One-on-one guidance. Focused on your business priorities and questions.
             </p>
-            {checkoutEnabled() ? (
-              <CheckoutButton product="consulting_1hr" fallbackHref="/contact?interest=consultation#contact" className={secondaryBtn}>Request a Consultation</CheckoutButton>
-            ) : (
-              <Link href="/contact?interest=consultation#contact" className={secondaryBtn}>Request a Consultation</Link>
-            )}
-            <StartHereLink href={PRODUCT_PAGES.consultation} label="One-on-One AI Consultation" />
+            <CheckoutButton product="consulting_1hr" className={primaryBtn} ariaLabel="Start Here: One-on-One AI Consultation">
+              Start Here
+            </CheckoutButton>
           </article>
           {/* 5. Custom app / SaaS */}
           <article className={card} aria-labelledby="p-custom">

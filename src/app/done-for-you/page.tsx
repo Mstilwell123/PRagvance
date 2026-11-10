@@ -373,6 +373,29 @@ export default function DoneForYouPage() {
             {PRICING.doneForYou.setup} setup · {PRICING.doneForYou.support}/month support · $2,500
             deposit to start, $2,500 at handover
           </p>
+          <div className="mt-6 max-w-xl">
+            <a
+              href={DEPOSIT_HREF}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={primaryBtn}
+              aria-label="Start Here: Done-for-You Complete Setup"
+            >
+              Start Here
+            </a>
+            <p className="mt-3 text-sm leading-relaxed text-[color:var(--text-muted)]">
+              Start Here opens secure checkout for the $2,500 deposit toward the $5,000 Done-for-You
+              setup. The remaining $2,500 is billed at handover.
+            </p>
+            <a
+              href={SITE.skoolUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${textLink} mt-3 inline-block text-sm`}
+            >
+              Join AI Workforce
+            </a>
+          </div>
           <p className="mt-2 max-w-2xl text-sm text-[color:var(--text-muted)]">
             You&apos;ll need your own Grok Bot account. Your agents are built and run there.{" "}
             <Mark tag="[CONFIRM]" />

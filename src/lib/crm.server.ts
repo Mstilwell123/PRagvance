@@ -1,6 +1,12 @@
 import type { LeadInput } from "./lead";
 import type { ProductKey } from "./checkout/products";
-import { paidCheckoutNote, paidTags } from "./checkout/paid";
+import { paidCheckoutNote, paidTags, safeLogDetail } from "./checkout/paid";
+import {
+  SHADOW_LAB_LEAD_SOURCE,
+  shadowLabLeadNote,
+  shadowLabLeadTags,
+  type ShadowLabSignup,
+} from "./checkout/shadow-lab-signup";
 import { claimOnce, getJson, release, setJson } from "./kv.server";
 
 const API = "https://services.leadconnectorhq.com";
@@ -170,5 +176,90 @@ export async function syncPaidCheckoutToCrm(input: PaidCrmInput): Promise<"recor
     return "recorded";
   } finally {
     await release(lockKey);
+  }
+}
+
+/** Whole Shadow Lab lead write. Checkout continues if this budget runs out. */
+export const SHADOW_LAB_LEAD_TIMEOUT_MS = 4_000;
+
+export type ShadowLabCrmResponse = {
+  ok: boolean;
+  status: number;
+  json: () => Promise<{ contact?: { id?: string } } | null>;
+};
+
+/**
+ * Upsert a Shadow Lab buyer, tag them, and save interest + message as a note.
+ * No custom fields. Throws on failure; callers decide whether checkout continues.
+ */
+export async function upsertShadowLabLead(
+  input: ShadowLabSignup,
+  deps: {
+    locationId: string;
+    post: (path: string, body: unknown, timeoutMs: number) => Promise<ShadowLabCrmResponse>;
+    now?: () => number;
+  },
+): Promise<void> {
+  const clock = deps.now ?? Date.now;
+  const budgetEnd = clock() + SHADOW_LAB_LEAD_TIMEOUT_MS;
+  const post = (path: string, body: unknown) => {
+    const left = budgetEnd - clock();
+    if (left < 200) throw new Error("ghl timeout");
+    return deps.post(path, body, left);
+  };
+
+  const res = await post("/contacts/upsert", {
+    locationId: deps.locationId,
+    email: input.email,
+    source: SHADOW_LAB_LEAD_SOURCE,
+    ...nameFields(input.name),
+  });
+  if (!res.ok) throw new Error(`ghl upsert ${res.status}`);
+  const id = (await res.json())?.contact?.id;
+  if (typeof id !== "string" || !CONTACT_ID.test(id)) throw new Error("ghl upsert returned no contact id");
+
+  const tagRes = await post(`/contacts/${id}/tags`, { tags: [...shadowLabLeadTags(input.product)] });
+  if (!tagRes.ok) throw new Error(`ghl tags ${tagRes.status}`);
+
+  const noteRes = await post(`/contacts/${id}/notes`, { body: shadowLabLeadNote(input.interest, input.message) });
+  if (!noteRes.ok) throw new Error(`ghl note ${noteRes.status}`);
+}
+
+/** Live CRM write. Returns without throwing when GHL env is unset. */
+export async function recordShadowLabLead(input: ShadowLabSignup): Promise<void> {
+  const cfg = crmConfig();
+  if (!cfg) {
+    console.warn("[crm] shadow lab lead skipped: GHL_PRIVATE_TOKEN or GHL_LOCATION_ID unset");
+    return;
+  }
+  await upsertShadowLabLead(input, {
+    locationId: cfg.locationId,
+    post: async (path, body, timeoutMs) => {
+      const res = await ghlPost(cfg.token, path, body, timeoutMs);
+      if (!res.ok) await res.body?.cancel().catch(() => undefined);
+      return {
+        ok: res.ok,
+        status: res.status,
+        json: async () => {
+          try {
+            return (await res.json()) as { contact?: { id?: string } } | null;
+          } catch {
+            return null;
+          }
+        },
+      };
+    },
+  });
+}
+
+/** Log and swallow CRM failures so checkout is never blocked. */
+export async function runShadowLabLead(
+  input: ShadowLabSignup,
+  upsert: (input: ShadowLabSignup) => Promise<void>,
+): Promise<void> {
+  try {
+    await upsert(input);
+  } catch (err) {
+    console.error("[crm] shadow lab lead failed", safeLogDetail(err));
   }
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import BreadcrumbJsonLd from "@/components/BreadcrumbJsonLd";
 import ShadowLabOffers, { FooterNotes, HowItWorks } from "@/components/ShadowLabOffers";
+import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Shadow Lab — Live AI Agent Building on Google Meet | Pragvance",
@@ -56,6 +57,16 @@ export default function ShadowLabPage() {
         <div className="mt-6">
           <ShadowLabOffers />
         </div>
+        <p className="mt-6 text-center text-sm">
+          <a
+            href={SITE.skoolUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-[#f3cd7d] hover:underline"
+          >
+            Join AI Workforce
+          </a>
+        </p>
 
         <h2 className="mt-14 text-2xl font-semibold text-[color:var(--gold-bright)]">How it works</h2>
         <div className="mt-6">

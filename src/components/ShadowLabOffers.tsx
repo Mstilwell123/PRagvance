@@ -1,11 +1,10 @@
 import Link from "next/link";
+import ShadowLabSignup from "@/components/ShadowLabSignup";
 import { PRICING } from "@/lib/pricing";
-
-const SESSION_LINK = process.env.NEXT_PUBLIC_SHADOW_LAB_PAYMENT_LINK || "";
-const MONTHLY_LINK = process.env.NEXT_PUBLIC_SHADOW_LAB_MONTHLY_PAYMENT_LINK || "";
-export const CALENDLY = "https://calendly.com/pragvance/30min";
+import type { ShadowLabProduct } from "@/lib/checkout/shadow-lab-signup";
 
 type Offer = {
+  product: ShadowLabProduct;
   name: string;
   sub: string;
   price: string;
@@ -13,20 +12,20 @@ type Offer = {
   badge: string;
   savings?: string;
   comparison?: string;
-  link: string;
-  payCta: string;
   points: string[];
+  explanation: string;
 };
 
 const OFFERS: Offer[] = [
   {
+    product: "shadow_lab_group",
     name: "Shadow Lab — Single Session",
     sub: "One two-hour session · Live on Google Meet · Date to be announced",
     price: PRICING.shadowLabSingle.amount,
     unit: "for one two-hour session",
     badge: "Up to 10 seats",
-    link: SESSION_LINK,
-    payCta: "Test checkout — $497",
+    explanation:
+      "Sign up takes your name, email, and what you want to build, then opens secure checkout for this $497 session. After payment, Pragvance takes you to book a time.",
     points: [
       "One live two-hour group session on Google Meet",
       "Build your own AI agent hands-on, with Mark and Grok Bot guiding you",
@@ -35,6 +34,7 @@ const OFFERS: Offer[] = [
     ],
   },
   {
+    product: "shadow_lab_monthly",
     name: "Shadow Lab — Monthly Package",
     sub: "Four two-hour sessions per month · Google Meet",
     price: PRICING.shadowLabMonthly.amount,
@@ -42,8 +42,8 @@ const OFFERS: Offer[] = [
     badge: "4 × 2 hours / month",
     savings: PRICING.shadowLabMonthly.savings,
     comparison: `Compared with ${PRICING.shadowLabMonthly.comparison} for four individual sessions`,
-    link: MONTHLY_LINK,
-    payCta: "Test checkout — $997/month",
+    explanation:
+      "Sign up takes your name, email, and what you want to build, then opens secure checkout for the $997/month package. After payment, Pragvance takes you to book a time.",
     points: [
       "Four live two-hour sessions a month on Google Meet (eight hours total)",
       "Keep building with AI helpers, with Mark and Grok Bot guiding you",
@@ -84,25 +84,7 @@ function OfferCard({ o }: { o: Offer }) {
         ))}
       </ul>
       <div className="mt-8">
-        <Link
-          href="/contact?interest=shadow-lab#contact"
-          className="flex w-full items-center justify-center rounded-lg bg-[#e8bd63] px-6 py-4 text-base font-bold text-[#08111d] hover:bg-[#f3cd7d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f5f4f1]"
-        >
-          Discuss Shadow Lab
-        </Link>
-        {o.link && (
-          <>
-            <a
-              href={o.link}
-              className="mt-3 flex w-full items-center justify-center rounded-lg border border-[#d6ac55]/60 px-6 py-3 text-sm font-semibold text-[#e8bd63] hover:bg-[#d6ac55]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f5f4f1]"
-            >
-              {o.payCta}
-            </a>
-            <p className="mt-2 text-center text-xs text-[color:var(--text-muted)]">
-              All sales are final. No refunds. · Secure checkout by Stripe
-            </p>
-          </>
-        )}
+        <ShadowLabSignup product={o.product} label={o.name} explanation={o.explanation} />
       </div>
     </div>
   );
@@ -143,11 +125,7 @@ export function FooterNotes() {
   return (
     <>
       <p className="mt-10 text-center text-sm text-[color:var(--text-muted)]">
-        Already paid?{" "}
-        <a href={CALENDLY} className="font-semibold text-[#f3cd7d] hover:underline">
-          Book your session
-        </a>{" "}
-        · Questions?{" "}
+        Questions?{" "}
         <Link href="/contact?interest=shadow-lab#contact" className="font-semibold text-[#f3cd7d] hover:underline">
           Contact us
         </Link>

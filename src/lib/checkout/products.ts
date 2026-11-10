@@ -23,8 +23,22 @@ export function isProductKey(v: unknown): v is ProductKey {
   return typeof v === "string" && Object.prototype.hasOwnProperty.call(PRODUCTS, v);
 }
 
+/**
+ * Live Shadow Lab prices. Used when that product's env price is unset,
+ * or when the env value is one of the $1 test prices (price_1UXufc… / price_1UXufe…).
+ */
+export const SHADOW_LAB_PRICE_DEFAULTS: Partial<Record<ProductKey, string>> = {
+  shadow_lab_group: "price_1UXucA83KSR7xg0bY4hd5r6H",
+  shadow_lab_monthly: "price_1UXucC83KSR7xg0bzvpdDk9f",
+};
+
+const IGNORED_TEST_PRICE_PREFIXES = ["price_1UXufc", "price_1UXufe"];
+
 export function priceIdFor(key: ProductKey, env: NodeJS.ProcessEnv = process.env): string | null {
-  return env[PRODUCTS[key].priceEnvKey]?.trim() || null;
+  const fromEnv = env[PRODUCTS[key].priceEnvKey]?.trim() || "";
+  const ignoredTest = IGNORED_TEST_PRICE_PREFIXES.some((prefix) => fromEnv.startsWith(prefix));
+  if (fromEnv && !(SHADOW_LAB_PRICE_DEFAULTS[key] && ignoredTest)) return fromEnv;
+  return SHADOW_LAB_PRICE_DEFAULTS[key] ?? null;
 }
 
 /** CHECKOUT_ENABLED must be exactly "true" to turn checkout on. Default off. */
