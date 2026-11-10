@@ -3,6 +3,8 @@ import GrokBotNote from "@/components/GrokBotNote";
 import CtaButtons from "@/components/CtaButtons";
 import Faq from "@/components/Faq";
 import HeroCarousel from "@/components/HeroCarousel";
+import StartHereLink from "@/components/StartHereLink";
+import { PRODUCT_PAGES } from "@/lib/pricing";
 import { DESKS, SITE } from "@/lib/site";
 
 export default function HomePage() {
@@ -117,12 +119,7 @@ export default function HomePage() {
               >
                 Join AI Workforce — {SITE.swarmPrice}
               </a>
-              <Link
-                href="/aiworkforce"
-                className="mt-3 text-center text-sm text-[color:var(--electric-bright)] hover:underline"
-              >
-                Learn more about AI Workforce
-              </Link>
+              <StartHereLink href={PRODUCT_PAGES.aiWorkforce} label="AI Workforce" />
             </article>
 
             <article className="panel flex flex-col p-6 md:p-8">
@@ -144,12 +141,7 @@ export default function HomePage() {
               >
                 Discuss Shadow Lab
               </Link>
-              <Link
-                href="/shadow-lab"
-                className="mt-3 text-center text-sm text-[color:var(--electric-bright)] hover:underline"
-              >
-                Learn more about Shadow Lab
-              </Link>
+              <StartHereLink href={PRODUCT_PAGES.shadowLab} label="Shadow Lab" />
             </article>
           </div>
           <p className="mt-6 text-center text-sm text-[color:var(--text-muted)]">
@@ -230,6 +222,11 @@ export default function HomePage() {
               >
                 Visit MinutesIntel.ai →
               </a>
+              <StartHereLink
+                href="https://minutesintel.ai"
+                label="MinutesIntel.ai"
+                className="mt-3 block text-left"
+              />
             </article>
             <article className="panel p-6">
               <h3 className="text-xl font-semibold text-[color:var(--text)]">Your next build</h3>
@@ -243,6 +240,7 @@ export default function HomePage() {
               >
                 Talk about your next app →
               </Link>
+              <StartHereLink href={PRODUCT_PAGES.customApp} label="Custom App / SaaS" className="mt-3 block text-left" />
             </article>
           </div>
           <Link
