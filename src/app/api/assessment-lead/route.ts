@@ -1,132 +1,99 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import {
+  ASSESSMENT_FROM_DEFAULT,
+  assessmentEmail,
+  validateAssessmentLead,
+  type AssessmentLead,
+  type AssessmentMail,
+} from "@/lib/assessment-lead";
+import { safeLogDetail } from "@/lib/checkout/paid";
+import { recordAssessmentLead, runAssessmentLead } from "@/lib/crm.server";
 
 export const runtime = "nodejs";
 
-const NEXT_WANT = new Set(["swarm", "lab", "custom", "score", null]);
+type ResendResult = { error: { message?: string } | null };
 
-const PHONE_RE = /^[\d\s+\-()]{7,30}$/;
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-type Body = {
-  company?: unknown;
-  phone?: unknown;
-  email?: unknown;
-  score?: unknown;
-  band?: unknown;
-  nextWant?: unknown;
-  honeypot?: unknown;
-  website?: unknown;
-  company_url?: unknown;
+export type AssessmentLeadDeps = {
+  env?: NodeJS.ProcessEnv;
+  now?: () => Date;
+  recordLead?: (lead: AssessmentLead) => Promise<void>;
+  sendEmail?: (lead: AssessmentLead, env: NodeJS.ProcessEnv) => Promise<void>;
 };
 
-function str(v: unknown): string {
-  return typeof v === "string" ? v : "";
+function spamTrap(raw: unknown): boolean {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return false;
+  const r = raw as Record<string, unknown>;
+  return [r.honeypot, r.website, r.company_url].some((v) => typeof v === "string" && v.trim() !== "");
+}
+
+function fromAddress(env: NodeJS.ProcessEnv): string {
+  return env.ASSESSMENT_FROM_EMAIL?.trim() || ASSESSMENT_FROM_DEFAULT;
+}
+
+/** Backup mail to support@pragvance.ai. Throws when Resend is missing or rejects the send. */
+export async function sendAssessmentEmail(
+  mail: AssessmentMail,
+  env: NodeJS.ProcessEnv,
+  transport?: (mail: AssessmentMail) => Promise<ResendResult>,
+): Promise<void> {
+  const apiKey = env.RESEND_API_KEY?.trim();
+  if (!apiKey) throw new Error("mailer not configured");
+  const send =
+    transport ??
+    (async (message: AssessmentMail) => {
+      const resend = new Resend(apiKey);
+      const { error } = await resend.emails.send({
+        from: message.from,
+        to: message.to,
+        subject: message.subject,
+        text: message.text,
+        replyTo: message.replyTo,
+      });
+      return { error };
+    });
+  const { error } = await send(mail);
+  if (error) throw new Error(error.message || "resend error");
+}
+
+/**
+ * Valid input always returns success. GoHighLevel and Resend failures are logged
+ * and do not change the response — the score is already known in the browser.
+ */
+export async function handleAssessmentLead(
+  raw: unknown,
+  deps: AssessmentLeadDeps = {},
+): Promise<{ status: number; body: { ok: true } | { error: string } }> {
+  if (spamTrap(raw)) return { status: 200, body: { ok: true } };
+
+  const parsed = validateAssessmentLead(raw);
+  if (!parsed.ok) return { status: 400, body: { error: parsed.error } };
+
+  const env = deps.env ?? process.env;
+  const lead: AssessmentLead = {
+    ...parsed.lead,
+    submittedAt: (deps.now ?? (() => new Date()))().toISOString(),
+  };
+
+  await runAssessmentLead(lead, deps.recordLead ?? recordAssessmentLead);
+
+  try {
+    if (deps.sendEmail) await deps.sendEmail(lead, env);
+    else await sendAssessmentEmail(assessmentEmail(lead, fromAddress(env)), env);
+  } catch (err) {
+    console.error("[assessment-lead] resend failed", safeLogDetail(err));
+  }
+
+  return { status: 200, body: { ok: true } };
 }
 
 export async function POST(req: Request) {
-  let body: Body;
+  let body: unknown;
   try {
-    body = (await req.json()) as Body;
+    body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
-
-  // Silent honeypot discard
-  const honeypot =
-    str(body.honeypot).trim() ||
-    str(body.website).trim() ||
-    str(body.company_url).trim();
-  if (honeypot) {
-    return NextResponse.json({ ok: true });
-  }
-
-  const company = str(body.company).trim();
-  const phone = str(body.phone).trim();
-  const email = str(body.email).trim();
-  const band = str(body.band).trim();
-  const scoreRaw = body.score;
-  const score =
-    typeof scoreRaw === "number"
-      ? scoreRaw
-      : typeof scoreRaw === "string" && scoreRaw.trim() !== ""
-        ? Number(scoreRaw)
-        : NaN;
-
-  if (!company || company.length > 200) {
-    return NextResponse.json({ error: "Invalid company" }, { status: 400 });
-  }
-  if (!phone || !PHONE_RE.test(phone)) {
-    return NextResponse.json({ error: "Invalid phone" }, { status: 400 });
-  }
-  if (!email || email.length > 254 || !EMAIL_RE.test(email)) {
-    return NextResponse.json({ error: "Invalid email" }, { status: 400 });
-  }
-  if (!Number.isInteger(score) || score < 0 || score > 75) {
-    return NextResponse.json({ error: "Invalid score" }, { status: 400 });
-  }
-  if (!band || band.length > 120) {
-    return NextResponse.json({ error: "Invalid band" }, { status: 400 });
-  }
-
-  let nextWant: string | null = null;
-  if (body.nextWant === null || body.nextWant === undefined || body.nextWant === "") {
-    nextWant = null;
-  } else if (typeof body.nextWant === "string" && NEXT_WANT.has(body.nextWant)) {
-    nextWant = body.nextWant;
-  } else {
-    return NextResponse.json({ error: "Invalid nextWant" }, { status: 400 });
-  }
-
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json({ error: "Mailer not configured" }, { status: 503 });
-  }
-
-  const from =
-    process.env.ASSESSMENT_FROM_EMAIL?.trim() ||
-    "Pragvance Assessment <onboarding@resend.dev>";
-
-  const nextLabel =
-    nextWant === "swarm"
-      ? "Weekly classroom (AI Workforce)"
-      : nextWant === "lab"
-        ? "High-touch seats (Lab)"
-        : nextWant === "custom"
-          ? "Custom app / product"
-          : nextWant === "score"
-            ? "Just the score"
-            : "(none)";
-
-  const timestamp = new Date().toISOString();
-  const text = [
-    `Company: ${company}`,
-    `Phone: ${phone}`,
-    `Email: ${email}`,
-    `Score: ${score} / 75`,
-    `Band: ${band}`,
-    `What they want next: ${nextLabel}`,
-    `Submitted: ${timestamp}`,
-  ].join("\n");
-
-  try {
-    const resend = new Resend(apiKey);
-    const { error } = await resend.emails.send({
-      from,
-      to: "support@pragvance.ai",
-      subject: `AI Assessment lead — ${company}`,
-      text,
-      replyTo: email,
-    });
-
-    if (error) {
-      console.error("Resend error:", error);
-      return NextResponse.json({ error: "Failed to send" }, { status: 502 });
-    }
-
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("Resend exception:", err);
-    return NextResponse.json({ error: "Failed to send" }, { status: 502 });
-  }
+  const result = await handleAssessmentLead(body);
+  return NextResponse.json(result.body, { status: result.status });
 }
