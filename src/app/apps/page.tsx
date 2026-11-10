@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import BreadcrumbJsonLd from "@/components/BreadcrumbJsonLd";
 import { APPS } from "@/lib/apps";
+import { PRODUCT_PAGES } from "@/lib/pricing";
+import StartHereLink from "@/components/StartHereLink";
 
 export const metadata: Metadata = {
   title: "Apps & SaaS Portfolio",
@@ -64,6 +66,7 @@ export default function AppsPage() {
               </a>
               <h2 className="mt-4 text-xl font-semibold text-[color:var(--gold-bright)]">{app.name}</h2>
               <p className="mt-2 text-sm text-[color:var(--text-muted)]">{app.description}</p>
+              <StartHereLink href={app.url} label={app.name} />
             </article>
           ))}
         </div>
@@ -79,6 +82,7 @@ export default function AppsPage() {
             >
               Talk about your next app →
             </Link>
+            <StartHereLink href={PRODUCT_PAGES.customApp} label="Custom App / SaaS" className="mt-3 block text-left" />
           </article>
         </div>
       </section>

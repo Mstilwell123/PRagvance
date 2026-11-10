@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { SITE } from "@/lib/site";
+import { PRODUCT_PAGES } from "@/lib/pricing";
+import StartHereLink from "@/components/StartHereLink";
 import { OFFERS, UTM_KEYS, offerFromSlug, validateLead } from "@/lib/lead";
 
 type Status = "idle" | "sending" | "sent" | "error";
@@ -102,6 +104,11 @@ export default function ContactPage() {
             Pay $2,500 Deposit
           </a>
           <p className="text-xs text-[color:var(--text-muted)]">Have questions first? Send us a message below.</p>
+          <StartHereLink
+            href={PRODUCT_PAGES.doneForYou}
+            label="Done-for-You Complete Setup"
+            className="block text-left"
+          />
         </div>
       )}
 

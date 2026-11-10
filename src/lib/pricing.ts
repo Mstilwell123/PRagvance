@@ -18,6 +18,15 @@ export const PRICING = {
 export const SHADOW_LAB_SUMMARY =
   "$497 for one two-hour session, or $997/month for four two-hour sessions (eight hours total)";
 
+/** One page per priced product. Start Here links use these paths. */
+export const PRODUCT_PAGES = {
+  aiWorkforce: "/aiworkforce",
+  shadowLab: "/shadow-lab",
+  doneForYou: "/done-for-you",
+  consultation: "/consultation",
+  customApp: "/custom-app",
+} as const;
+
 export const PRODUCTS = [
   { name: "MinutesIntel.ai", href: "https://www.minutesintel.ai/" },
   { name: "App N SaaS Builder", href: "https://www.appnsaasbuilder.com/" },

@@ -3,7 +3,8 @@ import Link from "next/link";
 import GrokBotNote from "@/components/GrokBotNote";
 import BreadcrumbJsonLd from "@/components/BreadcrumbJsonLd";
 import ShadowLabSwitch from "@/components/pricing/ShadowLabSwitch";
-import { PRICING } from "@/lib/pricing";
+import { PRICING, PRODUCT_PAGES } from "@/lib/pricing";
+import StartHereLink from "@/components/StartHereLink";
 import { SITE } from "@/lib/site";
 import CheckoutButton from "@/components/CheckoutButton";
 import { checkoutEnabled } from "@/lib/checkout/products";
@@ -88,6 +89,7 @@ export default function PricingPage() {
             <a href={SITE.skoolUrl} target="_blank" rel="noopener noreferrer" className={primaryBtn}>
               Join AI Workforce
             </a>
+            <StartHereLink href={PRODUCT_PAGES.aiWorkforce} label="AI Workforce" />
           </article>
 
           {/* 2. Shadow Lab */}
@@ -100,6 +102,7 @@ export default function PricingPage() {
             <ShadowLabSwitch />
             <div className="mt-6 flex flex-1 flex-col">
               <Link href="/contact?interest=shadow-lab#contact" className={secondaryBtn}>Discuss Shadow Lab</Link>
+              <StartHereLink href={PRODUCT_PAGES.shadowLab} label="Shadow Lab" />
             </div>
           </article>
 
@@ -125,6 +128,7 @@ export default function PricingPage() {
             <p className="mb-6 mt-2 text-sm font-semibold text-[#f3cd7d]">$2,500 deposit<br />$2,500 on completion</p>
             <a href="https://buy.stripe.com/28E8wJ7D91iv3UlbJP9MY03" className={primaryBtn}>Pay $2,500 Deposit</a>
             <p className="mb-3 mt-2 text-center text-xs text-[color:var(--text-muted)]">50% deposit. Remaining $2,500 billed on completion. The $2,500 deposit is non-refundable.</p>
+            <StartHereLink href={PRODUCT_PAGES.doneForYou} label="Done-for-You Complete Setup" />
           </article>
 
           {/* 4. One-on-One AI Consultation */}
@@ -144,6 +148,7 @@ export default function PricingPage() {
             ) : (
               <Link href="/contact?interest=consultation#contact" className={secondaryBtn}>Request a Consultation</Link>
             )}
+            <StartHereLink href={PRODUCT_PAGES.consultation} label="One-on-One AI Consultation" />
           </article>
           {/* 5. Custom app / SaaS */}
           <article className={card} aria-labelledby="p-custom">
@@ -155,6 +160,7 @@ export default function PricingPage() {
               development.
             </p>
             <Link href="/contact?interest=custom#contact" className={secondaryBtn}>Discuss a Custom Build</Link>
+            <StartHereLink href={PRODUCT_PAGES.customApp} label="Custom App / SaaS" />
           </article>
         </div>
 
