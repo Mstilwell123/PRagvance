@@ -1,6 +1,8 @@
 import type Stripe from "stripe";
-import { checkoutEnabled, isProductKey, priceIdFor, PRODUCTS } from "./products";
+import { checkoutEnabled, isProductKey, priceIdFor, PRODUCTS, type ProductKey } from "./products";
 import { oncePerEvent, recordEntitlement } from "./entitlements.server";
+import { syncPaidCheckoutToCrm } from "../crm.server";
+import { safeLogDetail } from "./paid";
 
 type Json = { status: number; body: Record<string, unknown> };
 
@@ -9,6 +11,14 @@ export type CheckoutDeps = {
   siteUrl: () => string;
   createSession: (p: Stripe.Checkout.SessionCreateParams) => Promise<{ url: string | null }>;
 };
+
+function successUrl(site: string, product: ProductKey): string {
+  const path =
+    product === "consulting_1hr"
+      ? "/access/book?session_id={CHECKOUT_SESSION_ID}"
+      : "/summary?checkout=success&session_id={CHECKOUT_SESSION_ID}";
+  return `${site}${path}`;
+}
 
 /** POST { product } -> { url }. Client never sends price or amount. */
 export async function handleCheckout(raw: unknown, deps: CheckoutDeps): Promise<Json> {
@@ -28,7 +38,7 @@ export async function handleCheckout(raw: unknown, deps: CheckoutDeps): Promise<
   const session = await deps.createSession({
     mode: p.mode,
     line_items: [{ price, quantity: 1 }],
-    success_url: `${site}/summary?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+    success_url: successUrl(site, product),
     cancel_url: `${site}/summary?checkout=canceled`,
     metadata: { product_key: product },
   });
@@ -41,6 +51,8 @@ export type WebhookDeps = {
   constructEvent: (body: string, sig: string, secret: string) => Stripe.Event;
 };
 
+const USABLE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export async function handleWebhook(rawBody: string, signature: string | null, deps: WebhookDeps): Promise<Json> {
   if (!deps.secret) return { status: 503, body: { error: "Webhook not configured" } };
   if (!signature) return { status: 400, body: { error: "Missing stripe-signature" } };
@@ -50,8 +62,9 @@ export async function handleWebhook(rawBody: string, signature: string | null, d
   } catch {
     return { status: 400, body: { error: "Invalid signature" } };
   }
-  const outcome = await oncePerEvent(event.id, async () => {
-    if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
+  try {
+    const outcome = await oncePerEvent(event.id, async () => {
+      if (event.type !== "checkout.session.completed" && event.type !== "checkout.session.async_payment_succeeded") return;
       const s = event.data.object as Stripe.Checkout.Session;
       const key = s.metadata?.product_key;
       if (!isProductKey(key)) return;
@@ -66,7 +79,29 @@ export async function handleWebhook(rawBody: string, signature: string | null, d
         stripe_event_id: event.id,
         created_at: new Date().toISOString(),
       });
-    }
-  });
-  return { status: 200, body: { received: true, ...(outcome === "duplicate" ? { duplicate: true } : {}) } };
+      // Entitlement is already stored. CRM runs only for a captured payment.
+      // GHL errors throw: the event claim is released and the handler returns
+      // 500 so Stripe retries. The crm:{session} marker is set only after the
+      // note lands, so a retry does not duplicate a note that never succeeded.
+      if (s.payment_status !== "paid") return;
+      const email = s.customer_details?.email?.trim() ?? "";
+      if (!USABLE_EMAIL.test(email)) {
+        console.warn(`[crm] paid contact skipped: no usable email session=${s.id}`);
+        return;
+      }
+      const name = s.customer_details?.name?.trim() || null;
+      await syncPaidCheckoutToCrm({
+        sessionId: s.id,
+        email,
+        name: name ? name.slice(0, 120) : null,
+        productKey: key,
+        amountTotal: typeof s.amount_total === "number" ? s.amount_total : null,
+        currency: s.currency ?? null,
+      });
+    });
+    return { status: 200, body: { received: true, ...(outcome === "duplicate" ? { duplicate: true } : {}) } };
+  } catch (err) {
+    console.error("[stripe webhook] processing failed", safeLogDetail(err));
+    return { status: 500, body: { error: "Handler failed" } };
+  }
 }
