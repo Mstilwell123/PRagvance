@@ -71,12 +71,12 @@ export const QUESTIONS = [
   },
   {
     id: "bus",
-    q: 'If the person who "gets AI" quit tomorrow, what survives?',
+    q: "If your best AI person left tomorrow, could someone else run it without them?",
     options: [
       "Nothing",
       "Their chat history",
       "A few prompts in a doc",
-      "Roles, skills, and runbooks someone else can pick up",
+      "Roles, skills, runbook someone else can pick up — otherwise known as a standard operating procedure, SOP.",
     ],
   },
   {
