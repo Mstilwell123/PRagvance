@@ -350,11 +350,24 @@ export default function DoneForYouPage() {
             inbox, your leads, your documents and your follow-ups. Then we hand it over trained,
             tested and written down, so you know exactly what each agent does.
           </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-start">
             <FitCallLink className={primaryBtn} />
             <a href="#included" className={secondaryBtn}>
               See what&apos;s included
             </a>
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:max-w-[17rem]">
+              <a
+                href={DEPOSIT_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${primaryBtn} w-full sm:w-auto`}
+              >
+                Buy Now
+              </a>
+              <p className="text-xs leading-relaxed text-[color:var(--text-muted)]">
+                You pay 50% today: a $2,500 deposit toward the $5,000 total setup.
+              </p>
+            </div>
           </div>
           <p className="mt-6 text-sm font-semibold text-[#f3cd7d]">
             {PRICING.doneForYou.setup} setup · {PRICING.doneForYou.support}/month support · $2,500
