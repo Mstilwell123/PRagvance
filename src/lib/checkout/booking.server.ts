@@ -1,5 +1,5 @@
 import type Stripe from "stripe";
-import { PRODUCTS } from "./products";
+import { isProductKey, PRODUCTS } from "./products";
 import { getStripe } from "./stripe.server";
 import {
   formatStripeAmount,
@@ -63,13 +63,20 @@ export async function resolveBooking(
     console.error("[booking] session retrieve failed", safeLogDetail(err));
     return { state: "unavailable" };
   }
-  if (session.id !== id || session.payment_status !== "paid" || session.productKey !== "consulting_1hr") {
+  if (
+    session.id !== id ||
+    session.payment_status !== "paid" ||
+    !isProductKey(session.productKey) ||
+    (session.productKey !== "consulting_1hr" &&
+      session.productKey !== "shadow_lab_group" &&
+      session.productKey !== "shadow_lab_monthly")
+  ) {
     return { state: "unavailable" };
   }
   return {
     state: "confirmed",
     amountLabel: formatStripeAmount(session.amount_total, session.currency),
-    productName: PRODUCTS.consulting_1hr.label,
+    productName: PRODUCTS[session.productKey].label,
     maskedEmail: maskEmail(session.email?.trim() ?? ""),
     bookingUrl: httpsBookingUrl(deps.bookingUrl),
     sessionId: session.id,

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import CheckoutButton from "@/components/CheckoutButton";
-import { checkoutEnabled } from "@/lib/checkout/products";
 import { PRICING } from "@/lib/pricing";
 import { SITE } from "@/lib/site";
 
@@ -27,8 +26,8 @@ export const metadata: Metadata = {
   },
 };
 
-const cta =
-  "mt-10 inline-flex rounded-full bg-[color:var(--gold)] px-6 py-3 text-sm font-semibold text-black hover:bg-[color:var(--gold-bright)] gold-glow";
+const purchaseBtn =
+  "inline-flex rounded-full bg-[color:var(--gold)] px-6 py-3 text-sm font-semibold text-black hover:bg-[color:var(--gold-bright)] gold-glow";
 const textLink = "text-[color:var(--electric-bright)] hover:underline";
 
 function Confirm({ tag }: { tag: string }) {
@@ -36,7 +35,6 @@ function Confirm({ tag }: { tag: string }) {
 }
 
 export default function ConsultationPage() {
-  const requestHref = "/contact?interest=consultation#contact";
   return (
     <>
       <p className="bg-[color:var(--gold)] px-4 py-3 text-center text-sm font-semibold text-black">
@@ -54,6 +52,28 @@ export default function ConsultationPage() {
         <p className="mt-2 text-[color:var(--text-muted)]">
           {PRICING.consultation.duration} · one-on-one by video
         </p>
+
+        <div className="mt-8 max-w-xl">
+          <CheckoutButton
+            product="consulting_1hr"
+            className={purchaseBtn}
+            ariaLabel="Start Here: One-on-One AI Consultation"
+          >
+            Start Here
+          </CheckoutButton>
+          <p className="mt-3 text-sm leading-relaxed text-[color:var(--text-muted)]">
+            Start Here opens secure checkout for the {PRICING.consultation.amount} one-on-one session. After
+            payment, Pragvance takes you to book the 60-minute video consultation.
+          </p>
+          <a
+            href={SITE.skoolUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${textLink} mt-3 inline-block text-sm`}
+          >
+            Join AI Workforce
+          </a>
+        </div>
 
         <div className="mt-8 space-y-4 text-[color:var(--text-muted)]">
           <p>One-on-one guidance. Focused on your business priorities and questions.</p>
@@ -82,12 +102,8 @@ export default function ConsultationPage() {
         <h2 className="mt-12 text-2xl font-semibold text-[color:var(--gold-bright)]">How to request it</h2>
         <div className="mt-4 space-y-4 text-sm text-[color:var(--text-muted)]">
           <p>
-            Use “Request a Consultation” on this page, on pricing, or on the summary. That opens the{" "}
-            <Link href={requestHref} className={textLink}>
-              contact form
-            </Link>{" "}
-            with One-on-One AI Consultation selected. When checkout is on, the same button starts the
-            one-time payment instead, and returns to that contact form if checkout is unavailable.
+            Start Here on this page opens secure checkout for the {PRICING.consultation.amount} one-time
+            session. After payment, Pragvance takes you to book the 60-minute video consultation.
           </p>
           <p>
             Questions:{" "}
@@ -139,15 +155,6 @@ export default function ConsultationPage() {
           </li>
         </ul>
 
-        {checkoutEnabled() ? (
-          <CheckoutButton product="consulting_1hr" fallbackHref={requestHref} className={cta}>
-            Request a Consultation
-          </CheckoutButton>
-        ) : (
-          <Link href={requestHref} className={cta}>
-            Request a Consultation
-          </Link>
-        )}
       </section>
     </>
   );

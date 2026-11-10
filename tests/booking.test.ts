@@ -64,8 +64,37 @@ test("paid consulting confirmation masks email and uses the booking url", async 
   assert.equal(page.includes("buyer@example.com"), false);
   assert.match(page, new RegExp(`href="${BOOK}"`));
   assert.match(page, /Schedule your session/);
+  assert.match(page, /data-auto-redirect="true"/);
   assert.doesNotMatch(page, /calendly\.com/i);
   assert.doesNotMatch(page, /business day|within \d+/i);
+});
+
+test("paid shadow lab sessions redirect to the same booking url", async () => {
+  for (const productKey of ["shadow_lab_group", "shadow_lab_monthly"] as const) {
+    const view = await resolveBooking(SID, {
+      bookingUrl: BOOK,
+      retrieve: async () => paid({ productKey, amount_total: productKey === "shadow_lab_group" ? 49700 : 99700 }),
+    });
+    assert.equal(view.state, "confirmed");
+    if (view.state !== "confirmed") continue;
+    assert.equal(view.bookingUrl, BOOK);
+    assert.equal(view.productName, productKey === "shadow_lab_group" ? "Shadow Lab Group" : "Shadow Lab Monthly");
+    const page = html(view);
+    assert.match(page, new RegExp(`href="${BOOK}"`));
+    assert.match(page, /data-auto-redirect="true"/);
+    assert.match(page, /Payment confirmed/);
+    assert.equal(page.includes("buyer@example.com"), false);
+  }
+
+  const unpaid = await resolveBooking(SID, {
+    bookingUrl: BOOK,
+    retrieve: async () => paid({ productKey: "shadow_lab_monthly", payment_status: "unpaid" }),
+  });
+  assert.equal(unpaid.state, "unavailable");
+  const hidden = html(unpaid);
+  assert.equal(hidden.includes(BOOK), false);
+  assert.equal(hidden.includes("data-auto-redirect"), false);
+  assert.equal(hidden.includes("Payment confirmed"), false);
 });
 
 test("missing or invalid booking URL asks the buyer to email support", async () => {
@@ -76,6 +105,7 @@ test("missing or invalid booking URL asks the buyer to email support", async () 
     if (view.state !== "confirmed") continue;
     assert.equal(view.bookingUrl, null);
     const page = html(view);
+    assert.equal(page.includes("data-auto-redirect"), false);
     assert.match(page, /mailto:support@pragvance\.ai\?subject=Schedule%2060-minute%20consultation/);
     assert.match(page, /support@pragvance\.ai/);
     assert.match(page, /to schedule your 60-minute session/);
@@ -102,8 +132,6 @@ test("unpaid, invalid, missing, and wrong-product sessions stay unconfirmed", as
   const cases: CheckoutSnapshot[] = [
     paid({ payment_status: "unpaid" }),
     paid({ payment_status: "no_payment_required" }),
-    paid({ productKey: "shadow_lab_group" }),
-    paid({ productKey: "shadow_lab_monthly" }),
     paid({ productKey: "done_for_you" }),
     paid({ productKey: null }),
     paid({ id: "cs_test_someoneelse1" }),
@@ -112,7 +140,7 @@ test("unpaid, invalid, missing, and wrong-product sessions stay unconfirmed", as
     const view = await resolveBooking(SID, { bookingUrl: BOOK, retrieve: async () => session });
     assert.equal(view.state, "unavailable", JSON.stringify(session));
     const page = html(view);
-    assert.match(page, /confirm a paid consultation/);
+    assert.match(page, /confirm a paid session/);
     assert.match(page, /href="\/contact"/);
     assert.equal(page.includes("Payment confirmed"), false);
     assert.equal(page.includes("199.00 USD"), false);

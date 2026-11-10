@@ -70,20 +70,24 @@ test("duplicate event -> processed once, entitlement recorded", async () => {
   }
 });
 
-test("consulting success url is the booking page; other products stay on summary", async () => {
+test("paid products land on the booking page", async () => {
   created = [];
   const env = {
     ...on,
     STRIPE_PRICE_SHADOW_LAB_GROUP: "price_group",
     STRIPE_PRICE_SHADOW_LAB_MONTHLY: "price_month",
   } as NodeJS.ProcessEnv;
-  assert.equal((await handleCheckout({ product: "consulting_1hr" }, deps(env))).status, 200);
-  assert.equal((await handleCheckout({ product: "shadow_lab_group" }, deps(env))).status, 200);
-  assert.equal((await handleCheckout({ product: "shadow_lab_monthly" }, deps(env))).status, 200);
-  assert.equal(created[0].success_url, "https://example.test/access/book?session_id={CHECKOUT_SESSION_ID}");
+  const signup = { name: "Jane Doe", email: "buyer@example.com", interest: "Build an agent", message: "" };
+  const quiet = { ...deps(env), recordLead: async () => {} };
+  assert.equal((await handleCheckout({ product: "consulting_1hr" }, quiet)).status, 200);
+  assert.equal((await handleCheckout({ product: "shadow_lab_group", ...signup }, quiet)).status, 200);
+  assert.equal((await handleCheckout({ product: "shadow_lab_monthly", ...signup }, quiet)).status, 200);
+  const book = "https://example.test/access/book?session_id={CHECKOUT_SESSION_ID}";
+  assert.equal(created[0].success_url, book);
   assert.equal(created[0].cancel_url, "https://example.test/summary?checkout=canceled");
   assert.equal(created[0].metadata?.product_key, "consulting_1hr");
-  assert.equal(created[1].success_url, "https://example.test/summary?checkout=success&session_id={CHECKOUT_SESSION_ID}");
-  assert.equal(created[2].success_url, "https://example.test/summary?checkout=success&session_id={CHECKOUT_SESSION_ID}");
+  assert.equal(created[1].success_url, book);
+  assert.equal(created[1].customer_email, "buyer@example.com");
+  assert.equal(created[2].success_url, book);
   assert.equal(created[2].mode, "subscription");
 });

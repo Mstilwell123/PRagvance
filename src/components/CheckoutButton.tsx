@@ -3,22 +3,53 @@
 import { useState } from "react";
 import type { ProductKey } from "@/lib/checkout/products";
 
-/** Rendered only when CHECKOUT_ENABLED=true. Sends a product key only. */
-export default function CheckoutButton({ product, fallbackHref, className, children }: { product: ProductKey; fallbackHref: string; className: string; children: React.ReactNode }) {
+/** Sends a product key only. A fallback href is used when the caller still has one. */
+export default function CheckoutButton({
+  product,
+  fallbackHref,
+  className,
+  children,
+  ariaLabel,
+}: {
+  product: ProductKey;
+  fallbackHref?: string;
+  className: string;
+  children: React.ReactNode;
+  ariaLabel?: string;
+}) {
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
   async function go() {
     setBusy(true);
+    setError("");
     try {
       const r = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ product }) });
       const j = (await r.json()) as { url?: string };
-      window.location.href = r.ok && j.url ? j.url : fallbackHref;
+      if (r.ok && j.url) {
+        window.location.href = j.url;
+        return;
+      }
+      if (fallbackHref) {
+        window.location.href = fallbackHref;
+        return;
+      }
+      setError("Checkout is unavailable right now. Email support@pragvance.ai.");
     } catch {
-      window.location.href = fallbackHref;
+      if (fallbackHref) {
+        window.location.href = fallbackHref;
+        return;
+      }
+      setError("Checkout is unavailable right now. Email support@pragvance.ai.");
+    } finally {
+      setBusy(false);
     }
   }
   return (
-    <button type="button" onClick={go} disabled={busy} className={className}>
-      {children}
-    </button>
+    <>
+      <button type="button" onClick={go} disabled={busy} className={className} aria-label={ariaLabel}>
+        {children}
+      </button>
+      {error ? <p className="mt-2 text-center text-xs text-[#f3cd7d]">{error}</p> : null}
+    </>
   );
 }
