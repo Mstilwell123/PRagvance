@@ -70,9 +70,10 @@ test("assessment lead trims fields and rejects anything out of range", () => {
 
   const edges = validateAssessmentLead(raw({ score: 0, nextWant: "", name: "A".repeat(120), company: "B".repeat(200) }));
   assert.equal(edges.ok, true);
-  const top = validateAssessmentLead(raw({ score: "75", nextWant: null, band: "Operating layer" }));
+  assert.equal(ASSESSMENT_SCORE_MAX, 84);
+  const top = validateAssessmentLead(raw({ score: "84", nextWant: null, band: "Operating layer" }));
   assert.equal(top.ok, true);
-  if (top.ok) assert.equal(top.lead.score, 75);
+  if (top.ok) assert.equal(top.lead.score, 84);
 
   for (const body of [
     raw({ name: "  " }),
@@ -84,7 +85,7 @@ test("assessment lead trims fields and rejects anything out of range", () => {
     raw({ phone: "call-me" }),
     raw({ email: "not-an-email" }),
     raw({ email: `${"a".repeat(250)}@b.co` }),
-    raw({ score: 76 }),
+    raw({ score: 85 }),
     raw({ score: -1 }),
     raw({ score: 10.5 }),
     raw({ score: "nope" }),
@@ -152,7 +153,7 @@ test("assessment upsert payload, tags, band tag, and note", async () => {
   assert.deepEqual(posts[1].body.tags, ["AI Assessment lead", "AI Assessment - Chat toys / no system"]);
   assert.equal(
     posts[2].body.body,
-    ["Score: 12 / 75", "Band: Chat toys / no system", "What do you want next: (none)", `Submitted: ${SUBMITTED}`].join("\n"),
+    ["Score: 12 / 84", "Band: Chat toys / no system", "What do you want next: (none)", `Submitted: ${SUBMITTED}`].join("\n"),
   );
 
   const mailed = assessmentEmail(sample, ASSESSMENT_FROM_DEFAULT);
@@ -160,7 +161,7 @@ test("assessment upsert payload, tags, band tag, and note", async () => {
   assert.equal(mailed.replyTo, "jane@acme.test");
   assert.match(mailed.text, /^Name: Jane Doe\n/);
   assert.match(mailed.text, /Company: Acme/);
-  assert.match(mailed.text, /Score: 42 \/ 75/);
+  assert.match(mailed.text, /Score: 42 \/ 84/);
 });
 
 test("assessment lead failure fallback still returns success", async () => {

@@ -1,4 +1,7 @@
+import { ASSESSMENT_SCORE_MAX } from "./assessment-questions";
 import { LIMITS } from "./lead";
+
+export { ASSESSMENT_SCORE_MAX };
 
 /** Bands produced by the assessment. The fallback label is included so a score still maps. */
 export const ASSESSMENT_BANDS = [
@@ -16,7 +19,6 @@ export type AssessmentNextWant = (typeof ASSESSMENT_NEXT)[number] | null;
 
 export const ASSESSMENT_SOURCE = "pragvance.ai AI Assessment";
 export const ASSESSMENT_LEAD_TAG = "AI Assessment lead";
-export const ASSESSMENT_SCORE_MAX = 75;
 export const ASSESSMENT_FROM_DEFAULT = "Pragvance Assessment <onboarding@resend.dev>";
 
 const PHONE_RE = /^[\d\s+\-()]{7,30}$/;

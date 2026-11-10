@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 import AssessmentQuiz from "@/components/AssessmentQuiz";
 import BreadcrumbJsonLd from "@/components/BreadcrumbJsonLd";
+import { ASSESSMENT_SCORE_MAX, QUESTIONS } from "@/lib/assessment-questions";
 import { FAQ } from "@/lib/site";
+
+const questionCount = QUESTIONS.length;
 
 export const metadata: Metadata = {
   title: { absolute: "AI Assessment — How well does your company use AI? | Pragvance" },
-  description:
-    "Free AI Assessment: a 25-question diagnostic (score 0–75) that bands how your company uses AI — and where AI Workforce or Shadow Lab fits. Replaces the old Reality Check.",
+  description: `Free AI Assessment: a ${questionCount}-question diagnostic (score 0–${ASSESSMENT_SCORE_MAX}) that bands how your company uses AI — and where AI Workforce or Shadow Lab fits. Replaces the old Reality Check.`,
   alternates: { canonical: "/assessment" },
   openGraph: {
     title: "AI Assessment — How well does your company use AI?",
-    description: "25 questions. Honest bands (0–75). No fake percentages — AI Workforce, Lab, apps, or clarity.",
+    description: `${questionCount} questions. Honest bands (0–${ASSESSMENT_SCORE_MAX}). No fake percentages — AI Workforce, Lab, apps, or clarity.`,
     url: "/assessment",
     images: [{ url: "/logo-lockup.png", alt: "Pragvance" }],
   },
@@ -34,7 +36,7 @@ export default function AssessmentPage() {
         name: "Is the assessment free?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Yes. The AI Assessment is free. It scores 0–75 across 25 questions and recommends AI Workforce, Shadow Lab, a custom build conversation, or contact-only clarity — with band labels only, no fake percentages.",
+          text: `Yes. The AI Assessment is free. It scores 0–${ASSESSMENT_SCORE_MAX} across ${questionCount} questions and recommends AI Workforce, Shadow Lab, a custom build conversation, or contact-only clarity — with band labels only, no fake percentages.`,
         },
       },
     ],
@@ -58,7 +60,8 @@ export default function AssessmentPage() {
             AI Assessment
           </h1>
           <p className="mt-4 text-[color:var(--text-muted)]">
-            25 questions. Score 0–75 with honest bands — no fake percentages. Replaces the old
+            {questionCount} questions. Score 0–{ASSESSMENT_SCORE_MAX} with honest bands — no fake
+            percentages. Replaces the old
             Reality Check. See where agents help and where they do not.
           </p>
         </div>

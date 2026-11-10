@@ -5,7 +5,7 @@ import type { FormEvent } from "react";
 import Link from "next/link";
 import { completeAssessmentCapture } from "@/lib/assessment-lead";
 import { SITE } from "@/lib/site";
-import { QUESTIONS } from "@/lib/assessment-questions";
+import { ASSESSMENT_SCORE_MAX, QUESTIONS, bandForScore, scoreTier } from "@/lib/assessment-questions";
 
 type NextWant = "swarm" | "lab" | "custom" | "score" | null;
 
@@ -23,17 +23,20 @@ function scoreTotal(answers: Record<string, number>): number {
 }
 
 function bandFromScore(total: number, nextWant: NextWant): BandResult {
-  // Optional next pick must never override a 0–24 into Lab
-  const low = total <= 24;
-  const midLow = total >= 25 && total <= 39;
-  const mid = total >= 40 && total <= 54;
-  const high = total >= 55;
+  // Optional next pick must never override a 0–27 into Lab
+  const tier = scoreTier(total);
+  const low = tier === "low";
+  const midLow = tier === "midLow";
+  const mid = tier === "mid";
+  const high = tier === "high";
+  const bandName = bandForScore(total);
+  const scored = `Score ${total} / ${ASSESSMENT_SCORE_MAX}.`;
 
   if (high && nextWant === "custom") {
     return {
-      band: "Operating layer",
+      band: bandName,
       title: "Operating layer — custom app conversation",
-      body: `Score ${total} / 75. You asked about a custom app. Talk through what to ship — or stay in Shadow Lab (${SITE.labPrices}) if you want closer coaching first.`,
+      body: `${scored} You asked about a custom app. Talk through what to ship — or stay in Shadow Lab (${SITE.labPrices}) if you want closer coaching first.`,
       href: "/contact?interest=custom#contact",
       cta: "Talk about a custom app",
     };
@@ -42,18 +45,18 @@ function bandFromScore(total: number, nextWant: NextWant): BandResult {
   if (high) {
     if (nextWant === "swarm") {
       return {
-        band: "Operating layer",
+        band: bandName,
         title: "Operating layer — AI Workforce still fits",
-        body: `Score ${total} / 75. You already run AI as an operating layer. Weekly classroom keeps the roster sharp — ${SITE.swarmPrice} on Skool.`,
+        body: `${scored} You already run AI as an operating layer. Weekly classroom keeps the roster sharp — ${SITE.swarmPrice} on Skool.`,
         href: SITE.skoolUrl,
         cta: `Join AI Workforce — ${SITE.swarmPrice}`,
         external: true,
       };
     }
     return {
-      band: "Operating layer",
+      band: bandName,
       title: "Operating layer — Shadow Lab",
-      body: `Score ${total} / 75. Live coaching for founders who want closer guidance — ${SITE.labPrices}.`,
+      body: `${scored} Live coaching for founders who want closer guidance — ${SITE.labPrices}.`,
       href: "/shadow-lab",
       cta: "Explore Shadow Lab",
     };
@@ -62,60 +65,59 @@ function bandFromScore(total: number, nextWant: NextWant): BandResult {
   if (mid) {
     if (nextWant === "lab") {
       return {
-        band: "Real workflows, weak ops",
+        band: bandName,
         title: "Real workflows, weak ops — Shadow Lab if you want a closer desk",
-        body: `Score ${total} / 75. Production workflows exist; ops are thin. AI Workforce builds the system; Shadow Lab (${SITE.labPrices}) if you want closer coaching.`,
+        body: `${scored} Production workflows exist; ops are thin. AI Workforce builds the system; Shadow Lab (${SITE.labPrices}) if you want closer coaching.`,
         href: "/shadow-lab",
         cta: "Explore Shadow Lab",
       };
     }
     if (nextWant === "custom") {
       return {
-        band: "Real workflows, weak ops",
+        band: bandName,
         title: "Real workflows, weak ops — custom conversation",
-        body: `Score ${total} / 75. You may need a product, not only agents. Or start with AI Workforce (${SITE.swarmPrice}) to tighten ops first.`,
+        body: `${scored} You may need a product, not only agents. Or start with AI Workforce (${SITE.swarmPrice}) to tighten ops first.`,
         href: "/contact?interest=custom#contact",
         cta: "Talk about a custom app",
       };
     }
     return {
-      band: "Real workflows, weak ops",
+      band: bandName,
       title: "Real workflows, weak ops — AI Workforce",
-      body: `Score ${total} / 75. You have real workflows but weak ops. AI Workforce (${SITE.swarmPrice}) builds the roster and routines. Mention Shadow Lab if you want a closer desk.`,
+      body: `${scored} You have real workflows but weak ops. AI Workforce (${SITE.swarmPrice}) builds the roster and routines. Mention Shadow Lab if you want a closer desk.`,
       href: SITE.skoolUrl,
       cta: `Join AI Workforce — ${SITE.swarmPrice}`,
       external: true,
     };
   }
 
-  // 0–39 always Swarm-primary; optional Lab pick cannot override 0–24 into Lab
+  // 0–44 always Swarm-primary; optional Lab pick cannot override 0–27 into Lab
   if (low || midLow) {
-    const bandLabel = low ? "Chat toys / no system" : "Scattered pilots";
     if (nextWant === "custom") {
       return {
-        band: bandLabel,
-        title: `${bandLabel} — start with AI Workforce, or talk custom later`,
-        body: `Score ${total} / 75. ${bandLabel}. AI Workforce (${SITE.swarmPrice}) is the right first step. Custom apps come after you have a system — contact us when ready.`,
+        band: bandName,
+        title: `${bandName} — start with AI Workforce, or talk custom later`,
+        body: `${scored} ${bandName}. AI Workforce (${SITE.swarmPrice}) is the right first step. Custom apps come after you have a system — contact us when ready.`,
         href: SITE.skoolUrl,
         cta: `Join AI Workforce — ${SITE.swarmPrice}`,
         external: true,
       };
     }
-    // Even if they picked Lab optionally, 0–24 stays Swarm; 25–39 can mention Lab lightly but CTA stays Swarm unless they insist — rule: do not override 0–24 into Lab
+    // Even if they picked Lab optionally, 0–27 stays Swarm; 28–44 can mention Lab lightly but CTA stays Swarm unless they insist — rule: do not override 0–27 into Lab
     if (nextWant === "lab" && midLow) {
       return {
-        band: bandLabel,
-        title: `${bandLabel} — AI Workforce first`,
-        body: `Score ${total} / 75. Scattered pilots. Start with AI Workforce (${SITE.swarmPrice}). Shadow Lab (${SITE.labPrices}) is available when the foundation is in place.`,
+        band: bandName,
+        title: `${bandName} — AI Workforce first`,
+        body: `${scored} Scattered pilots. Start with AI Workforce (${SITE.swarmPrice}). Shadow Lab (${SITE.labPrices}) is available when the foundation is in place.`,
         href: SITE.skoolUrl,
         cta: `Join AI Workforce — ${SITE.swarmPrice}`,
         external: true,
       };
     }
     return {
-      band: bandLabel,
-      title: `${bandLabel} — AI Workforce`,
-      body: `Score ${total} / 75. ${bandLabel}. Weekly live training on Skool to build a Grok Bot agent team — ${SITE.swarmPrice}.`,
+      band: bandName,
+      title: `${bandName} — AI Workforce`,
+      body: `${scored} ${bandName}. Weekly live training on Skool to build a Grok Bot agent team — ${SITE.swarmPrice}.`,
       href: SITE.skoolUrl,
       cta: `Join AI Workforce — ${SITE.swarmPrice}`,
       external: true,
@@ -126,7 +128,7 @@ function bandFromScore(total: number, nextWant: NextWant): BandResult {
   return {
     band: "Assessment",
     title: "AI Workforce is a strong start",
-    body: `Score ${total} / 75. Weekly live training — ${SITE.swarmPrice}.`,
+    body: `${scored} Weekly live training — ${SITE.swarmPrice}.`,
     href: SITE.skoolUrl,
     cta: `Join AI Workforce — ${SITE.swarmPrice}`,
     external: true,
@@ -401,7 +403,7 @@ export default function AssessmentQuiz() {
             Your AI Assessment
           </p>
           <p className="mt-2 text-sm text-[color:var(--text-muted)]">
-            Score {total} / 75 · {result.band}
+            Score {total} / {ASSESSMENT_SCORE_MAX} · {result.band}
           </p>
           <h2 className="mt-2 text-2xl font-semibold text-[color:var(--gold-bright)]">
             {result.title}
