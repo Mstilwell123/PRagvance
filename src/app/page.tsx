@@ -5,6 +5,7 @@ import Faq from "@/components/Faq";
 import HeroCarousel from "@/components/HeroCarousel";
 import StartHereLink from "@/components/StartHereLink";
 import { PRODUCT_PAGES } from "@/lib/pricing";
+import { ASSESSMENT_SCORE_MAX, QUESTIONS } from "@/lib/assessment-questions";
 import { DESKS, SITE } from "@/lib/site";
 
 export default function HomePage() {
@@ -170,7 +171,7 @@ export default function HomePage() {
                 AI Assessment
               </h2>
               <p className="mt-4 text-[color:var(--text-muted)]">
-                A free 25-question diagnostic (0–75) so you see where agents help and where they
+                A free {QUESTIONS.length}-question diagnostic (0–{ASSESSMENT_SCORE_MAX}) so you see where agents help and where they
                 don’t — before you invest.
               </p>
               <Link

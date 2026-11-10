@@ -131,12 +131,12 @@ export const QUESTIONS = [
   },
   {
     id: "write",
-    q: "Which systems can AI write to (CRM, send email, calendar, code, payments)?",
+    q: "Which systems is AI allowed to write to — CRM, sending email, calendar, code, or payments?",
     options: [
       "None — copy-paste only",
       "One sandbox",
-      "Production on a few tools, no audit",
-      "Explicit write permissions, an audit log, and a human for irreversible actions",
+      "Production on a few tools, with no audit",
+      "Explicit write permissions set by a manager or department head, with an audit log and a human on irreversible actions",
     ],
   },
   {
@@ -147,6 +147,36 @@ export const QUESTIONS = [
       "When it breaks",
       "Monthly if we remember",
       "Scheduled review of quality, cost, and whether the job still exists",
+    ],
+  },
+  {
+    id: "resist",
+    q: "We've seen cases where employees quietly resist AI to protect their role. Does that sound like anyone on your team?",
+    options: [
+      "Yes, and no one is addressing it",
+      'Probably — we hear "AI doesn\'t work" from people who never really tried it',
+      "Some pushback, handled case by case",
+      "Low risk — roles are redesigned openly, real AI use is tracked, and people are rewarded for using it",
+    ],
+  },
+  {
+    id: "account",
+    q: "How do you keep people accountable for AI activity? Could you pull up an AI activity log of who did what?",
+    options: [
+      "We couldn't tell who did anything",
+      "We'd have to ask around",
+      "Some tools keep a history, but no one reviews it",
+      "An automatic AI activity log records every edit to prompts, tools, or permissions, plus searches and drafts, with the person's name and time — visible only to admins and stored in a database managers can query",
+    ],
+  },
+  {
+    id: "signs",
+    q: "Have you noticed any of these signs that AI is being quietly resisted?",
+    options: [
+      "Someone who controls the data quietly changes the inputs",
+      "Metrics suddenly go quiet",
+      "A pilot stalls right when it needs a champion",
+      "No visible signs of resistance",
     ],
   },
   {
@@ -252,3 +282,39 @@ export const QUESTIONS = [
 ] as const;
 
 export type Question = (typeof QUESTIONS)[number];
+
+/** Each option scores its index: first = 0, last = 3. Max is the sum of those tops. */
+export const ASSESSMENT_SCORE_MAX = QUESTIONS.reduce(
+  (sum, question) => sum + (question.options.length - 1),
+  0,
+);
+
+/**
+ * Inclusive upper bounds. Labels are the GoHighLevel band tags and must stay exact.
+ * 0–27 chat toys, 28–44 scattered pilots, 45–61 real workflows, 62–max operating layer.
+ */
+export const SCORE_BANDS = [
+  { max: 27, label: "Chat toys / no system" },
+  { max: 44, label: "Scattered pilots" },
+  { max: 61, label: "Real workflows, weak ops" },
+  { max: ASSESSMENT_SCORE_MAX, label: "Operating layer" },
+] as const;
+
+export type ScoreBandLabel = (typeof SCORE_BANDS)[number]["label"];
+
+export type ScoreTier = "low" | "midLow" | "mid" | "high";
+
+export function bandForScore(total: number): ScoreBandLabel {
+  for (const band of SCORE_BANDS) {
+    if (total <= band.max) return band.label;
+  }
+  return "Operating layer";
+}
+
+/** Same cutoffs as bandForScore, in the order the results page already branches on. */
+export function scoreTier(total: number): ScoreTier {
+  if (total <= SCORE_BANDS[0].max) return "low";
+  if (total <= SCORE_BANDS[1].max) return "midLow";
+  if (total <= SCORE_BANDS[2].max) return "mid";
+  return "high";
+}

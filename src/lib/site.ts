@@ -38,7 +38,7 @@ export const FAQ = [
   },
   {
     q: "What is the AI Assessment?",
-    a: "A free 25-question diagnostic (0–75) that bands how your company uses AI — from chat toys to an operating layer — and points to AI Workforce or Shadow Lab. It replaces the old Reality Check.",
+    a: "A free 28-question diagnostic (0–84) that bands how your company uses AI — from chat toys to an operating layer — and points to AI Workforce or Shadow Lab. It replaces the old Reality Check.",
   },
   {
     q: "Do you build custom AI apps?",
