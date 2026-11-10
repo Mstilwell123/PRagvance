@@ -158,6 +158,7 @@ export default function AssessmentQuiz() {
   const [honeypot, setHoneypot] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   const total = useMemo(() => scoreTotal(answers), [answers]);
   const previewBand = useMemo(() => bandFromScore(total, nextWant).band, [total, nextWant]);
@@ -180,6 +181,7 @@ export default function AssessmentQuiz() {
     setHoneypot("");
     setSubmitting(false);
     setSubmitError(null);
+    setEmailError(null);
   }
 
   async function onCaptureSubmit(e: FormEvent<HTMLFormElement>) {
@@ -188,9 +190,11 @@ export default function AssessmentQuiz() {
 
     setSubmitting(true);
     setSubmitError(null);
+    setEmailError(null);
 
     // Score and band are already computed here. Show them after a valid form
     // even when the lead API errors, times out, or never responds.
+    // completeAssessmentCapture rejects addresses the lead route would reject.
     const outcome = await completeAssessmentCapture(
       { name, company, phone, email, score: total, band: previewBand, nextWant, honeypot },
       (body) => {
@@ -204,7 +208,8 @@ export default function AssessmentQuiz() {
     );
 
     if (outcome.phase === "capture") {
-      setSubmitError(outcome.error);
+      if (outcome.field === "email") setEmailError(outcome.error);
+      else setSubmitError(outcome.error);
       setSubmitting(false);
       return;
     }
@@ -331,10 +336,20 @@ export default function AssessmentQuiz() {
                 required
                 autoComplete="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailError) setEmailError(null);
+                }}
+                aria-invalid={emailError ? true : undefined}
+                aria-describedby={emailError ? "assess-email-error" : undefined}
                 className={inputClass}
                 disabled={submitting}
               />
+              {emailError && (
+                <p id="assess-email-error" className="mt-2 text-sm text-red-400" role="alert">
+                  {emailError}
+                </p>
+              )}
             </div>
 
             {/* Honeypot — hidden from users */}

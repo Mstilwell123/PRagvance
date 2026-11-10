@@ -65,7 +65,16 @@ export type AssessmentMail = {
 
 export type AssessmentCaptureResult =
   | { phase: "result"; score: number; band: string }
-  | { phase: "capture"; error: string };
+  | { phase: "capture"; error: string; field?: "email" };
+
+/** Inline copy when the address fails the same check the lead route uses. */
+export const ASSESSMENT_EMAIL_ERROR = "Please enter a valid email address.";
+
+/** Trimmed address `validateAssessmentLead` will accept. */
+export function isValidAssessmentEmail(email: string): boolean {
+  const value = email.trim();
+  return value.length > 0 && value.length <= LIMITS.email && EMAIL_RE.test(value);
+}
 
 function trimmed(v: unknown): string | null {
   return typeof v === "string" ? v.trim() : null;
@@ -141,7 +150,7 @@ export function validateAssessmentLead(raw: unknown): { ok: true; lead: Assessme
   if (!name || name.length > LIMITS.name) return { ok: false, error: "Invalid name" };
   if (!company || company.length > COMPANY_MAX) return { ok: false, error: "Invalid company" };
   if (!phone || !PHONE_RE.test(phone)) return { ok: false, error: "Invalid phone" };
-  if (!email || email.length > LIMITS.email || !EMAIL_RE.test(email)) return { ok: false, error: "Invalid email" };
+  if (!isValidAssessmentEmail(email)) return { ok: false, error: "Invalid email" };
   const score = scoreOf(r.score);
   if (!Number.isInteger(score) || score < 0 || score > ASSESSMENT_SCORE_MAX) {
     return { ok: false, error: "Invalid score" };
@@ -164,6 +173,7 @@ export function validateAssessmentLead(raw: unknown): { ok: true; lead: Assessme
  * Client gate for the lead form.
  * A valid submit always reveals the score and band already computed in the browser.
  * Thrown requests (Resend, GoHighLevel, network) must not hide that result.
+ * An address the server would reject stays on the form and is not posted.
  */
 export async function completeAssessmentCapture(
   input: {
@@ -182,6 +192,9 @@ export async function completeAssessmentCapture(
   const company = input.company.trim();
   const phone = input.phone.trim();
   const email = input.email.trim();
+  if (email && !isValidAssessmentEmail(email)) {
+    return { phase: "capture", error: ASSESSMENT_EMAIL_ERROR, field: "email" };
+  }
   if (!name || !company || !phone || !email) {
     return { phase: "capture", error: "Name, company, phone, and email are required." };
   }
