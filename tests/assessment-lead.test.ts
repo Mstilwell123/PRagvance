@@ -3,11 +3,13 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
   ASSESSMENT_BANDS,
+  ASSESSMENT_EMAIL_ERROR,
   ASSESSMENT_FROM_DEFAULT,
   ASSESSMENT_SCORE_MAX,
   assessmentEmail,
   assessmentLeadTags,
   completeAssessmentCapture,
+  isValidAssessmentEmail,
   validateAssessmentLead,
   type AssessmentLead,
 } from "../src/lib/assessment-lead.ts";
@@ -84,6 +86,7 @@ test("assessment lead trims fields and rejects anything out of range", () => {
     raw({ phone: "123" }),
     raw({ phone: "call-me" }),
     raw({ email: "not-an-email" }),
+    raw({ email: "bob@" }),
     raw({ email: `${"a".repeat(250)}@b.co` }),
     raw({ score: 85 }),
     raw({ score: -1 }),
@@ -283,6 +286,9 @@ test("Resend throws, and the results still display / the route returns ok", asyn
   assert.match(quiz, /completeAssessmentCapture/);
   assert.match(quiz, /setPhase\("result"\)/);
   assert.match(quiz, /setSubmitError\(outcome\.error\)/);
+  assert.match(quiz, /setEmailError\(outcome\.error\)/);
+  assert.match(quiz, /id="assess-email"[\s\S]*id="assess-email-error"/);
+  assert.match(quiz, /outcome\.field === "email"/);
   assert.equal(quiz.includes("res.ok"), false);
   assert.equal(quiz.includes("Results are temporarily unavailable"), false);
   assert.match(quiz, /htmlFor="assess-name"/);
@@ -400,7 +406,117 @@ test("Resend throws, and the results still display / the route returns ok", asyn
     else process.env.GHL_LOCATION_ID = prevLocation;
   }
 
+  let emailPosts = 0;
+  const invalidEmail = await completeAssessmentCapture(
+    {
+      name: "Jane Doe",
+      company: "Acme",
+      phone: "5035550100",
+      email: "bob@",
+      score: 18,
+      band: "Chat toys / no system",
+      nextWant: null,
+      honeypot: "",
+    },
+    async () => {
+      emailPosts += 1;
+    },
+  );
+  assert.equal(emailPosts, 0);
+  assert.equal(invalidEmail.phase, "capture");
+  if (invalidEmail.phase === "capture") {
+    assert.equal(invalidEmail.error, ASSESSMENT_EMAIL_ERROR);
+    assert.equal(invalidEmail.error, "Please enter a valid email address.");
+    assert.equal(invalidEmail.field, "email");
+  }
+
+  const blankEmail = await completeAssessmentCapture(
+    {
+      name: "Jane Doe",
+      company: "Acme",
+      phone: "5035550100",
+      email: "   ",
+      score: 18,
+      band: "Chat toys / no system",
+      nextWant: null,
+      honeypot: "",
+    },
+    async () => {
+      emailPosts += 1;
+    },
+  );
+  assert.equal(emailPosts, 0);
+  assert.equal(blankEmail.phase, "capture");
+  if (blankEmail.phase === "capture") {
+    assert.match(blankEmail.error, /Name, company, phone, and email/);
+    assert.equal(blankEmail.field, undefined);
+  }
+
   const routeSrc = readFileSync(new URL("../src/app/api/assessment-lead/route.ts", import.meta.url), "utf8");
   assert.match(routeSrc, /RESEND_API_KEY/);
   assert.match(routeSrc, /ASSESSMENT_FROM_EMAIL/);
+});
+
+test("client and server share one email rule", async () => {
+  const rejected = ["bob@", "not-an-email", "jane@acme", "a@b", " jane @acme.test ", `${"a".repeat(250)}@b.co`, ""];
+  for (const email of rejected) {
+    assert.equal(isValidAssessmentEmail(email), false, email);
+    const bad = validateAssessmentLead(raw({ email }));
+    assert.equal(bad.ok, false, email);
+    if (!bad.ok) assert.equal(bad.error, "Invalid email");
+  }
+
+  const atLimit = `${"a".repeat(249)}@b.co`;
+  assert.equal(atLimit.length, 254);
+  assert.equal(isValidAssessmentEmail(`  ${atLimit}  `), true);
+  const accepted = validateAssessmentLead(raw({ email: `  ${atLimit}  ` }));
+  assert.equal(accepted.ok, true);
+  if (accepted.ok) assert.equal(accepted.lead.email, atLimit);
+
+  let posted: string | null = null;
+  const shown = await completeAssessmentCapture(
+    {
+      name: " Jane Doe ",
+      company: "Acme",
+      phone: "5035550100",
+      email: "  jane@acme.test ",
+      score: 42,
+      band: "Real workflows, weak ops",
+      nextWant: "score",
+      honeypot: "",
+    },
+    async (body) => {
+      posted = body.email;
+      throw new Error("network");
+    },
+  );
+  assert.equal(posted, "jane@acme.test");
+  assert.equal(shown.phase, "result");
+  if (shown.phase === "result") {
+    assert.equal(shown.score, 42);
+    assert.equal(shown.band, "Real workflows, weak ops");
+  }
+
+  let blockedPosts = 0;
+  const missingName = await completeAssessmentCapture(
+    {
+      name: "",
+      company: "Acme",
+      phone: "5035550100",
+      email: "bob@",
+      score: 42,
+      band: "Real workflows, weak ops",
+      nextWant: null,
+      honeypot: "",
+    },
+    async () => {
+      blockedPosts += 1;
+    },
+  );
+  assert.equal(blockedPosts, 0);
+  assert.equal(missingName.phase, "capture");
+  if (missingName.phase === "capture") {
+    assert.equal(missingName.field, "email");
+    assert.equal(missingName.error, "Please enter a valid email address.");
+  }
 });
