@@ -61,11 +61,11 @@ export default function BookingPanel({ view }: { view: BookingView }) {
             </>
           ) : (
             <p className="text-sm text-[color:var(--text-muted)]">
-              Email{" "}
+              We&apos;ll email your booking link. If it does not arrive, email{" "}
               <a href={mailtoFor(view.sessionId)} className="text-[color:var(--electric-bright)] hover:underline">
                 {SITE.email}
-              </a>{" "}
-              to schedule your 60-minute session.
+              </a>
+              .
             </p>
           )}
         </div>

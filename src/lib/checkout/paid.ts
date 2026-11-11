@@ -51,21 +51,6 @@ export function isCheckoutSessionId(id: string): boolean {
   return SESSION_ID.test(id);
 }
 
-/** https URL only. Anything else (unset, http, javascript:) means "no booking link". */
-export function httpsBookingUrl(raw: string | null | undefined): string | null {
-  const value = raw?.trim() ?? "";
-  if (!value) return null;
-  let url: URL;
-  try {
-    url = new URL(value);
-  } catch {
-    return null;
-  }
-  if (url.protocol !== "https:") return null;
-  if (url.username || url.password) return null;
-  return url.toString();
-}
-
 /** Partly mask an email for display. Returns "hidden" when it is not a single address. */
 export function maskEmail(email: string): string {
   const trimmed = email.trim();
@@ -83,7 +68,10 @@ export type BookingView =
       amountLabel: string;
       productName: string;
       maskedEmail: string;
+      /** Single-use scheduling URL. Null when Calendly is not configured or the URL was rejected. */
       bookingUrl: string | null;
+      /** "email" means tell the buyer we'll email the link. Never a reusable public URL. */
+      linkDelivery: "link" | "email";
       sessionId: string;
     }
   | { state: "unavailable" };
