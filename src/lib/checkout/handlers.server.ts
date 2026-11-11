@@ -1,6 +1,7 @@
 import type Stripe from "stripe";
-import { checkoutEnabled, isProductKey, priceIdFor, PRODUCTS, type ProductKey } from "./products";
+import { checkoutEnabled, isBookingProduct, isProductKey, priceIdFor, PRODUCTS, type ProductKey } from "./products";
 import { oncePerEvent, recordEntitlement } from "./entitlements.server";
+import { getOrCreateBookingLink } from "./booking-link.server";
 import { recordShadowLabLead, runShadowLabLead, syncPaidCheckoutToCrm } from "../crm.server";
 import { safeLogDetail } from "./paid";
 import {
@@ -20,10 +21,8 @@ export type CheckoutDeps = {
   recordLead?: (lead: ShadowLabSignup) => Promise<void>;
 };
 
-const BOOKING_PRODUCTS = new Set<ProductKey>(["consulting_1hr", "shadow_lab_group", "shadow_lab_monthly"]);
-
 function successUrl(site: string, product: ProductKey): string {
-  const path = BOOKING_PRODUCTS.has(product)
+  const path = isBookingProduct(product)
     ? "/access/book?session_id={CHECKOUT_SESSION_ID}"
     : "/summary?checkout=success&session_id={CHECKOUT_SESSION_ID}";
   return `${site}${path}`;
@@ -113,17 +112,20 @@ export async function handleWebhook(rawBody: string, signature: string | null, d
       const email = s.customer_details?.email?.trim() ?? "";
       if (!USABLE_EMAIL.test(email)) {
         console.warn(`[crm] paid contact skipped: no usable email session=${s.id}`);
-        return;
+      } else {
+        const name = s.customer_details?.name?.trim() || null;
+        await syncPaidCheckoutToCrm({
+          sessionId: s.id,
+          email,
+          name: name ? name.slice(0, 120) : null,
+          productKey: key,
+          amountTotal: typeof s.amount_total === "number" ? s.amount_total : null,
+          currency: s.currency ?? null,
+        });
       }
-      const name = s.customer_details?.name?.trim() || null;
-      await syncPaidCheckoutToCrm({
-        sessionId: s.id,
-        email,
-        name: name ? name.slice(0, 120) : null,
-        productKey: key,
-        amountTotal: typeof s.amount_total === "number" ? s.amount_total : null,
-        currency: s.currency ?? null,
-      });
+      // Same store the confirmation page reads. Missing Calendly env returns
+      // without throwing so Stripe does not retry a link we cannot create.
+      if (isBookingProduct(key)) await getOrCreateBookingLink(s.id);
     });
     return { status: 200, body: { received: true, ...(outcome === "duplicate" ? { duplicate: true } : {}) } };
   } catch (err) {

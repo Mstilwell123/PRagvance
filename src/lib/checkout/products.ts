@@ -23,6 +23,13 @@ export function isProductKey(v: unknown): v is ProductKey {
   return typeof v === "string" && Object.prototype.hasOwnProperty.call(PRODUCTS, v);
 }
 
+/** Products whose paid confirmation may receive a single-use scheduling link. */
+const BOOKING_PRODUCTS = new Set<ProductKey>(["consulting_1hr", "shadow_lab_group", "shadow_lab_monthly"]);
+
+export function isBookingProduct(key: ProductKey): boolean {
+  return BOOKING_PRODUCTS.has(key);
+}
+
 /**
  * Live Shadow Lab prices. Used when that product's env price is unset,
  * or when the env value is one of the $1 test prices (price_1UXufc… / price_1UXufe…).

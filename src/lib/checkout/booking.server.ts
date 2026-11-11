@@ -1,9 +1,10 @@
 import type Stripe from "stripe";
-import { isProductKey, PRODUCTS } from "./products";
+import { getOrCreateBookingLink } from "./booking-link.server";
+import { singleUseBookingUrl, type IssuedLink } from "./calendly.server";
+import { isBookingProduct, isProductKey, PRODUCTS } from "./products";
 import { getStripe } from "./stripe.server";
 import {
   formatStripeAmount,
-  httpsBookingUrl,
   isCheckoutSessionId,
   maskEmail,
   safeLogDetail,
@@ -47,11 +48,26 @@ export function sessionIdFromQuery(value: string | string[] | undefined): string
   return undefined;
 }
 
+function confirmedBase(session: CheckoutSnapshot & { productKey: "consulting_1hr" | "shadow_lab_group" | "shadow_lab_monthly" }) {
+  return {
+    state: "confirmed" as const,
+    amountLabel: formatStripeAmount(session.amount_total, session.currency),
+    productName: PRODUCTS[session.productKey].label,
+    maskedEmail: maskEmail(session.email?.trim() ?? ""),
+    sessionId: session.id,
+  };
+}
+
+/**
+ * Confirm payment from the Checkout Session, then attach the single-use link.
+ * Unpaid, unknown, and forged ids never reach the link issuer.
+ * A non-single-use URL from the issuer is dropped.
+ */
 export async function resolveBooking(
   sessionId: string | undefined,
   deps: {
     retrieve: (id: string) => Promise<CheckoutSnapshot>;
-    bookingUrl?: string | null;
+    issueLink: (session: CheckoutSnapshot) => Promise<IssuedLink>;
   },
 ): Promise<BookingView> {
   const id = sessionId?.trim() ?? "";
@@ -67,29 +83,45 @@ export async function resolveBooking(
     session.id !== id ||
     session.payment_status !== "paid" ||
     !isProductKey(session.productKey) ||
-    (session.productKey !== "consulting_1hr" &&
-      session.productKey !== "shadow_lab_group" &&
-      session.productKey !== "shadow_lab_monthly")
+    !isBookingProduct(session.productKey)
   ) {
     return { state: "unavailable" };
   }
+
+  const base = confirmedBase({ ...session, productKey: session.productKey });
+  let issued: IssuedLink;
+  try {
+    issued = await deps.issueLink(session);
+  } catch (err) {
+    console.error("[booking] link issue failed", safeLogDetail(err));
+    return { ...base, bookingUrl: null, linkDelivery: "email" };
+  }
+
+  const bookingUrl = issued.delivery === "link" ? singleUseBookingUrl(issued.bookingUrl) : null;
+  if (issued.delivery === "link" && !bookingUrl) {
+    console.error("[booking] rejected non single-use url");
+    return { ...base, bookingUrl: null, linkDelivery: "email" };
+  }
   return {
-    state: "confirmed",
-    amountLabel: formatStripeAmount(session.amount_total, session.currency),
-    productName: PRODUCTS[session.productKey].label,
-    maskedEmail: maskEmail(session.email?.trim() ?? ""),
-    bookingUrl: httpsBookingUrl(deps.bookingUrl),
-    sessionId: session.id,
+    ...base,
+    bookingUrl,
+    linkDelivery: bookingUrl ? "link" : "email",
   };
 }
 
-/** Page entry. Reads CONSULTATION_BOOKING_URL and the Stripe secret. Never confirms without a paid session. */
+/**
+ * Page entry. Retrieves the Checkout Session with the Stripe secret, then
+ * reads or creates the single-use link. Does not read a public booking URL.
+ */
 export async function loadBookingPage(
   sessionId: string | undefined,
-  deps: { retrieve?: (id: string) => Promise<CheckoutSnapshot> } = {},
+  deps: {
+    retrieve?: (id: string) => Promise<CheckoutSnapshot>;
+    issueLink?: (session: CheckoutSnapshot) => Promise<IssuedLink>;
+  } = {},
 ): Promise<BookingView> {
   return resolveBooking(sessionId, {
-    bookingUrl: process.env.CONSULTATION_BOOKING_URL,
     retrieve: deps.retrieve ?? retrieveCheckoutSession,
+    issueLink: deps.issueLink ?? ((session) => getOrCreateBookingLink(session.id)),
   });
 }

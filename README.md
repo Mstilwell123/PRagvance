@@ -78,21 +78,27 @@ Off by default. Set `CHECKOUT_ENABLED=true` to enable; otherwise pricing/summary
 - Idempotency: KV marker `crm:{session_id}` (`{ at }`) is set only after the upsert, the tags, and the note all succeed. A second event for that session, or a Stripe retry of one that already succeeded, does not add another note. Overlapping deliveries take a short lock `crm:lock:{session_id}` (30s). The one that loses the lock gets a 500 so Stripe retries.
 - Failure: the entitlement is written first. If GoHighLevel errors, times out, or the lock is busy, the marker stays unset, the lock is released, and the webhook returns **500**. Stripe retries. The entitlement overwrite is the same record. Each CRM request aborts after 8s; the paid sync gives up after a 12s budget.
 - Missing `GHL_PRIVATE_TOKEN` or `GHL_LOCATION_ID`: CRM is skipped, a warning is logged with no token and no email, the entitlement is kept, and the webhook returns **200**. Stripe will not retry that event, and a resend of the same event id is ignored. Set both variables before checkout is enabled in that environment.
-- A paid session with no usable `customer_details.email` skips CRM the same way (200, entitlement kept). `no_payment_required` records the entitlement and does not call CRM.
+- A paid session with no usable `customer_details.email` skips CRM the same way (200, entitlement kept). `no_payment_required` records the entitlement and does not call CRM or Calendly.
+- A **paid** booking product (`consulting_1hr`, `shadow_lab_group`, `shadow_lab_monthly`) then asks Calendly API v2 `POST /scheduling_links` for one link: `max_event_count` 1, `owner_type` `EventType`, `owner` = `CALENDLY_EVENT_TYPE_URI`. The link is stored at `booking-link:{session_id}`. A Stripe retry or a second event for that session returns the stored link and does not create another. A Calendly error returns **500** so Stripe retries; the CRM marker still prevents a second note. Missing or invalid Calendly env does not fail the webhook.
 - Logs for the paid path are status and session id only. Response bodies are discarded.
 - Env vars: see `.env.example`. Keys only via env. Test keys only on previews. Do not change live Stripe prices, payment links, or Dashboard objects from this app.
 - Store: Upstash/Vercel KV if configured, else in-memory. Without a shared store, CRM dedupe is per instance, so production needs KV. Reference Postgres schema: `db/migrations/0001_checkout.{up,down}.sql` (not applied).
 
 ## Consultation booking page
 
-`/access/book` is server-rendered and `noindex` (page metadata and `X-Robots-Tag`). It is not in the nav or the sitemap. `/access` is disallowed in `robots.txt`.
+`/access/book` is server-rendered and `noindex` (page metadata and `X-Robots-Tag`). It is not in the nav or the sitemap. `/access` is disallowed in `robots.txt`. No redirect in `next.config` points at Calendly.
 
-The page loads the Checkout Session with the server Stripe secret. It confirms the payment only when the id matches `cs_test_` or `cs_live_` plus 8–200 letters or digits, `payment_status` is `paid`, and the product is `consulting_1hr`, `shadow_lab_group`, or `shadow_lab_monthly`. The confirmation shows the amount, the product name, and the buyer email with the local part masked (`b***@example.com`). A confirmed page with `CONSULTATION_BOOKING_URL` set redirects the browser there and still shows the scheduling link. The URL is not rendered for any other session.
+The page loads the Checkout Session with the server Stripe secret. It confirms the payment only when the id matches `cs_test_` or `cs_live_` plus 8–200 letters or digits, `payment_status` is `paid`, and the product is `consulting_1hr`, `shadow_lab_group`, or `shadow_lab_monthly`. The confirmation shows the amount, the product name, and the buyer email with the local part masked (`b***@example.com`). A confirmed page shows the single-use scheduling link stored for that session (or creates it if the webhook has not yet) and redirects the browser to that link. The link is a `https://calendly.com/d/...` URL. A public event page is rejected and is not rendered.
+
+The old `CONSULTATION_BOOKING_URL` variable is not read. Remove it from the host. Do not point any env var at a public Calendly page.
 
 | Var | Purpose |
 | --- | --- |
-| `CONSULTATION_BOOKING_URL` | https URL of the **60-minute** scheduling page. Not set in this repo. Do not point it at the free 30-minute event. |
+| `CALENDLY_API_TOKEN` | Server-only Calendly personal access token. Never expose it to the client. |
+| `CALENDLY_EVENT_TYPE_URI` | `https://api.calendly.com/event_types/{id}` for the **60-minute** event. |
 
-If that variable is unset, or is not an https URL, the page tells the buyer to email [support@pragvance.ai](mailto:support@pragvance.ai) to schedule. It does not promise a reply time.
+If either variable is missing, or the event type URI is not that API shape, the page says we'll email the booking link. It does not show a Calendly URL and it does not promise a reply time. Nothing in this app sends that email; send it by hand, or set the two variables so the page can show the link.
 
-Missing, invalid, unpaid, or wrong-product sessions get one message — we couldn't confirm a paid consultation — and a link to `/contact`. The page does not say the payment succeeded unless Stripe says it was paid.
+Missing, invalid, unpaid, or wrong-product sessions get one message — we couldn't confirm a paid session — and a link to `/contact`. The page does not say the payment succeeded unless Stripe says it was paid. Forged or unsigned webhook bodies do not create a link or a CRM contact.
+
+Paid buyers still reach GoHighLevel only through the existing checkout sync (`GHL_PRIVATE_TOKEN` and `GHL_LOCATION_ID`). Set the location id to the AI Workforce location. This app does not add a second CRM workflow. A manual test-mode runbook is in `docs/booking-gate-test-mode.md`.
