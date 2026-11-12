@@ -1,6 +1,6 @@
 import type { LeadInput } from "./lead";
 import type { ProductKey } from "./checkout/products";
-import { paidCheckoutNote, paidTags, safeLogDetail } from "./checkout/paid";
+import { paidCheckoutNote, paidTags, safeLogDetail, stripeMajorUnits } from "./checkout/paid";
 import {
   ASSESSMENT_SOURCE,
   assessmentLeadNote,
@@ -19,6 +19,9 @@ const API = "https://services.leadconnectorhq.com";
 const VERSION = "2021-07-28";
 const OFFER_FIELD_ID = "ptTwJX1zKJGm2BAIkQVM";
 const LEAD_TAG = "New - Lead";
+/** Pragvance Offers pipeline, stage "Done-for-You Deposit Paid". */
+const DEPOSIT_PIPELINE_ID = "qANySPz5tWWLCHiyQ5kW";
+const DEPOSIT_STAGE_ID = "de73dc18-c7df-4b1b-b772-855976cb6423";
 /** Per-request cap so a slow CRM cannot hang the lead form or a webhook. */
 const CALL_TIMEOUT_MS = 8_000;
 /** Whole paid-sync budget, under Stripe's webhook timeout. */
@@ -123,10 +126,12 @@ type CrmMarker = { at: string };
 
 /**
  * Upsert the buyer, add the paid tags, and add one note.
+ * A Done-for-You deposit also opens one opportunity in Pragvance Offers.
  * Returns "skipped" when GHL env is unset (caller still returns 200).
  * Throws when GHL fails after the env is present. The caller must not treat
- * that as success: the marker is set only after all three writes succeed,
- * so a retry can write the note that never landed.
+ * that as success: the marker is set only after the note lands, so a retry
+ * can write the note that never landed. The opportunity marker is set as
+ * soon as that create succeeds, so the retry does not open a second one.
  */
 export async function syncPaidCheckoutToCrm(input: PaidCrmInput): Promise<"recorded" | "skipped"> {
   const cfg = crmConfig();
@@ -167,6 +172,25 @@ export async function syncPaidCheckoutToCrm(input: PaidCrmInput): Promise<"recor
 
     const tagRes = await post(`/contacts/${id}/tags`, { tags: paidTags(input.productKey) });
     await requireOk(tagRes, "tags", input.sessionId);
+
+    if (input.productKey === "done_for_you_deposit") {
+      const oppKey = `crm-opp:${input.sessionId}`;
+      if (!(await getJson<CrmMarker>(oppKey))) {
+        const monetaryValue = stripeMajorUnits(input.amountTotal, input.currency);
+        const oppRes = await post("/opportunities/", {
+          locationId: cfg.locationId,
+          pipelineId: DEPOSIT_PIPELINE_ID,
+          pipelineStageId: DEPOSIT_STAGE_ID,
+          name: "Done-for-You deposit",
+          status: "open",
+          contactId: id,
+          ...(monetaryValue === null ? {} : { monetaryValue }),
+        });
+        await requireOk(oppRes, "opportunity", input.sessionId);
+        await oppRes.body?.cancel().catch(() => undefined);
+        await setJson(oppKey, { at: new Date().toISOString() } satisfies CrmMarker);
+      }
+    }
 
     const noteRes = await post(`/contacts/${id}/notes`, {
       body: paidCheckoutNote({

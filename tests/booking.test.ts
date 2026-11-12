@@ -143,6 +143,35 @@ test("missing calendly config or a reusable url says we'll email the booking lin
   }
 });
 
+test("a paid done-for-you deposit confirms and asks for a kickoff call", async () => {
+  const calls = { n: 0 };
+  const view = await resolveBooking(SID, {
+    issueLink: issue({ delivery: "link", bookingUrl: LINK }, calls),
+    retrieve: async () => paid({ productKey: "done_for_you_deposit", amount_total: 250000 }),
+  });
+  assert.equal(calls.n, 1);
+  assert.equal(view.state, "confirmed");
+  if (view.state !== "confirmed") return;
+  assert.equal(view.productName, "Done-for-You Complete Setup - Deposit");
+  assert.equal(view.amountLabel, "2500.00 USD");
+  assert.equal(view.scheduleHeading, "Schedule your Done-for-You kickoff call");
+  assert.equal(view.scheduleAction, "Schedule your kickoff call");
+  const page = html(view);
+  assert.match(page, /Schedule your Done-for-You kickoff call/);
+  assert.match(page, /Schedule your kickoff call/);
+  assert.match(page, /2500\.00 USD/);
+  assert.equal(page.includes("60-minute session"), false);
+  assert.equal(page.includes("60-minute consultation"), false);
+
+  const emailed = await resolveBooking(SID, {
+    issueLink: async () => ({ delivery: "email" }),
+    retrieve: async () => paid({ productKey: "done_for_you_deposit", amount_total: 250000 }),
+  });
+  const fallback = html(emailed);
+  assert.match(fallback, /mailto:support@pragvance\.ai\?subject=Schedule%20Done-for-You%20kickoff%20call/);
+  assert.equal(fallback.includes("60-minute"), false);
+});
+
 test("unpaid, invalid, missing, and wrong-product sessions stay unconfirmed", async () => {
   const badIds = ["", "   ", "cs_test_short", "cs_live_", "cs_unknown_abcdefgh", "cs_test_abc-defghi", "../cs_test_abcdefgh", "https://evil.example/cs_test_abcdefgh"];
   let retrieves = 0;

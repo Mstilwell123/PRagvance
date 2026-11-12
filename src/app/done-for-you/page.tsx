@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
+import CheckoutButton from "@/components/CheckoutButton";
 import { PRICING } from "@/lib/pricing";
 import { SITE } from "@/lib/site";
 
@@ -25,8 +26,6 @@ export const metadata: Metadata = {
   },
 };
 
-/** Same Done-for-You deposit URL already used on pricing, summary, and contact. */
-const DEPOSIT_HREF = "https://buy.stripe.com/28E8wJ7D91iv3UlbJP9MY03";
 /** Same contact pattern as the other offers: /contact?interest=<slug>#contact */
 const FIT_CALL_HREF = "/contact?interest=done-for-you#contact";
 
@@ -319,11 +318,19 @@ function FitCallLink({ className }: { className: string }) {
   );
 }
 
-function DepositLink({ className }: { className: string }) {
+function DepositCheckout({
+  className,
+  children,
+  ariaLabel,
+}: {
+  className: string;
+  children: ReactNode;
+  ariaLabel?: string;
+}) {
   return (
-    <a href={DEPOSIT_HREF} target="_blank" rel="noopener noreferrer" className={className}>
-      Pay $2,500 deposit
-    </a>
+    <CheckoutButton product="done_for_you_deposit" className={className} ariaLabel={ariaLabel}>
+      {children}
+    </CheckoutButton>
   );
 }
 
@@ -356,14 +363,9 @@ export default function DoneForYouPage() {
               See what&apos;s included
             </a>
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:max-w-[17rem]">
-              <a
-                href={DEPOSIT_HREF}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${primaryBtn} w-full sm:w-auto`}
-              >
+              <DepositCheckout className={`${primaryBtn} w-full sm:w-auto`} ariaLabel="Buy Now: Done-for-You deposit">
                 Buy Now
-              </a>
+              </DepositCheckout>
               <p className="text-xs leading-relaxed text-[color:var(--text-muted)]">
                 You pay 50% today: a $2,500 deposit toward the $5,000 total setup.
               </p>
@@ -374,15 +376,9 @@ export default function DoneForYouPage() {
             deposit to start, $2,500 at handover
           </p>
           <div className="mt-6 max-w-xl">
-            <a
-              href={DEPOSIT_HREF}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={primaryBtn}
-              aria-label="Start Here: Done-for-You Complete Setup"
-            >
+            <DepositCheckout className={primaryBtn} ariaLabel="Start Here: Done-for-You Complete Setup">
               Start Here
-            </a>
+            </DepositCheckout>
             <p className="mt-3 text-sm leading-relaxed text-[color:var(--text-muted)]">
               Start Here opens secure checkout for the $2,500 deposit toward the $5,000 Done-for-You
               setup. The remaining $2,500 is billed at handover.
@@ -737,7 +733,9 @@ export default function DoneForYouPage() {
       <Section id="start" title="Final call to action" tone="space">
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <FitCallLink className={primaryBtn} />
-          <DepositLink className={primaryBtn} />
+          <DepositCheckout className={primaryBtn} ariaLabel="Pay $2,500 deposit for Done-for-You Complete Setup">
+            Pay $2,500 deposit
+          </DepositCheckout>
         </div>
         <p className="mt-3 max-w-xl text-xs text-[color:var(--text-muted)]">
           50% deposit. Remaining $2,500 billed on completion. The $2,500 deposit is non-refundable.

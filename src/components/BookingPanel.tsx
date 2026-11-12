@@ -6,10 +6,9 @@ import { SITE } from "@/lib/site";
 const btn =
   "flex w-full items-center justify-center rounded-full bg-[color:var(--gold)] px-6 py-3 text-center text-sm font-semibold text-black hover:bg-[color:var(--gold-bright)]";
 
-function mailtoFor(sessionId: string): string {
-  const subject = encodeURIComponent("Schedule 60-minute consultation");
+function mailtoFor(sessionId: string, subject: string): string {
   const body = encodeURIComponent(`Checkout session: ${sessionId}`);
-  return `mailto:${SITE.email}?subject=${subject}&body=${body}`;
+  return `mailto:${SITE.email}?subject=${encodeURIComponent(subject)}&body=${body}`;
 }
 
 export default function BookingPanel({ view }: { view: BookingView }) {
@@ -50,19 +49,19 @@ export default function BookingPanel({ view }: { view: BookingView }) {
           </div>
         </dl>
         <div className="space-y-3">
-          <h2 className="text-xl font-semibold text-[color:var(--text)]">Schedule your 60-minute session</h2>
+          <h2 className="text-xl font-semibold text-[color:var(--text)]">{view.scheduleHeading}</h2>
           {view.bookingUrl ? (
             <>
               <BookingRedirect url={view.bookingUrl} />
               <a href={view.bookingUrl} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer" className={btn}>
-                Schedule your session
+                {view.scheduleAction}
                 <span className="sr-only"> (opens in a new tab)</span>
               </a>
             </>
           ) : (
             <p className="text-sm text-[color:var(--text-muted)]">
               We&apos;ll email your booking link. If it does not arrive, email{" "}
-              <a href={mailtoFor(view.sessionId)} className="text-[color:var(--electric-bright)] hover:underline">
+              <a href={mailtoFor(view.sessionId, view.mailSubject)} className="text-[color:var(--electric-bright)] hover:underline">
                 {SITE.email}
               </a>
               .

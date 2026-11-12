@@ -6,6 +6,7 @@ import {
   type CalendlyConfig,
   type IssuedLink,
 } from "./calendly.server";
+import type { ProductKey } from "./products";
 
 type Stored = { bookingUrl: string; at: string };
 
@@ -28,12 +29,13 @@ export async function getOrCreateBookingLink(
   deps: {
     env?: NodeJS.ProcessEnv;
     create?: (cfg: CalendlyConfig) => Promise<string>;
+    productKey?: ProductKey;
   } = {},
 ): Promise<IssuedLink> {
   const existing = await readStored(sessionId);
   if (existing) return { delivery: "link", bookingUrl: existing };
 
-  const cfg = calendlyConfig(deps.env ?? process.env);
+  const cfg = calendlyConfig(deps.env ?? process.env, deps.productKey);
   if (!cfg) return { delivery: "email" };
 
   const lock = lockKey(sessionId);

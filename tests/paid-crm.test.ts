@@ -5,7 +5,7 @@ import { handleWebhook } from "../src/lib/checkout/handlers.server.ts";
 import { sendLeadToCrm } from "../src/lib/crm.server.ts";
 import { getEntitlement } from "../src/lib/checkout/entitlements.server.ts";
 import { _resetMemory, _resetJsonMemory, getJson } from "../src/lib/kv.server.ts";
-import { formatStripeAmount, paidCheckoutNote } from "../src/lib/checkout/paid.ts";
+import { formatStripeAmount, paidCheckoutNote, stripeMajorUnits } from "../src/lib/checkout/paid.ts";
 
 const SECRET = "whsec_test_dummy";
 const TOKEN = "pit-test-token";
@@ -15,7 +15,7 @@ const sign = (payload: string) => Stripe.webhooks.generateTestHeaderString({ pay
 
 type Hit = { url: string; body: Record<string, unknown>; auth: string | null; version: string | null; signal: boolean };
 
-function installGhl(failStep?: "upsert" | "tags" | "note") {
+function installGhl(failStep?: "upsert" | "tags" | "note" | "opportunity") {
   const hits: Hit[] = [];
   const prev = globalThis.fetch;
   globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -30,7 +30,15 @@ function installGhl(failStep?: "upsert" | "tags" | "note") {
       version: headers.get("version"),
       signal: init?.signal instanceof AbortSignal,
     });
-    const step = url.endsWith("/contacts/upsert") ? "upsert" : url.endsWith("/tags") ? "tags" : url.endsWith("/notes") ? "note" : "other";
+    const step = url.endsWith("/contacts/upsert")
+      ? "upsert"
+      : url.endsWith("/tags")
+        ? "tags"
+        : url.endsWith("/notes")
+          ? "note"
+          : url.includes("/opportunities")
+            ? "opportunity"
+            : "other";
     if (failStep && step === failStep) {
       return new Response(JSON.stringify({ email: "buyer@example.com", token: TOKEN }), { status: step === "tags" ? 429 : 500 });
     }
@@ -106,6 +114,8 @@ test("amount and note format", () => {
   assert.equal(formatStripeAmount(500, "jpy"), "500 JPY");
   assert.equal(formatStripeAmount(1234, "kwd"), "1.234 KWD");
   assert.equal(formatStripeAmount(null, "usd"), "unknown");
+  assert.equal(stripeMajorUnits(250000, "usd"), 2500);
+  assert.equal(stripeMajorUnits(null, "usd"), null);
   assert.equal(
     paidCheckoutNote({ amountTotal: 19900, currency: "usd", productKey: "consulting_1hr", sessionId: "cs_test_paidconsult01" }),
     "Amount: 199.00 USD\nProduct: consulting_1hr\nStripe session: cs_test_paidconsult01",
@@ -153,6 +163,7 @@ test("paid consulting session upserts once across both events and a retry", asyn
   assert.equal(typeof marker?.at, "string");
   assert.equal(JSON.stringify(marker).includes("buyer@example.com"), false);
   assert.equal((await getEntitlement(sessionId))?.product_key, "consulting_1hr");
+  assert.equal(ghl.hits.some((h) => h.url.includes("/opportunities")), false);
 });
 
 test("shadow lab products get their own paid tags and no lead tag", async () => {
@@ -189,6 +200,7 @@ test("shadow lab products get their own paid tags and no lead tag", async () => 
   const groupUpsert = ghl.hits.find((h) => h.url.endsWith("/contacts/upsert"));
   assert.equal(groupUpsert?.body.firstName, undefined);
   assert.equal(JSON.stringify(tags).includes("New - Lead"), false);
+  assert.equal(ghl.hits.some((h) => h.url.includes("/opportunities")), false);
 });
 
 test("GHL failure keeps the entitlement, skips the marker, and a retry writes once", async () => {
@@ -310,7 +322,98 @@ test("unpaid and no-email sessions do not write CRM", async () => {
   assert.doesNotMatch(warnings.join("\n"), /@/);
 });
 
-test("done-for-you and unknown products do not write CRM or entitlements", async () => {
+test("done-for-you deposit tags the contact and opens one pipeline opportunity", async () => {
+  resetKv();
+  const ghl = installGhl();
+  const sessionId = "cs_test_dfydeposit01";
+  await withCrmEnv(true, async () => {
+    const completed = sessionEvent({
+      eventId: "evt_dfy_deposit",
+      sessionId,
+      product_key: "done_for_you_deposit",
+      amount_total: 250000,
+    });
+    const again = sessionEvent({
+      eventId: "evt_dfy_deposit_async",
+      type: "checkout.session.async_payment_succeeded",
+      sessionId,
+      product_key: "done_for_you_deposit",
+      amount_total: 250000,
+    });
+    assert.equal((await handleWebhook(completed, sign(completed), wh)).status, 200);
+    assert.equal((await handleWebhook(again, sign(again), wh)).status, 200);
+  });
+  ghl.restore();
+
+  const tags = ghl.hits.filter((h) => h.url.endsWith("/tags"));
+  const opps = ghl.hits.filter((h) => h.url.includes("/opportunities"));
+  const notes = ghl.hits.filter((h) => h.url.endsWith("/notes"));
+  assert.equal(tags.length, 1);
+  assert.deepEqual(tags[0].body.tags, ["paid", "paid - done-for-you deposit"]);
+  assert.equal(opps.length, 1);
+  assert.equal(opps[0].url, "https://services.leadconnectorhq.com/opportunities/");
+  assert.equal(opps[0].body.locationId, LOCATION);
+  assert.equal(opps[0].body.pipelineId, "qANySPz5tWWLCHiyQ5kW");
+  assert.equal(opps[0].body.pipelineStageId, "de73dc18-c7df-4b1b-b772-855976cb6423");
+  assert.equal(opps[0].body.name, "Done-for-You deposit");
+  assert.equal(opps[0].body.status, "open");
+  assert.equal(opps[0].body.contactId, "contact1");
+  assert.equal(opps[0].body.monetaryValue, 2500);
+  assert.equal(notes.length, 1);
+  assert.equal(notes[0].body.body, "Amount: 2500.00 USD\nProduct: done_for_you_deposit\nStripe session: cs_test_dfydeposit01");
+  assert.equal(typeof (await getJson<{ at: string }>(`crm-opp:${sessionId}`))?.at, "string");
+  assert.equal(JSON.stringify(await getJson(`crm-opp:${sessionId}`)).includes("buyer@example.com"), false);
+  assert.equal((await getEntitlement(sessionId))?.product_key, "done_for_you_deposit");
+});
+
+test("a failed deposit opportunity does not write the note, and a note failure does not open a second one", async () => {
+  resetKv();
+  const sessionId = "cs_test_dfyoppfail1";
+  const body = sessionEvent({
+    eventId: "evt_dfy_opp",
+    sessionId,
+    product_key: "done_for_you_deposit",
+    amount_total: 250000,
+  });
+  const failing = installGhl("opportunity");
+  try {
+    await withCrmEnv(true, async () => {
+      const failed = await handleWebhook(body, sign(body), wh);
+      assert.equal(failed.status, 500);
+      assert.equal(failing.hits.some((h) => h.url.endsWith("/notes")), false);
+      assert.equal(await getJson(`crm:${sessionId}`), null);
+      assert.equal(await getJson(`crm-opp:${sessionId}`), null);
+      failing.restore();
+
+      const noteFails = installGhl("note");
+      try {
+        const noted = await handleWebhook(body, sign(body), wh);
+        assert.equal(noted.status, 500);
+        assert.equal(noteFails.hits.filter((h) => h.url.includes("/opportunities")).length, 1);
+        assert.equal(typeof (await getJson<{ at: string }>(`crm-opp:${sessionId}`))?.at, "string");
+        assert.equal(await getJson(`crm:${sessionId}`), null);
+        noteFails.restore();
+
+        const ok = installGhl();
+        try {
+          const retried = await handleWebhook(body, sign(body), wh);
+          assert.equal(retried.status, 200);
+          assert.equal(ok.hits.filter((h) => h.url.includes("/opportunities")).length, 0);
+          assert.equal(ok.hits.filter((h) => h.url.endsWith("/notes")).length, 1);
+          assert.equal(typeof (await getJson<{ at: string }>(`crm:${sessionId}`))?.at, "string");
+        } finally {
+          ok.restore();
+        }
+      } finally {
+        noteFails.restore();
+      }
+    });
+  } finally {
+    failing.restore();
+  }
+});
+
+test("unknown products do not write CRM or entitlements", async () => {
   resetKv();
   const ghl = installGhl();
   try {

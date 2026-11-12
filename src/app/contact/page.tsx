@@ -5,6 +5,7 @@ import type { FormEvent } from "react";
 import { SITE } from "@/lib/site";
 import { PRODUCT_PAGES } from "@/lib/pricing";
 import StartHereLink from "@/components/StartHereLink";
+import CheckoutButton from "@/components/CheckoutButton";
 import { OFFERS, UTM_KEYS, offerFromSlug, validateLead } from "@/lib/lead";
 
 type Status = "idle" | "sending" | "sent" | "error";
@@ -95,14 +96,13 @@ export default function ContactPage() {
           <p className="text-sm text-[color:var(--text-muted)]">
             We invoice the final $2,500 when your setup is handed over. The $2,500 deposit is non-refundable.
           </p>
-          <a
-            href="https://buy.stripe.com/28E8wJ7D91iv3UlbJP9MY03"
-            target="_blank"
-            rel="noopener noreferrer"
+          <CheckoutButton
+            product="done_for_you_deposit"
             className="flex w-full items-center justify-center rounded-full bg-[color:var(--gold)] px-6 py-3 text-sm font-semibold text-black hover:bg-[color:var(--gold-bright)]"
+            ariaLabel="Pay $2,500 deposit for Done-for-You Complete Setup"
           >
             Pay $2,500 Deposit
-          </a>
+          </CheckoutButton>
           <p className="text-xs text-[color:var(--text-muted)]">Have questions first? Send us a message below.</p>
           <StartHereLink
             href={PRODUCT_PAGES.doneForYou}
