@@ -481,6 +481,29 @@ test("site source and redirects do not contain a public calendly url", async () 
     calendlyConfig({ CALENDLY_API_TOKEN: "tok", CALENDLY_EVENT_TYPE_URI: PUBLIC_EVENT } as NodeJS.ProcessEnv),
     null,
   );
+  const kickoff = "https://api.calendly.com/event_types/KICKOFFEVENT1";
+  const shared = calendlyConfig(
+    { CALENDLY_API_TOKEN: "tok", CALENDLY_EVENT_TYPE_URI: EVENT_TYPE, CALENDLY_EVENT_TYPE_URI_DONE_FOR_YOU: kickoff } as NodeJS.ProcessEnv,
+    "consulting_1hr",
+  );
+  assert.equal(shared?.eventTypeUri, EVENT_TYPE);
+  const dedicated = calendlyConfig(
+    { CALENDLY_API_TOKEN: "tok", CALENDLY_EVENT_TYPE_URI: EVENT_TYPE, CALENDLY_EVENT_TYPE_URI_DONE_FOR_YOU: kickoff } as NodeJS.ProcessEnv,
+    "done_for_you_deposit",
+  );
+  assert.equal(dedicated?.eventTypeUri, kickoff);
+  const fallback = calendlyConfig(
+    { CALENDLY_API_TOKEN: "tok", CALENDLY_EVENT_TYPE_URI: EVENT_TYPE } as NodeJS.ProcessEnv,
+    "done_for_you_deposit",
+  );
+  assert.equal(fallback?.eventTypeUri, EVENT_TYPE);
+  assert.equal(
+    calendlyConfig(
+      { CALENDLY_API_TOKEN: "tok", CALENDLY_EVENT_TYPE_URI: EVENT_TYPE, CALENDLY_EVENT_TYPE_URI_DONE_FOR_YOU: PUBLIC_EVENT } as NodeJS.ProcessEnv,
+      "done_for_you_deposit",
+    ),
+    null,
+  );
   const redirects = JSON.stringify(await nextConfig.redirects?.());
   assert.equal(forbidden.test(redirects), false);
   assert.equal(redirects.toLowerCase().includes("calendly"), false);

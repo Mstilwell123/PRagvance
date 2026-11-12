@@ -14,6 +14,7 @@ export const PAID_PRODUCT_TAG: Record<ProductKey, string> = {
   consulting_1hr: "paid - consulting (60 min 1:1)",
   shadow_lab_group: "paid - shadow lab (session)",
   shadow_lab_monthly: "paid - shadow lab (monthly)",
+  done_for_you_deposit: "paid - done-for-you deposit",
 };
 
 export function paidTags(product: ProductKey): string[] {
@@ -29,6 +30,15 @@ export function formatStripeAmount(amountTotal: number | null | undefined, curre
   const minor = Math.abs(Math.trunc(amountTotal));
   const major = digits === 0 ? String(minor) : `${Math.trunc(minor / 10 ** digits)}.${String(minor % 10 ** digits).padStart(digits, "0")}`;
   return `${sign}${major} ${code.toUpperCase()}`;
+}
+
+/** Major-unit amount for a CRM monetary value. Null when the Stripe amount is missing. */
+export function stripeMajorUnits(amountTotal: number | null | undefined, currency: string | null | undefined): number | null {
+  if (typeof amountTotal !== "number" || !Number.isFinite(amountTotal) || !currency?.trim()) return null;
+  const code = currency.trim().toLowerCase();
+  const digits = ZERO_DECIMAL.has(code) ? 0 : THREE_DECIMAL.has(code) ? 3 : 2;
+  const sign = amountTotal < 0 ? -1 : 1;
+  return sign * (Math.abs(Math.trunc(amountTotal)) / 10 ** digits);
 }
 
 /** CRM note written once per paid Checkout Session. */
@@ -73,6 +83,9 @@ export type BookingView =
       /** "email" means tell the buyer we'll email the link. Never a reusable public URL. */
       linkDelivery: "link" | "email";
       sessionId: string;
+      scheduleHeading: string;
+      scheduleAction: string;
+      mailSubject: string;
     }
   | { state: "unavailable" };
 

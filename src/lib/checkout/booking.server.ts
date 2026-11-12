@@ -1,7 +1,7 @@
 import type Stripe from "stripe";
 import { getOrCreateBookingLink } from "./booking-link.server";
 import { singleUseBookingUrl, type IssuedLink } from "./calendly.server";
-import { isBookingProduct, isProductKey, PRODUCTS } from "./products";
+import { isBookingProduct, isProductKey, PRODUCTS, type ProductKey } from "./products";
 import { getStripe } from "./stripe.server";
 import {
   formatStripeAmount,
@@ -48,13 +48,29 @@ export function sessionIdFromQuery(value: string | string[] | undefined): string
   return undefined;
 }
 
-function confirmedBase(session: CheckoutSnapshot & { productKey: "consulting_1hr" | "shadow_lab_group" | "shadow_lab_monthly" }) {
+function scheduleCopy(productKey: ProductKey): { scheduleHeading: string; scheduleAction: string; mailSubject: string } {
+  if (productKey === "done_for_you_deposit") {
+    return {
+      scheduleHeading: "Schedule your Done-for-You kickoff call",
+      scheduleAction: "Schedule your kickoff call",
+      mailSubject: "Schedule Done-for-You kickoff call",
+    };
+  }
+  return {
+    scheduleHeading: "Schedule your 60-minute session",
+    scheduleAction: "Schedule your session",
+    mailSubject: "Schedule 60-minute consultation",
+  };
+}
+
+function confirmedBase(session: CheckoutSnapshot & { productKey: ProductKey }) {
   return {
     state: "confirmed" as const,
     amountLabel: formatStripeAmount(session.amount_total, session.currency),
     productName: PRODUCTS[session.productKey].label,
     maskedEmail: maskEmail(session.email?.trim() ?? ""),
     sessionId: session.id,
+    ...scheduleCopy(session.productKey),
   };
 }
 
@@ -122,6 +138,8 @@ export async function loadBookingPage(
 ): Promise<BookingView> {
   return resolveBooking(sessionId, {
     retrieve: deps.retrieve ?? retrieveCheckoutSession,
-    issueLink: deps.issueLink ?? ((session) => getOrCreateBookingLink(session.id)),
+    issueLink: deps.issueLink ?? ((session) => getOrCreateBookingLink(session.id, {
+      productKey: isProductKey(session.productKey) ? session.productKey : undefined,
+    })),
   });
 }

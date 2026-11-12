@@ -125,7 +125,7 @@ export async function handleWebhook(rawBody: string, signature: string | null, d
       }
       // Same store the confirmation page reads. Missing Calendly env returns
       // without throwing so Stripe does not retry a link we cannot create.
-      if (isBookingProduct(key)) await getOrCreateBookingLink(s.id);
+      if (isBookingProduct(key)) await getOrCreateBookingLink(s.id, { productKey: key });
     });
     return { status: 200, body: { received: true, ...(outcome === "duplicate" ? { duplicate: true } : {}) } };
   } catch (err) {

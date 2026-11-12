@@ -1,7 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import Stripe from "stripe";
+import { readFileSync, readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
 import { handleCheckout, handleWebhook } from "../src/lib/checkout/handlers.server.ts";
+import { DONE_FOR_YOU_DEPOSIT_PRICE } from "../src/lib/checkout/products.ts";
 import { getEntitlement } from "../src/lib/checkout/entitlements.server.ts";
 import { _resetMemory, _resetJsonMemory } from "../src/lib/kv.server.ts";
 
@@ -90,4 +93,42 @@ test("paid products land on the booking page", async () => {
   assert.equal(created[1].customer_email, "buyer@example.com");
   assert.equal(created[2].success_url, book);
   assert.equal(created[2].mode, "subscription");
+
+  const deposit = await handleCheckout({ product: "done_for_you_deposit", price: "price_evil", amount: 1 }, quiet);
+  assert.equal(deposit.status, 200);
+  assert.deepEqual(created[3].line_items, [{ price: DONE_FOR_YOU_DEPOSIT_PRICE, quantity: 1 }]);
+  assert.equal(created[3].mode, "payment");
+  assert.equal(created[3].success_url, book);
+  assert.equal(created[3].cancel_url, "https://example.test/summary?checkout=canceled");
+  assert.equal(created[3].metadata?.product_key, "done_for_you_deposit");
+  assert.equal(created[3].customer_email, undefined);
+
+  const overridden = await handleCheckout(
+    { product: "done_for_you_deposit" },
+    { ...quiet, env: { ...env, STRIPE_PRICE_DONE_FOR_YOU: "price_dfy_override" } },
+  );
+  assert.equal(overridden.status, 200);
+  assert.equal(created[4].line_items?.[0]?.price, "price_dfy_override");
+
+  const ignored = await handleCheckout(
+    { product: "done_for_you_deposit" },
+    { ...quiet, env: { ...env, STRIPE_PRICE_DONE_FOR_YOU: "price_1UXufcTEST" } },
+  );
+  assert.equal(ignored.status, 200);
+  assert.equal(created[5].line_items?.[0]?.price, DONE_FOR_YOU_DEPOSIT_PRICE);
+});
+
+test("deposit pages do not link to a Stripe payment link", () => {
+  function files(dir: string): string[] {
+    const out: string[] = [];
+    for (const name of readdirSync(dir)) {
+      if (name === "node_modules" || name === ".next") continue;
+      const path = join(dir, name);
+      if (statSync(path).isDirectory()) out.push(...files(path));
+      else if (/\.(ts|tsx)$/.test(name)) out.push(path);
+    }
+    return out;
+  }
+  const hits = files(join(process.cwd(), "src")).filter((path) => readFileSync(path, "utf8").includes("buy.stripe.com"));
+  assert.deepEqual(hits, []);
 });

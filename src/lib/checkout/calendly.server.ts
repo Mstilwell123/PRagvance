@@ -1,3 +1,5 @@
+import type { ProductKey } from "./products";
+
 /**
  * Single-use Calendly scheduling links (API v2).
  * A reusable public event URL is never accepted or returned.
@@ -13,9 +15,21 @@ export type IssuedLink =
   | { delivery: "link"; bookingUrl: string }
   | { delivery: "email" };
 
-/** Both vars must be set, and the event type must be a Calendly API URI. Otherwise fail closed. */
-export function calendlyConfig(env: NodeJS.ProcessEnv = process.env): CalendlyConfig | null {
+/**
+ * Both the token and an API event-type URI must be set. Otherwise fail closed.
+ * A Done-for-You deposit uses CALENDLY_EVENT_TYPE_URI_DONE_FOR_YOU when that
+ * value is a Calendly API URI. When it is unset, the deposit uses the shared
+ * event. A non-empty dedicated value that is not an API URI fails closed.
+ */
+export function calendlyConfig(env: NodeJS.ProcessEnv = process.env, productKey?: ProductKey): CalendlyConfig | null {
   const token = env.CALENDLY_API_TOKEN?.trim() ?? "";
+  if (productKey === "done_for_you_deposit") {
+    const dedicated = env.CALENDLY_EVENT_TYPE_URI_DONE_FOR_YOU?.trim() ?? "";
+    if (dedicated) {
+      if (!token || !EVENT_TYPE_URI.test(dedicated)) return null;
+      return { token, eventTypeUri: dedicated };
+    }
+  }
   const eventTypeUri = env.CALENDLY_EVENT_TYPE_URI?.trim() ?? "";
   if (!token || !EVENT_TYPE_URI.test(eventTypeUri)) return null;
   return { token, eventTypeUri };

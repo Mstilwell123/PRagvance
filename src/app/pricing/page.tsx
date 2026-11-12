@@ -120,7 +120,9 @@ export default function PricingPage() {
               terms agreed before work begins.
             </p>
             <p className="mb-6 mt-2 text-sm font-semibold text-[#f3cd7d]">$2,500 deposit<br />$2,500 on completion</p>
-            <a href="https://buy.stripe.com/28E8wJ7D91iv3UlbJP9MY03" className={primaryBtn}>Pay $2,500 Deposit</a>
+            <CheckoutButton product="done_for_you_deposit" className={primaryBtn} ariaLabel="Pay $2,500 deposit for Done-for-You Complete Setup">
+              Pay $2,500 Deposit
+            </CheckoutButton>
             <p className="mb-3 mt-2 text-center text-xs text-[color:var(--text-muted)]">50% deposit. Remaining $2,500 billed on completion. The $2,500 deposit is non-refundable.</p>
             <StartHereLink href={PRODUCT_PAGES.doneForYou} label="Done-for-You Complete Setup" />
           </article>
