@@ -64,6 +64,7 @@ function sessionEvent(opts: {
   amount_total?: number | null;
   currency?: string | null;
   omitMetadata?: boolean;
+  metadata?: Record<string, string>;
 }) {
   const object: Record<string, unknown> = {
     id: opts.sessionId,
@@ -76,7 +77,8 @@ function sessionEvent(opts: {
       name: opts.name === undefined ? "Jane Doe" : opts.name,
     },
   };
-  if (!opts.omitMetadata) object.metadata = opts.product_key === null ? {} : { product_key: opts.product_key ?? "consulting_1hr" };
+  if (opts.metadata) object.metadata = opts.metadata;
+  else if (!opts.omitMetadata) object.metadata = opts.product_key === null ? {} : { product_key: opts.product_key ?? "consulting_1hr" };
   return JSON.stringify({
     id: opts.eventId,
     object: "event",
@@ -413,6 +415,31 @@ test("a failed deposit opportunity does not write the note, and a note failure d
   }
 });
 
+test("a Done-for-You payment-link session with offer metadata syncs the same CRM tags and opportunity", async () => {
+  resetKv();
+  const ghl = installGhl();
+  const sessionId = "cs_test_dfylink00001";
+  await withCrmEnv(true, async () => {
+    const completed = sessionEvent({
+      eventId: "evt_dfy_link",
+      sessionId,
+      amount_total: 250000,
+      metadata: { offer: "done_for_you_deposit" },
+    });
+    assert.equal((await handleWebhook(completed, sign(completed), wh)).status, 200);
+  });
+  ghl.restore();
+
+  const tags = ghl.hits.filter((h) => h.url.endsWith("/tags"));
+  const opps = ghl.hits.filter((h) => h.url.includes("/opportunities"));
+  assert.equal(tags.length, 1);
+  assert.deepEqual(tags[0].body.tags, ["paid", "paid - done-for-you deposit"]);
+  assert.equal(opps.length, 1);
+  assert.equal(opps[0].body.pipelineStageId, "de73dc18-c7df-4b1b-b772-855976cb6423");
+  assert.equal(opps[0].body.monetaryValue, 2500);
+  assert.equal((await getEntitlement(sessionId))?.product_key, "done_for_you_deposit");
+});
+
 test("unknown products do not write CRM or entitlements", async () => {
   resetKv();
   const ghl = installGhl();
@@ -422,6 +449,7 @@ test("unknown products do not write CRM or entitlements", async () => {
         sessionEvent({ eventId: "evt_dfy", sessionId: "cs_test_dfy000000001", product_key: "done_for_you" }),
         sessionEvent({ eventId: "evt_none", sessionId: "cs_test_none00000001", omitMetadata: true }),
         sessionEvent({ eventId: "evt_blank", sessionId: "cs_test_blank0000001", product_key: null }),
+        sessionEvent({ eventId: "evt_second", sessionId: "cs_test_second000001", metadata: { offer: "done_for_you_second_payment" } }),
       ];
       for (const body of cases) {
         const res = await handleWebhook(body, sign(body), wh);
@@ -430,6 +458,7 @@ test("unknown products do not write CRM or entitlements", async () => {
       assert.equal(await getEntitlement("cs_test_dfy000000001"), null);
       assert.equal(await getEntitlement("cs_test_none00000001"), null);
       assert.equal(await getEntitlement("cs_test_blank0000001"), null);
+      assert.equal(await getEntitlement("cs_test_second000001"), null);
     });
   } finally {
     ghl.restore();
