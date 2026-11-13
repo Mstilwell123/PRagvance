@@ -1,5 +1,5 @@
 import type Stripe from "stripe";
-import { checkoutEnabled, isBookingProduct, isProductKey, priceIdFor, PRODUCTS, type ProductKey } from "./products";
+import { checkoutEnabled, isBookingProduct, isProductKey, priceIdFor, productKeyFromMetadata, PRODUCTS, type ProductKey } from "./products";
 import { oncePerEvent, recordEntitlement } from "./entitlements.server";
 import { getOrCreateBookingLink } from "./booking-link.server";
 import { recordShadowLabLead, runShadowLabLead, syncPaidCheckoutToCrm } from "../crm.server";
@@ -91,8 +91,8 @@ export async function handleWebhook(rawBody: string, signature: string | null, d
     const outcome = await oncePerEvent(event.id, async () => {
       if (event.type !== "checkout.session.completed" && event.type !== "checkout.session.async_payment_succeeded") return;
       const s = event.data.object as Stripe.Checkout.Session;
-      const key = s.metadata?.product_key;
-      if (!isProductKey(key)) return;
+      const key = productKeyFromMetadata(s.metadata);
+      if (!key) return;
       if (s.payment_status !== "paid" && s.payment_status !== "no_payment_required") return;
       await recordEntitlement({
         checkout_session_id: s.id,

@@ -24,6 +24,25 @@ export function isProductKey(v: unknown): v is ProductKey {
   return typeof v === "string" && Object.prototype.hasOwnProperty.call(PRODUCTS, v);
 }
 
+/** Live Done-for-You deposit payment link metadata (`offer=done_for_you_deposit`). */
+const OFFER_PRODUCT_KEYS: Record<string, ProductKey> = {
+  done_for_you_deposit: "done_for_you_deposit",
+};
+
+/** Resolve a Checkout Session's product from site `product_key` or a known payment-link `offer`. */
+export function productKeyFromMetadata(
+  metadata: Record<string, string | undefined> | null | undefined,
+): ProductKey | null {
+  if (!metadata) return null;
+  const key = metadata.product_key?.trim();
+  if (isProductKey(key)) return key;
+  const offer = metadata.offer?.trim();
+  if (offer && Object.prototype.hasOwnProperty.call(OFFER_PRODUCT_KEYS, offer)) {
+    return OFFER_PRODUCT_KEYS[offer];
+  }
+  return null;
+}
+
 /** Products whose paid confirmation may receive a single-use scheduling link. */
 const BOOKING_PRODUCTS = new Set<ProductKey>(["consulting_1hr", "shadow_lab_group", "shadow_lab_monthly", "done_for_you_deposit"]);
 
