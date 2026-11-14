@@ -32,8 +32,17 @@ const LOGO_LINKS_TO_LANDING = new Set<string>([
   "ShowPiece.Pro",
   "MinutePushPro",
   "AppDemo.live",
+  "VoiceTalk.app",
   "ID-Clare",
 ]);
+
+/** VoiceTalk links to pricing instead of the homepage. */
+const LOGO_LINK_OVERRIDES: Record<string, { href: string; ariaLabel: string }> = {
+  "VoiceTalk.app": {
+    href: "https://voicetalk.app/pricing",
+    ariaLabel: "Open VoiceTalk pricing",
+  },
+};
 
 export default function AppsPage() {
   return (
@@ -83,13 +92,14 @@ export default function AppsPage() {
                     {app.name.charAt(0)}
                   </span>
                 );
+                const logoLink = LOGO_LINK_OVERRIDES[app.name];
                 return LOGO_LINKS_TO_LANDING.has(app.name) ? (
                   <a
-                    href={app.url}
+                    href={logoLink?.href ?? app.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block rounded-2xl transition hover:scale-105"
-                    aria-label={`Open ${app.name} landing page`}
+                    aria-label={logoLink?.ariaLabel ?? `Open ${app.name} landing page`}
                   >
                     {logo}
                   </a>
