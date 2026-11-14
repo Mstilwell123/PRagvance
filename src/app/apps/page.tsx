@@ -18,6 +18,12 @@ export const metadata: Metadata = {
   },
 };
 
+/** Easy to edit — the tool name “Enhance” may change. */
+export const BUILT_BY_AI_AGENTS = {
+  heading: "Built by AI agents",
+  body: "Every app on this page was developed by Mark’s AI agents, not hand-coded by Mark, over six months using tools like Lovable, Enhance and Base44. It’s the same AI workforce we help you build.",
+} as const;
+
 export default function AppsPage() {
   return (
     <>
@@ -36,6 +42,14 @@ export default function AppsPage() {
           shipped app — web or store — with an AI Guide in the loop so founders aren’t blocked
           waiting on a traditional PM.
         </p>
+        <div className="mt-10 max-w-2xl">
+          <h2 className="text-xl font-semibold text-[color:var(--text)]">
+            {BUILT_BY_AI_AGENTS.heading}
+          </h2>
+          <p className="mt-2 text-sm text-[color:var(--text-muted)]">
+            {BUILT_BY_AI_AGENTS.body}
+          </p>
+        </div>
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {APPS.map((app) => (
             <article key={app.name} className="panel gold-glow flex flex-col items-center p-6 text-center">
