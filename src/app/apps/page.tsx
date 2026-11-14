@@ -24,6 +24,17 @@ export const BUILT_BY_AI_AGENTS = {
   body: "Every app on this page was developed by Mark’s AI agents, not hand-coded by Mark, over six months using tools like Lovable, Enhance and Base44. It’s the same AI workforce we help you build.",
 } as const;
 
+/** Logos link only when the landing page and a Get Started (or equivalent) CTA were verified. */
+const LOGO_LINKS_TO_LANDING = new Set<string>([
+  "MinutesIntel.ai",
+  "My Briefing",
+  "App N SaaS Builder",
+  "ShowPiece.Pro",
+  "MinutePushPro",
+  "AppDemo.live",
+  "ID-Clare",
+]);
+
 export default function AppsPage() {
   return (
     <>
@@ -53,13 +64,8 @@ export default function AppsPage() {
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {APPS.map((app) => (
             <article key={app.name} className="panel gold-glow flex flex-col items-center p-6 text-center">
-              <a
-                href={app.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block rounded-2xl transition hover:scale-105"
-              >
-                {app.logo ? (
+              {(() => {
+                const logo = app.logo ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={app.logo}
@@ -76,8 +82,21 @@ export default function AppsPage() {
                   >
                     {app.name.charAt(0)}
                   </span>
-                )}
-              </a>
+                );
+                return LOGO_LINKS_TO_LANDING.has(app.name) ? (
+                  <a
+                    href={app.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block rounded-2xl transition hover:scale-105"
+                    aria-label={`Open ${app.name} landing page`}
+                  >
+                    {logo}
+                  </a>
+                ) : (
+                  <div className="rounded-2xl">{logo}</div>
+                );
+              })()}
               <h2 className="mt-4 text-xl font-semibold text-[color:var(--gold-bright)]">{app.name}</h2>
               <p className="mt-2 text-sm text-[color:var(--text-muted)]">{app.description}</p>
               <StartHereLink href={app.url} label={app.name} />

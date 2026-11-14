@@ -70,7 +70,7 @@ function nameFields(name: string | null): { name?: string; firstName?: string; l
   return { name, firstName, ...(lastName ? { lastName } : {}) };
 }
 
-export async function sendLeadToCrm(lead: LeadInput): Promise<string> {
+export async function sendLeadToCrm(lead: LeadInput, opts?: { tags?: string[] }): Promise<string> {
   const cfg = crmConfig();
   if (!cfg) throw new Error("CRM env not configured");
   const { token, locationId } = cfg;
@@ -96,7 +96,8 @@ export async function sendLeadToCrm(lead: LeadInput): Promise<string> {
   const id: string | undefined = (await res.json())?.contact?.id;
   if (!id) throw new Error("upsert returned no contact id");
 
-  const tagRes = await ghlPost(token, `/contacts/${id}/tags`, { tags: [LEAD_TAG] }, CALL_TIMEOUT_MS);
+  const tags = [LEAD_TAG, ...(opts?.tags ?? [])].filter((tag, i, all) => all.indexOf(tag) === i);
+  const tagRes = await ghlPost(token, `/contacts/${id}/tags`, { tags }, CALL_TIMEOUT_MS);
   if (!tagRes.ok) throw new Error(`tags ${tagRes.status}: ${(await tagRes.text()).slice(0, 300)}`);
 
   const note = [

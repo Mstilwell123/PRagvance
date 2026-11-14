@@ -4,11 +4,28 @@ export const OFFERS = [
   { slug: "done-for-you", label: "Done-for-You Setup" },
   { slug: "consultation", label: "One-on-One AI Consultation" },
   { slug: "aiworkforce", label: "AI Workforce" },
-  { slug: "custom", label: "Custom app / SaaS" },
+  { slug: "custom", label: "Custom App / SaaS" },
   { slug: "general", label: "General" },
 ] as const;
 
 export type OfferLabel = (typeof OFFERS)[number]["label"];
+
+/** Options shown only on /contact?interest=custom. Also accepted by validateLead. */
+export const CUSTOM_BUILD_OPTIONS = [
+  "Custom App (web or mobile)",
+  "Custom SaaS product",
+  "Add AI agents to an existing app",
+  "Not sure yet, let's talk",
+] as const;
+
+export type CustomBuildOption = (typeof CUSTOM_BUILD_OPTIONS)[number];
+export type LeadOffer = OfferLabel | CustomBuildOption;
+
+export const CUSTOM_BUILD_URGENT_TAG = "custom-build-urgent";
+
+export function isCustomBuildOption(v: unknown): v is CustomBuildOption {
+  return typeof v === "string" && (CUSTOM_BUILD_OPTIONS as readonly string[]).includes(v);
+}
 
 const ALIASES: Record<string, string> = { "ai-workforce": "aiworkforce" };
 
@@ -28,7 +45,7 @@ export const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term",
 export type LeadInput = {
   name: string;
   email: string;
-  offer: OfferLabel;
+  offer: LeadOffer;
   building: string;
   message: string;
   utm: Partial<Record<(typeof UTM_KEYS)[number], string>>;
@@ -48,7 +65,7 @@ export function validateLead(raw: unknown): { ok: true; lead: LeadInput } | { ok
   if (name.length > LIMITS.name) return { ok: false, error: "Name is too long." };
   if (!email || email.length > LIMITS.email || !EMAIL_RE.test(email))
     return { ok: false, error: "Please enter a valid email." };
-  if (!isOfferLabel(r.offer)) return { ok: false, error: "Please choose an option." };
+  if (!(isOfferLabel(r.offer) || isCustomBuildOption(r.offer))) return { ok: false, error: "Please choose an option." };
   if (building.length > LIMITS.building)
     return { ok: false, error: "Please keep “What are you building?” under 2,000 characters." };
   if (message.length > LIMITS.message) return { ok: false, error: "Please keep your message under 5,000 characters." };
