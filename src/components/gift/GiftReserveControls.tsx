@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { isGiftCheckoutUiEnabled } from "@/lib/checkout/gift-public";
 import { SITE } from "@/lib/site";
+import { GIFT_TIER_PRICING } from "@/lib/checkout/gift-pricing";
 
 type UiPath = "gift" | "enroll";
 
@@ -26,16 +27,22 @@ export default function GiftReserveControls({
   tierName,
   path,
   buttonClass,
+  installmentsEnabled = false,
 }: {
   tierName: string;
   path: UiPath;
   buttonClass: string;
+  installmentsEnabled?: boolean;
 }) {
   const reserveLabel = path === "gift" ? "Reserve your gift" : "Reserve your spot";
   const checkoutOn = isGiftCheckoutUiEnabled();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [plan, setPlan] = useState<"full" | "installment">("full");
+  const api = apiTier(tierName);
+  const pricing = GIFT_TIER_PRICING[api];
+  const showInstallments = installmentsEnabled && pricing.installmentCents !== null;
   const [recipientName, setRecipientName] = useState("");
   const [recipientEmail, setRecipientEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -81,6 +88,7 @@ export default function GiftReserveControls({
     void startCheckout({
       tier: apiTier(tierName),
       path: "gift",
+      plan,
       recipientName,
       recipientEmail,
       message,
@@ -90,12 +98,35 @@ export default function GiftReserveControls({
 
   return (
     <div className="mt-auto">
+      {showInstallments ? (
+        <fieldset className="mb-3 space-y-1 text-left text-xs text-[color:var(--text-muted)]">
+          <legend className="mb-1 font-medium text-[color:var(--text)]">Payment</legend>
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              name={`plan-${api}-${path}`}
+              checked={plan === "full"}
+              onChange={() => setPlan("full")}
+            />
+            Pay in full ({pricing.fullLabel})
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              name={`plan-${api}-${path}`}
+              checked={plan === "installment"}
+              onChange={() => setPlan("installment")}
+            />
+            3 payments of {pricing.installmentLabel}
+          </label>
+        </fieldset>
+      ) : null}
       {path === "enroll" ? (
         <button
           type="button"
           className={`${buttonClass} w-full`}
           disabled={busy}
-          onClick={() => void startCheckout({ tier: apiTier(tierName), path: "direct" })}
+          onClick={() => void startCheckout({ tier: apiTier(tierName), path: "direct", plan })}
         >
           {busy ? "Continuing…" : "Continue to checkout"}
         </button>

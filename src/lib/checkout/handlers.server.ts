@@ -13,6 +13,8 @@ import {
 import { isGiftSessionMetadata } from "./gift.server";
 import { giftOrderFromSession, kvGiftOrderStore, type GiftOrder, type GiftOrderStore } from "./gift-orders.server";
 import { notifyGiftFulfillment, type GiftNotifyResult } from "./gift-notify.server";
+import { countPaidInstallmentInvoice } from "./gift-installments.server";
+import { getStripe } from "./stripe.server";
 
 type Json = { status: number; body: Record<string, unknown> };
 
@@ -80,7 +82,40 @@ export type WebhookDeps = {
   env?: NodeJS.ProcessEnv;
   giftStore?: GiftOrderStore;
   notifyGift?: (order: GiftOrder) => Promise<GiftNotifyResult>;
+  cancelSubscription?: (subscriptionId: string, opts: { cancel_at_period_end: boolean }) => Promise<void>;
 };
+
+function checkoutSubscriptionId(session: Stripe.Checkout.Session): string | null {
+  const sub = session.subscription;
+  if (typeof sub === "string") return sub;
+  if (sub && typeof sub === "object" && "id" in sub) return (sub as { id: string }).id;
+  return null;
+}
+
+function checkoutInvoiceId(session: Stripe.Checkout.Session): string | null {
+  const inv = session.invoice;
+  if (typeof inv === "string") return inv;
+  if (inv && typeof inv === "object" && "id" in inv) return (inv as { id: string }).id;
+  return null;
+}
+
+/** Supports current Invoice.subscription and the parent.subscription_details shape. */
+export function invoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
+  const raw = invoice as Stripe.Invoice & {
+    subscription?: string | { id?: string } | null;
+    parent?: { subscription_details?: { subscription?: string | { id?: string } | null } | null } | null;
+  };
+  if (typeof raw.subscription === "string") return raw.subscription;
+  if (raw.subscription && typeof raw.subscription === "object" && raw.subscription.id) return raw.subscription.id;
+  const parentSub = raw.parent?.subscription_details?.subscription;
+  if (typeof parentSub === "string") return parentSub;
+  if (parentSub && typeof parentSub === "object" && parentSub.id) return parentSub.id;
+  return null;
+}
+
+async function defaultCancelSubscription(subscriptionId: string, opts: { cancel_at_period_end: boolean }) {
+  await getStripe().subscriptions.update(subscriptionId, { cancel_at_period_end: opts.cancel_at_period_end });
+}
 
 const USABLE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -95,6 +130,21 @@ export async function handleWebhook(rawBody: string, signature: string | null, d
   }
   try {
     const outcome = await oncePerEvent(event.id, async () => {
+      if (event.type === "invoice.paid" || event.type === "invoice.payment_succeeded") {
+        const invoice = event.data.object as Stripe.Invoice;
+        if (invoice.status && invoice.status !== "paid") return;
+        const subscriptionId = invoiceSubscriptionId(invoice);
+        if (!subscriptionId) return;
+        const store = deps.giftStore ?? kvGiftOrderStore;
+        await countPaidInstallmentInvoice(
+          { invoiceId: invoice.id, subscriptionId },
+          {
+            store,
+            cancelSubscription: deps.cancelSubscription ?? defaultCancelSubscription,
+          },
+        );
+        return;
+      }
       if (
         event.type !== "checkout.session.completed" &&
         event.type !== "checkout.session.async_payment_succeeded" &&
@@ -115,6 +165,8 @@ export async function handleWebhook(rawBody: string, signature: string | null, d
           amountTotal: typeof s.amount_total === "number" ? s.amount_total : null,
           currency: s.currency ?? null,
           eventId: event.id,
+          subscriptionId: checkoutSubscriptionId(s),
+          invoiceId: checkoutInvoiceId(s),
         });
         if (!order) return;
         const store = deps.giftStore ?? kvGiftOrderStore;

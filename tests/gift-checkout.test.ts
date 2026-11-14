@@ -6,9 +6,11 @@ import {
   liveStripeKeyBlocked,
   validateGiftCheckout,
   giftCheckoutEnabled,
+  couponIdForGiftCheckout,
 } from "../src/lib/checkout/gift.server.ts";
-import { handleWebhook } from "../src/lib/checkout/handlers.server.ts";
-import { giftOrderFromSession, type GiftOrder } from "../src/lib/checkout/gift-orders.server.ts";
+import { handleWebhook, invoiceSubscriptionId } from "../src/lib/checkout/handlers.server.ts";
+import { giftOrderFromSession, type GiftOrder, type GiftOrderStore } from "../src/lib/checkout/gift-orders.server.ts";
+import { countPaidInstallmentInvoice } from "../src/lib/checkout/gift-installments.server.ts";
 import { _resetMemory, _resetJsonMemory } from "../src/lib/kv.server.ts";
 
 const SECRET = "whsec_test_gift";
@@ -92,7 +94,7 @@ test("price comes from env allowlist; client amount and price are ignored", asyn
   assert.equal(created[0].params.metadata?.recipient_email, "alex@example.com");
   assert.equal(created[0].params.success_url, "https://example.test/gift?checkout=success&session_id={CHECKOUT_SESSION_ID}");
   assert.equal(created[0].params.cancel_url, "https://example.test/gift?checkout=canceled");
-  assert.ok(created[0].options.idempotencyKey.startsWith("gift_starter_gift_"));
+  assert.ok(created[0].options.idempotencyKey.startsWith("gift_starter_gift_full_"));
 });
 
 test("Black Friday coupon applies only from env", async () => {
@@ -243,4 +245,250 @@ test("giftOrderFromSession requires education_gift metadata", () => {
     }),
     null,
   );
+});
+
+
+const installmentOn = {
+  ...on,
+  STRIPE_GIFT_INSTALLMENTS_ENABLED: "true",
+  STRIPE_PRICE_HEADSTART_INSTALLMENT: "price_headstart_installment_test",
+  STRIPE_PRICE_BUILDER_INSTALLMENT: "price_builder_installment_test",
+} as NodeJS.ProcessEnv;
+
+test("starter installment is rejected; default plan is pay in full", () => {
+  assert.equal(validateGiftCheckout({ ...giftBody, plan: "installment" }).ok, false);
+  const ok = validateGiftCheckout(giftBody);
+  assert.equal(ok.ok, true);
+  if (ok.ok) assert.equal(ok.value.plan, "full");
+  const head = validateGiftCheckout({ tier: "headstart", path: "direct", plan: "installment" });
+  assert.equal(head.ok, true);
+});
+
+test("Black Friday coupon is skipped when the flag is false", async () => {
+  created = [];
+  const r = await handleGiftCheckout(
+    giftBody,
+    deps({ ...on, STRIPE_COUPON_BLACKFRIDAY: "BF15", GIFT_BLACK_FRIDAY_ENABLED: "false" }),
+  );
+  assert.equal(r.status, 200);
+  assert.equal(created[0].params.discounts, undefined);
+});
+
+test("installment checkout is off by default and creates a subscription when enabled", async () => {
+  created = [];
+  const off = await handleGiftCheckout(
+    { tier: "headstart", path: "direct", plan: "installment" },
+    deps(on),
+  );
+  assert.equal(off.status, 403);
+  assert.equal(created.length, 0);
+
+  const r = await handleGiftCheckout(
+    { tier: "headstart", path: "direct", plan: "installment" },
+    deps(installmentOn),
+  );
+  assert.equal(r.status, 200);
+  assert.equal(created[0].params.mode, "subscription");
+  assert.deepEqual(created[0].params.line_items, [{ price: "price_headstart_installment_test", quantity: 1 }]);
+  assert.equal(created[0].params.discounts, undefined);
+  assert.equal(created[0].params.metadata?.gift_plan, "installment");
+  assert.equal(created[0].params.metadata?.gift_installments, "3");
+  assert.equal(created[0].params.subscription_data?.metadata?.gift_plan, "installment");
+  assert.ok(created[0].options.idempotencyKey.startsWith("gift_headstart_direct_installment_"));
+});
+
+test("installment checkout does not apply the Black Friday coupon even when BF is on", async () => {
+  created = [];
+  const r = await handleGiftCheckout(
+    { tier: "builder", path: "direct", plan: "installment" },
+    deps({ ...installmentOn, STRIPE_COUPON_BLACKFRIDAY: "BF15" }),
+  );
+  assert.equal(r.status, 200);
+  assert.equal(created[0].params.discounts, undefined);
+  assert.deepEqual(created[0].params.line_items, [{ price: "price_builder_installment_test", quantity: 1 }]);
+});
+
+test("per-tier amount-off coupon env vars are off by default and win over the shared coupon", () => {
+  assert.equal(couponIdForGiftCheckout("starter", {}), "");
+  assert.equal(couponIdForGiftCheckout("starter", { STRIPE_COUPON_BLACKFRIDAY: "BF15" }), "BF15");
+  assert.equal(
+    couponIdForGiftCheckout("starter", { STRIPE_COUPON_BLACKFRIDAY: "BF15", STRIPE_COUPON_STARTER: "STARTER75" }),
+    "STARTER75",
+  );
+  assert.equal(
+    couponIdForGiftCheckout("headstart", { STRIPE_COUPON_BLACKFRIDAY: "BF15", STRIPE_COUPON_STARTER: "STARTER75" }),
+    "BF15",
+  );
+  assert.equal(
+    couponIdForGiftCheckout("builder", { STRIPE_COUPON_BUILDER: "BUILDER765", STRIPE_COUPON_BLACKFRIDAY: "BF15" }),
+    "BUILDER765",
+  );
+  assert.equal(
+    couponIdForGiftCheckout("starter", { STRIPE_COUPON_STARTER: "STARTER75", GIFT_BLACK_FRIDAY_ENABLED: "false" }),
+    "",
+  );
+});
+
+test("pay-in-full uses the per-tier coupon when set", async () => {
+  created = [];
+  const r = await handleGiftCheckout(
+    giftBody,
+    deps({ ...on, STRIPE_COUPON_BLACKFRIDAY: "BF15", STRIPE_COUPON_STARTER: "STARTER75" }),
+  );
+  assert.equal(r.status, 200);
+  assert.deepEqual(created[0].params.discounts, [{ coupon: "STARTER75" }]);
+});
+
+test("installment checkout does not apply a per-tier coupon", async () => {
+  created = [];
+  const r = await handleGiftCheckout(
+    { tier: "headstart", path: "direct", plan: "installment" },
+    deps({ ...installmentOn, STRIPE_COUPON_BLACKFRIDAY: "BF15", STRIPE_COUPON_HEADSTART: "HEADSTART450" }),
+  );
+  assert.equal(r.status, 200);
+  assert.equal(created[0].params.discounts, undefined);
+});
+
+test("live key guard still blocks installment checkout", async () => {
+  created = [];
+  const r = await handleGiftCheckout(
+    { tier: "headstart", path: "direct", plan: "installment" },
+    deps(installmentOn, { secretKey: () => "sk_live_dummy_not_a_real_key" }),
+  );
+  assert.equal(r.status, 503);
+  assert.equal(created.length, 0);
+});
+
+function memoryGiftStore(): GiftOrderStore & { orders: GiftOrder[] } {
+  const orders: GiftOrder[] = [];
+  const store: GiftOrderStore & { orders: GiftOrder[] } = {
+    orders,
+    record: async (order) => {
+      const i = orders.findIndex((o) => o.checkout_session_id === order.checkout_session_id);
+      if (i >= 0) orders[i] = order;
+      else orders.push(order);
+    },
+    get: async (sessionId) => orders.find((o) => o.checkout_session_id === sessionId) ?? null,
+    getBySubscription: async (subscriptionId) =>
+      orders.find((o) => o.stripe_subscription_id === subscriptionId) ?? null,
+  };
+  return store;
+}
+
+test("invoice subscription id is read from legacy and parent shapes", () => {
+  assert.equal(invoiceSubscriptionId({ subscription: "sub_legacy" } as never), "sub_legacy");
+  assert.equal(
+    invoiceSubscriptionId({ parent: { subscription_details: { subscription: "sub_parent" } } } as never),
+    "sub_parent",
+  );
+  assert.equal(invoiceSubscriptionId({} as never), null);
+});
+
+test("installment cap cancels after three paid invoices and is idempotent", async () => {
+  _resetMemory();
+  const store = memoryGiftStore();
+  const canceled: string[] = [];
+  const starter: GiftOrder = {
+    checkout_session_id: "cs_test_installment",
+    tier: "headstart",
+    path: "direct",
+    plan: "installment",
+    status: "paid",
+    recipient_name: null,
+    recipient_email: null,
+    message: null,
+    delivery_date: null,
+    buyer_email: "buyer@example.com",
+    amount_total: 100000,
+    currency: "usd",
+    stripe_event_id: "evt_cs",
+    created_at: new Date().toISOString(),
+    stripe_subscription_id: "sub_test_1",
+    installment_paid_count: 0,
+    installment_capped: false,
+    counted_invoice_ids: [],
+  };
+  await store.record(starter);
+  const cap = {
+    store,
+    cancelSubscription: async (id: string) => {
+      canceled.push(id);
+    },
+  };
+
+  const first = await countPaidInstallmentInvoice({ invoiceId: "in_1", subscriptionId: "sub_test_1" }, cap);
+  const firstAgain = await countPaidInstallmentInvoice({ invoiceId: "in_1", subscriptionId: "sub_test_1" }, cap);
+  const second = await countPaidInstallmentInvoice({ invoiceId: "in_2", subscriptionId: "sub_test_1" }, cap);
+  const third = await countPaidInstallmentInvoice({ invoiceId: "in_3", subscriptionId: "sub_test_1" }, cap);
+  const thirdAgain = await countPaidInstallmentInvoice({ invoiceId: "in_3", subscriptionId: "sub_test_1" }, cap);
+
+  assert.equal(first?.installment_paid_count, 1);
+  assert.equal(firstAgain?.installment_paid_count, 1);
+  assert.equal(second?.installment_paid_count, 2);
+  assert.equal(third?.installment_paid_count, 3);
+  assert.equal(third?.installment_capped, true);
+  assert.equal(thirdAgain?.installment_capped, true);
+  assert.deepEqual(canceled, ["sub_test_1"]);
+});
+
+function invoicePayload(eventId: string, invoiceId: string, subscriptionId: string, type = "invoice.paid") {
+  return JSON.stringify({
+    id: eventId,
+    object: "event",
+    type,
+    data: {
+      object: {
+        id: invoiceId,
+        object: "invoice",
+        status: "paid",
+        subscription: subscriptionId,
+      },
+    },
+  });
+}
+
+test("signed invoice.paid webhook caps the subscription after three invoices", async () => {
+  _resetMemory();
+  _resetJsonMemory();
+  const store = memoryGiftStore();
+  await store.record({
+    checkout_session_id: "cs_test_wh_inst",
+    tier: "builder",
+    path: "direct",
+    plan: "installment",
+    status: "paid",
+    recipient_name: null,
+    recipient_email: null,
+    message: null,
+    delivery_date: null,
+    buyer_email: "buyer@example.com",
+    amount_total: 170000,
+    currency: "usd",
+    stripe_event_id: "evt_wh_cs",
+    created_at: new Date().toISOString(),
+    stripe_subscription_id: "sub_wh_1",
+    installment_paid_count: 0,
+    installment_capped: false,
+    counted_invoice_ids: [],
+  });
+  const canceled: string[] = [];
+  const giftWh = {
+    ...wh,
+    giftStore: store,
+    cancelSubscription: async (id: string) => {
+      canceled.push(id);
+    },
+  };
+  for (const [i, ev] of ["evt_in_1", "evt_in_2", "evt_in_3"].entries()) {
+    const body = invoicePayload(ev, `in_wh_${i + 1}`, "sub_wh_1");
+    const r = await handleWebhook(body, sign(body), giftWh);
+    assert.equal(r.status, 200);
+  }
+  const replay = invoicePayload("evt_in_3", "in_wh_3", "sub_wh_1");
+  const r2 = await handleWebhook(replay, sign(replay), giftWh);
+  assert.equal(r2.status, 200);
+  assert.equal(r2.body.duplicate, true);
+  assert.equal(store.orders[0].installment_paid_count, 3);
+  assert.equal(store.orders[0].installment_capped, true);
+  assert.deepEqual(canceled, ["sub_wh_1"]);
 });
