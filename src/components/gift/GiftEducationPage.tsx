@@ -13,7 +13,7 @@ const TIERS = [
     id: "starter",
     kicker: "Tier one",
     name: "Starter",
-    sale: "$1,274",
+    sale: "$1,274.15",
     regular: "$1,499",
     plan: null as string | null,
     recommended: false,
@@ -34,7 +34,7 @@ const TIERS = [
     id: "head-start",
     kicker: "Tier two",
     name: "Head Start",
-    sale: "$2,549",
+    sale: "$2,549.15",
     regular: "$2,999",
     plan: "Or 3 payments of $1,000 at the regular price of $2,999",
     recommended: true,
@@ -59,7 +59,7 @@ const TIERS = [
     id: "builder",
     kicker: "Tier three",
     name: "Builder",
-    sale: "$5,949",
+    sale: "$5,949.15",
     regular: "$6,999",
     plan: "Or 3 payments of $2,333 at the regular price of $6,999",
     recommended: false,
@@ -175,8 +175,9 @@ export default function GiftEducationPage() {
           Black Friday: 15% off every tier
         </p>
         <p className="mt-4 max-w-xl text-sm text-[color:var(--text-muted)]">
-          Buttons on this page collect interest only. They do not take payment. There is no free
-          trial on any tier.
+          {checkoutOn
+            ? "Choose a tier and continue to checkout to pay in full at the Black Friday price. Payment is taken on Stripe Checkout, not on this page. There is no free trial on any tier."
+            : "Buttons on this page collect interest only. They do not take payment. There is no free trial on any tier."}
         </p>
       </section>
 
@@ -405,11 +406,12 @@ export default function GiftEducationPage() {
                 <article className="panel p-6">
                   <p className="text-2xl font-semibold text-[color:var(--gold)]">2</p>
                   <h3 className="mt-2 text-lg font-semibold text-[color:var(--text)]">
-                    Reserve your spot
+                    {checkoutOn ? "Continue to checkout" : "Reserve your spot"}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-[color:var(--text-muted)]">
-                    Send interest for that tier. This is not a payment. We will follow up to
-                    complete enrollment when checkout is available.
+                    {checkoutOn
+                      ? "Continue to checkout to pay in full for that tier. Payment is taken on Stripe Checkout, not on this page."
+                      : "Send interest for that tier. This is not a payment. We will follow up to complete enrollment when checkout is available."}
                   </p>
                 </article>
                 <article className="panel p-6">
@@ -453,9 +455,9 @@ export default function GiftEducationPage() {
               Also not claimed yet
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-[color:var(--text-muted)]">
-              The Head Start and Builder certificate, with final review, is coming soon. It is not
-              available today. Interest buttons collect interest only and do not enroll you or take
-              payment.
+              {checkoutOn
+                ? "The Head Start and Builder certificate, with final review, is coming soon. It is not available today. Continue to checkout to pay in full. Payment is taken on Stripe Checkout, not on this page."
+                : "The Head Start and Builder certificate, with final review, is coming soon. It is not available today. Interest buttons collect interest only and do not enroll you or take payment."}
             </p>
           </aside>
         </div>
@@ -555,21 +557,25 @@ export default function GiftEducationPage() {
       <section className="section-pad mx-auto max-w-6xl py-16 text-center md:py-20">
         <p className={kicker}>Next step</p>
         <h2 className="mt-3 text-2xl font-semibold text-[color:var(--text)] md:text-4xl">
-          Reserve interest when you are ready
+          {checkoutOn ? "Continue to checkout when you are ready" : "Reserve interest when you are ready"}
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-[color:var(--text-muted)]">
-          Choose Gift It or Enroll Direct, pick a tier, and send interest. We will follow up. This
-          is not a purchase.
+          {checkoutOn
+            ? "Choose Gift It or Enroll Direct, pick a tier, and continue to checkout to pay in full. Payment is taken on Stripe Checkout, not on this page."
+            : "Choose Gift It or Enroll Direct, pick a tier, and send interest. We will follow up. This is not a purchase."}
         </p>
         <a href="#tiers" className={`${btnGold} mt-8`}>
           See the gift options
         </a>
         <p className="mx-auto mt-10 max-w-3xl text-left text-xs leading-relaxed text-[color:var(--text-muted)]">
-          Black Friday pricing is 15% off the regular tier prices: Starter $1,274 (was $1,499), Head
-          Start $2,549 (was $2,999), and Builder $5,949 (was $6,999). There is no free trial on any
+          Black Friday pricing is 15% off the regular tier prices: Starter $1,274.15 (was $1,499), Head
+          Start $2,549.15 (was $2,999), and Builder $5,949.15 (was $6,999). There is no free trial on any
           tier. The certificate with final review is coming soon. Refund and transfer terms: details
-          coming soon. 12 months of membership; six months of guided, text-based lessons live today.
-          Buttons on this page collect interest only and do not process payment. Pragvance does not
+          coming soon. 12 months of membership; six months of guided, text-based lessons live today.{" "}
+          {checkoutOn
+            ? "Continue to checkout to pay in full. Payment is taken on Stripe Checkout, not on this page."
+            : "Buttons on this page collect interest only and do not process payment."}{" "}
+          Pragvance does not
           guarantee employment, clients, income, or any particular result.
         </p>
         <p className="mt-4">
