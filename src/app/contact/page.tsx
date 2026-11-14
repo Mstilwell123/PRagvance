@@ -6,16 +6,23 @@ import { SITE } from "@/lib/site";
 import { PRODUCT_PAGES } from "@/lib/pricing";
 import StartHereLink from "@/components/StartHereLink";
 import CheckoutButton from "@/components/CheckoutButton";
-import { OFFERS, UTM_KEYS, offerFromSlug, validateLead } from "@/lib/lead";
+import { OFFERS, CUSTOM_BUILD_OPTIONS, UTM_KEYS, offerFromSlug, validateLead } from "@/lib/lead";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
 export default function ContactPage() {
   const [interest, setInterest] = useState<string>("General");
+  const [customPath, setCustomPath] = useState(false);
   const [utm, setUtm] = useState<Record<string, string>>({});
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setInterest(offerFromSlug(params.get("interest")));
+    const slug = (params.get("interest") || "").trim().toLowerCase();
+    if (slug === "custom") {
+      setCustomPath(true);
+      setInterest(CUSTOM_BUILD_OPTIONS[0]);
+    } else {
+      setInterest(offerFromSlug(params.get("interest")));
+    }
     const found: Record<string, string> = {};
     for (const k of UTM_KEYS) {
       const v = params.get(k);
@@ -152,7 +159,7 @@ export default function ContactPage() {
         </div>
         <div>
           <label htmlFor="interest" className="block text-sm text-[color:var(--text-muted)]">
-            Interest
+            {customPath ? "Custom App / SaaS" : "Interest"}
           </label>
           <select
             id="interest"
@@ -161,26 +168,44 @@ export default function ContactPage() {
             value={interest}
             onChange={(e) => setInterest(e.target.value)}
           >
-            {OFFERS.map((i) => (
-              <option key={i.slug} value={i.label}>
-                {i.label}
-              </option>
-            ))}
+            {customPath
+              ? CUSTOM_BUILD_OPTIONS.map((label) => (
+                  <option key={label} value={label}>
+                    {label}
+                  </option>
+                ))
+              : OFFERS.map((i) => (
+                  <option key={i.slug} value={i.label}>
+                    {i.label}
+                  </option>
+                ))}
           </select>
         </div>
         <div>
           <label htmlFor="building" className="block text-sm text-[color:var(--text-muted)]">
             What are you building?
           </label>
-          <textarea
-            id="building"
-            name="building"
-            rows={3}
-            required
-            maxLength={2000}
-            className="mt-1 w-full rounded-lg border border-[color:var(--line)] bg-[color:var(--bg-elevated)] px-3 py-2 text-[color:var(--text)]"
-            placeholder="An app, a SaaS, an AI agent team for your business..."
-          />
+          {customPath ? (
+            <input
+              id="building"
+              name="building"
+              type="text"
+              required
+              maxLength={2000}
+              className="mt-1 w-full rounded-lg border border-[color:var(--line)] bg-[color:var(--bg-elevated)] px-3 py-2 text-[color:var(--text)]"
+              placeholder="An app, a SaaS, an AI agent team for your business..."
+            />
+          ) : (
+            <textarea
+              id="building"
+              name="building"
+              rows={3}
+              required
+              maxLength={2000}
+              className="mt-1 w-full rounded-lg border border-[color:var(--line)] bg-[color:var(--bg-elevated)] px-3 py-2 text-[color:var(--text)]"
+              placeholder="An app, a SaaS, an AI agent team for your business..."
+            />
+          )}
         </div>
         <div>
           <label htmlFor="message" className="block text-sm text-[color:var(--text-muted)]">
@@ -202,7 +227,7 @@ export default function ContactPage() {
           aria-busy={status === "sending"}
           className="w-full rounded-full bg-[color:var(--gold)] px-6 py-3 text-sm font-semibold text-black hover:bg-[color:var(--gold-bright)] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {status === "sending" ? "Sending…" : "Send message"}
+          {status === "sending" ? "Sending…" : customPath ? "Send Message" : "Send message"}
         </button>
         {error && (
           <p className="text-sm text-red-400" role="alert">

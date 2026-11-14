@@ -145,9 +145,9 @@ export default function PricingPage() {
           </article>
           {/* 5. Custom app / SaaS */}
           <article className={card} aria-labelledby="p-custom">
-            <p className={group}>Need a company-specific app or SaaS?</p>
+            <p className="text-4xl font-bold text-[#e8bd63]">{PRICING.custom.label}</p>
+            <p className={`${group} mt-4`}>Need a company-specific app or SaaS?</p>
             <h3 id="p-custom" className="mt-2 text-xl font-semibold text-[color:var(--text)]">Custom App / SaaS</h3>
-            <p className="mt-4 text-4xl font-bold text-[#e8bd63]">{PRICING.custom.label}</p>
             <p className="mb-6 mt-3 text-sm text-[color:var(--text-muted)]">
               Software built around your company&apos;s requirements. Scope and pricing are agreed before
               development.

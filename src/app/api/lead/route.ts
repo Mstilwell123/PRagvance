@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { validateLead } from "@/lib/lead";
-import { sendLeadToCrm } from "@/lib/crm.server";
+import { deliverLead } from "@/lib/custom-build-lead";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -43,10 +43,10 @@ export async function POST(req: Request) {
   const byEmail = await incrWindow(`lead:email:${v.lead.email.toLowerCase()}`, WINDOW_SEC);
   if (byEmail.count > MAX_PER_EMAIL) return tooMany(byEmail.ttl);
   try {
-    await sendLeadToCrm(v.lead);
+    await deliverLead(v.lead);
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("[lead] CRM handoff failed:", err instanceof Error ? err.message : err);
+    console.error("[lead] handoff failed:", err instanceof Error ? err.message : err);
     return NextResponse.json({ ok: false, error: GENERIC_ERROR }, { status: 502 });
   }
 }
