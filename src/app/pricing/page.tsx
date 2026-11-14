@@ -155,6 +155,15 @@ export default function PricingPage() {
             <Link href="/contact?interest=custom#contact" className={secondaryBtn}>Discuss a Custom Build</Link>
             <StartHereLink href={PRODUCT_PAGES.customApp} label="Custom App / SaaS" />
           </article>
+          {/* 6. Pragvance Education gift */}
+          <article className={card} aria-labelledby="p-gift">
+            <p className={group}>Pragvance Education</p>
+            <h3 id="p-gift" className="mt-2 text-xl font-semibold text-[color:var(--text)]">Gift an education to yourself, friend, or family.</h3>
+            <p className="mb-6 mt-3 text-sm text-[color:var(--text-muted)]">
+              Real portfolio projects and a year of membership — give it as a gift, or start yourself.
+            </p>
+            <Link href="/gift" className={secondaryBtn}>See the gift options</Link>
+          </article>
         </div>
 
       </section>
