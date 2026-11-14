@@ -5,6 +5,9 @@ import { SITE } from "@/lib/site";
 import StartHereLink from "@/components/StartHereLink";
 import CheckoutButton from "@/components/CheckoutButton";
 import { checkoutEnabled, type ProductKey } from "@/lib/checkout/products";
+import CheckoutStatus from "@/components/CheckoutStatus";
+import { resolveConfirmState } from "@/lib/checkout/confirm.server";
+import { getStripe } from "@/lib/checkout/stripe.server";
 
 const DESC = "A quick summary of Pragvance offerings: AI Workforce, Shadow Lab, consultation, and Done-for-You setup.";
 
@@ -26,10 +29,14 @@ const OFFERS: { name: string; price: string; text: string; href: string; cta: st
   { name: "Done-for-You Complete Setup", price: `${PRICING.doneForYou.setup} + ${PRICING.doneForYou.support}/month`, text: "A defined setup for your business, with the implementation scope, handover, and support terms agreed before work begins. The $2,500 deposit is non-refundable.", href: "/contact?interest=done-for-you#contact", cta: "Pay $2,500 Deposit", page: PRODUCT_PAGES.doneForYou, product: "done_for_you_deposit" },
 ];
 
-export default function SummaryPage() {
+export default async function SummaryPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const live = checkoutEnabled();
+  const state = await resolveConfirmState(await searchParams, {
+    retrieveSession: (id) => getStripe().checkout.sessions.retrieve(id) as never,
+  });
   return (
     <section className="section-pad mx-auto max-w-7xl py-12 md:py-20">
+      <CheckoutStatus state={state} />
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-[color:var(--gold-bright)]">Summary</p>
       <h1 className="mt-3 text-3xl font-semibold leading-tight text-[color:var(--text)] md:text-5xl">Everything Pragvance offers</h1>
       <p className="mt-4 max-w-3xl text-[color:var(--text-muted)] md:text-lg">Choose the level of help that fits your needs. Full details are on the <Link href="/pricing" className="text-[#e8bd63] hover:underline">pricing page</Link>.</p>
