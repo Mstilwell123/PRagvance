@@ -6,6 +6,7 @@ import {
   liveStripeKeyBlocked,
   validateGiftCheckout,
   giftCheckoutEnabled,
+  couponIdForGiftCheckout,
 } from "../src/lib/checkout/gift.server.ts";
 import { handleWebhook, invoiceSubscriptionId } from "../src/lib/checkout/handlers.server.ts";
 import { giftOrderFromSession, type GiftOrder, type GiftOrderStore } from "../src/lib/checkout/gift-orders.server.ts";
@@ -305,6 +306,47 @@ test("installment checkout does not apply the Black Friday coupon even when BF i
   assert.equal(r.status, 200);
   assert.equal(created[0].params.discounts, undefined);
   assert.deepEqual(created[0].params.line_items, [{ price: "price_builder_installment_test", quantity: 1 }]);
+});
+
+test("per-tier amount-off coupon env vars are off by default and win over the shared coupon", () => {
+  assert.equal(couponIdForGiftCheckout("starter", {}), "");
+  assert.equal(couponIdForGiftCheckout("starter", { STRIPE_COUPON_BLACKFRIDAY: "BF15" }), "BF15");
+  assert.equal(
+    couponIdForGiftCheckout("starter", { STRIPE_COUPON_BLACKFRIDAY: "BF15", STRIPE_COUPON_STARTER: "STARTER75" }),
+    "STARTER75",
+  );
+  assert.equal(
+    couponIdForGiftCheckout("headstart", { STRIPE_COUPON_BLACKFRIDAY: "BF15", STRIPE_COUPON_STARTER: "STARTER75" }),
+    "BF15",
+  );
+  assert.equal(
+    couponIdForGiftCheckout("builder", { STRIPE_COUPON_BUILDER: "BUILDER765", STRIPE_COUPON_BLACKFRIDAY: "BF15" }),
+    "BUILDER765",
+  );
+  assert.equal(
+    couponIdForGiftCheckout("starter", { STRIPE_COUPON_STARTER: "STARTER75", GIFT_BLACK_FRIDAY_ENABLED: "false" }),
+    "",
+  );
+});
+
+test("pay-in-full uses the per-tier coupon when set", async () => {
+  created = [];
+  const r = await handleGiftCheckout(
+    giftBody,
+    deps({ ...on, STRIPE_COUPON_BLACKFRIDAY: "BF15", STRIPE_COUPON_STARTER: "STARTER75" }),
+  );
+  assert.equal(r.status, 200);
+  assert.deepEqual(created[0].params.discounts, [{ coupon: "STARTER75" }]);
+});
+
+test("installment checkout does not apply a per-tier coupon", async () => {
+  created = [];
+  const r = await handleGiftCheckout(
+    { tier: "headstart", path: "direct", plan: "installment" },
+    deps({ ...installmentOn, STRIPE_COUPON_BLACKFRIDAY: "BF15", STRIPE_COUPON_HEADSTART: "HEADSTART450" }),
+  );
+  assert.equal(r.status, 200);
+  assert.equal(created[0].params.discounts, undefined);
 });
 
 test("live key guard still blocks installment checkout", async () => {

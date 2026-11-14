@@ -25,6 +25,16 @@ export const GIFT_INSTALLMENT_PRICE_ENV: Record<
   builder: "STRIPE_PRICE_BUILDER_INSTALLMENT",
 };
 
+/** Optional per-tier amount-off coupon ids. Unset = off; fall back to STRIPE_COUPON_BLACKFRIDAY. */
+export const GIFT_TIER_COUPON_ENV: Record<
+  GiftTier,
+  "STRIPE_COUPON_STARTER" | "STRIPE_COUPON_HEADSTART" | "STRIPE_COUPON_BUILDER"
+> = {
+  starter: "STRIPE_COUPON_STARTER",
+  headstart: "STRIPE_COUPON_HEADSTART",
+  builder: "STRIPE_COUPON_BUILDER",
+};
+
 export const GIFT_TIER_LABEL: Record<GiftTier, string> = {
   starter: "Starter",
   headstart: "Head Start",
@@ -196,6 +206,14 @@ export function giftMetadata(input: GiftCheckoutInput): Stripe.MetadataParam {
   return meta;
 }
 
+/** Pay-in-full coupon id. Per-tier env wins when set; otherwise the shared Black Friday coupon. Unset = no coupon. */
+export function couponIdForGiftCheckout(tier: GiftTier, env: NodeJS.ProcessEnv = process.env): string {
+  if (!giftBlackFridayEnabled(env)) return "";
+  const perTier = env[GIFT_TIER_COUPON_ENV[tier]]?.trim() || "";
+  if (perTier) return perTier;
+  return env.STRIPE_COUPON_BLACKFRIDAY?.trim() || "";
+}
+
 /** POST { tier, path, plan?, ...gift fields } -> { url }. Client amounts and price ids are ignored. */
 export async function handleGiftCheckout(raw: unknown, deps: GiftCheckoutDeps): Promise<Json> {
   const env = deps.env ?? process.env;
@@ -237,10 +255,10 @@ export async function handleGiftCheckout(raw: unknown, deps: GiftCheckoutDeps): 
 
   if (parsed.value.plan === "installment") {
     params.subscription_data = { metadata };
-  } else if (giftBlackFridayEnabled(env)) {
+  } else {
     // Coupon applies only to pay-in-full, and only while Black Friday is on.
-    // Whether 15% should also apply to installments is an open question.
-    const coupon = env.STRIPE_COUPON_BLACKFRIDAY?.trim() || "";
+    // No 15% on payment plans. Per-tier amount-off coupon env vars are off unless set.
+    const coupon = couponIdForGiftCheckout(parsed.value.tier, env);
     if (coupon) params.discounts = [{ coupon }];
   }
 

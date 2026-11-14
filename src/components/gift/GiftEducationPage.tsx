@@ -5,7 +5,7 @@ import Link from "next/link";
 import { SITE } from "@/lib/site";
 import { isGiftBlackFridayUiEnabled, isGiftCheckoutUiEnabled, isGiftInstallmentUiEnabled } from "@/lib/checkout/gift-public";
 import GiftReserveControls from "@/components/gift/GiftReserveControls";
-import { blackFridaySaleLabel, GIFT_TIER_PRICING } from "@/lib/checkout/gift-pricing";
+import { GIFT_TIER_PRICING } from "@/lib/checkout/gift-pricing";
 
 type Path = "gift" | "enroll";
 
@@ -14,19 +14,19 @@ const TIERS = [
     id: "starter",
     kicker: "Tier one",
     name: "Starter",
-    sale: blackFridaySaleLabel(GIFT_TIER_PRICING.starter.fullCents),
+    sale: GIFT_TIER_PRICING.starter.blackFridayLabel,
     regular: GIFT_TIER_PRICING.starter.fullLabel,
     plan: null as string | null,
     recommended: false,
     giftItems: [
-      "12 months of AI Workforce membership",
-      "1 portfolio project with a 1-hour written review",
+      "6 months of membership",
+      "1 portfolio project with a written review",
       "No live 1:1",
       "No free trial",
     ],
     enrollItems: [
-      "12 months of AI Workforce membership",
-      "1 portfolio project with a 1-hour written review",
+      "6 months of membership",
+      "1 portfolio project with a written review",
       "No live 1:1",
       "No free trial",
     ],
@@ -35,7 +35,7 @@ const TIERS = [
     id: "head-start",
     kicker: "Tier two",
     name: "Head Start",
-    sale: blackFridaySaleLabel(GIFT_TIER_PRICING.headstart.fullCents),
+    sale: GIFT_TIER_PRICING.headstart.blackFridayLabel,
     regular: GIFT_TIER_PRICING.headstart.fullLabel,
     plan: `Or 3 payments of ${GIFT_TIER_PRICING.headstart.installmentLabel}`,
     recommended: true,
@@ -60,7 +60,7 @@ const TIERS = [
     id: "builder",
     kicker: "Tier three",
     name: "Builder",
-    sale: blackFridaySaleLabel(GIFT_TIER_PRICING.builder.fullCents),
+    sale: GIFT_TIER_PRICING.builder.blackFridayLabel,
     regular: GIFT_TIER_PRICING.builder.fullLabel,
     plan: `Or 3 payments of ${GIFT_TIER_PRICING.builder.installmentLabel}`,
     recommended: false,
@@ -87,12 +87,12 @@ const FAQS = [
     a: "Gift It is a gift card for someone else. You choose the tier, the recipient, a message, and a delivery date. The recipient redeems the gift, and the membership clock starts at redemption. Enroll Direct is the same education, bought for yourself. There is no gift card.",
   },
   {
-    q: "When does the 12-month membership start?",
-    a: "On Gift It, the membership clock starts at redemption. On Enroll Direct, it starts when enrollment begins, not when you first send interest.",
+    q: "When does membership start?",
+    a: "Starter is 6 months of membership. Head Start and Builder are 12 months. On Gift It, the membership clock starts at redemption. On Enroll Direct, it starts when enrollment begins, not when you first send interest.",
   },
   {
     q: "What is included in each tier?",
-    a: "Starter is 12 months of AI Workforce membership plus one portfolio project with a 1-hour written review, and no live 1:1. Head Start adds two more portfolio projects, a certificate with final review (coming soon), and monthly progress notes — to the giver on Gift It, or to the student on Enroll Direct. Builder includes everything in Head Start, plus 6 hrs of 1:1 marketing support.",
+    a: "Starter is 6 months of membership plus 1 portfolio project with a written review, and no live 1:1. Head Start is 12 months of AI Workforce membership, three portfolio projects, a certificate with final review (coming soon), and monthly progress notes — to the giver on Gift It, or to the student on Enroll Direct. Builder includes everything in Head Start, plus 6 hrs of 1:1 marketing support.",
   },
   {
     q: "What does “Certificate: coming soon” mean?",
@@ -100,11 +100,11 @@ const FAQS = [
   },
   {
     q: "What is live in the membership today?",
-    a: "12 months of membership; six months of guided, text-based lessons live today. Months 7 to 12 of lessons, live sessions, and group training are not promised on this page.",
+    a: "Starter is 6 months of membership. Head Start and Builder are 12 months. Six months of guided, text-based lessons are live today. Months 7 to 12 of lessons, live sessions, and group training are not promised on this page.",
   },
   {
     q: "Can I pay in three payments?",
-    a: "Head Start can be paid in full or in 3 payments of $1,000. Builder can be paid in full or in 3 payments of $1,700. Starter is pay in full only. When Black Friday is on, the prices shown are the 15% off pay-in-full amounts. Sale payment-plan amounts are not listed here.",
+    a: "Head Start can be paid in full or in 3 payments of $1,000. Builder can be paid in full or in 3 payments of $1,700. Starter is pay in full only. When Black Friday is on, 15% off applies to pay-in-full only. There is no 15% off on payment plans.",
   },
   {
     q: "Is there a free trial?",
@@ -159,12 +159,13 @@ export default function GiftEducationPage() {
       <section className="section-pad mx-auto max-w-6xl py-12 md:py-20">
         <p className={kicker}>Pragvance Education</p>
         <h1 className="mt-3 max-w-3xl text-3xl font-semibold leading-tight text-[color:var(--text)] md:text-5xl">
-          Give a year of practical AI education — or start it yourself.
+          Give practical AI education — or start it yourself.
         </h1>
         <p className="mt-4 max-w-3xl text-[color:var(--text-muted)] md:text-lg">
-          A standalone way to gift an education to a friend or family, or enroll directly. Each
-          tier includes 12 months of AI Workforce membership and real portfolio project work with
-          written review.
+          A standalone way to gift an education to a friend or family, or enroll directly. Starter
+          includes 6 months of membership plus 1 portfolio project with a written review. Head Start
+          and Builder include 12 months of AI Workforce membership and real portfolio project work
+          with written review.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <a href="#tiers" className={btnGold}>
@@ -454,12 +455,13 @@ export default function GiftEducationPage() {
         <div className="mt-8 grid gap-5 md:grid-cols-[1.2fr_0.8fr]">
           <div className="panel p-6">
             <p className="text-xl font-semibold italic text-[color:var(--text)] md:text-2xl">
-              12 months of membership; six months of guided, text-based lessons live today.
+              Starter is 6 months of membership. Head Start and Builder are 12 months. Six months of guided, text-based lessons are live today.
             </p>
             <p className="mt-4 text-sm leading-relaxed text-[color:var(--text-muted)]">
-              Every tier includes twelve months of AI Workforce membership. Six months of guided,
-              text-based lessons are live today. This page does not promise course content for
-              Months 7 to 12, live sessions, or group training.
+              Starter includes six months of membership. Head Start and Builder include twelve
+              months of AI Workforce membership. Six months of guided, text-based lessons are live
+              today. This page does not promise course content for Months 7 to 12, live sessions, or
+              group training.
             </p>
           </div>
           <aside className="panel p-6">
@@ -543,7 +545,7 @@ export default function GiftEducationPage() {
               <h3 className="text-xl font-semibold text-[color:var(--text)]">Real project work</h3>
               <p className="mt-2 text-sm leading-relaxed text-[color:var(--text-muted)]">
                 Each tier includes portfolio project work and a written review of that work. Starter
-                includes one project and a 1-hour written review. Head Start and Builder include
+                includes one project with a written review. Head Start and Builder include
                 three projects.
               </p>
             </article>
@@ -581,10 +583,10 @@ export default function GiftEducationPage() {
         </a>
         <p className="mx-auto mt-10 max-w-3xl text-left text-xs leading-relaxed text-[color:var(--text-muted)]">
           {blackFridayOn
-            ? `Black Friday pricing is 15% off the pay-in-full prices through Cyber Monday, November 30: Starter ${blackFridaySaleLabel(GIFT_TIER_PRICING.starter.fullCents)} (was ${GIFT_TIER_PRICING.starter.fullLabel}), Head Start ${blackFridaySaleLabel(GIFT_TIER_PRICING.headstart.fullCents)} (was ${GIFT_TIER_PRICING.headstart.fullLabel}), and Builder ${blackFridaySaleLabel(GIFT_TIER_PRICING.builder.fullCents)} (was ${GIFT_TIER_PRICING.builder.fullLabel}).`
+            ? `Black Friday pricing is 15% off pay-in-full through Cyber Monday, November 30: Starter ${GIFT_TIER_PRICING.starter.blackFridayLabel} (was ${GIFT_TIER_PRICING.starter.fullLabel}), Head Start ${GIFT_TIER_PRICING.headstart.blackFridayLabel} (was ${GIFT_TIER_PRICING.headstart.fullLabel}), and Builder ${GIFT_TIER_PRICING.builder.blackFridayLabel} (was ${GIFT_TIER_PRICING.builder.fullLabel}). There is no 15% off on payment plans.`
             : `Pay-in-full prices: Starter ${GIFT_TIER_PRICING.starter.fullLabel}, Head Start ${GIFT_TIER_PRICING.headstart.fullLabel}, and Builder ${GIFT_TIER_PRICING.builder.fullLabel}. Head Start can be 3 payments of ${GIFT_TIER_PRICING.headstart.installmentLabel}, and Builder can be 3 payments of ${GIFT_TIER_PRICING.builder.installmentLabel}.`} There is no free trial on any
           tier. The certificate with final review is coming soon. Refund and transfer terms: details
-          coming soon. 12 months of membership; six months of guided, text-based lessons live today.{" "}
+          coming soon. Starter is 6 months of membership. Head Start and Builder are 12 months. Six months of guided, text-based lessons are live today.{" "}
           {checkoutOn
             ? "Continue to checkout to pay in full. Payment is taken on Stripe Checkout, not on this page."
             : "Buttons on this page collect interest only and do not process payment."}{" "}

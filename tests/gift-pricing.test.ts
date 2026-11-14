@@ -23,17 +23,25 @@ test("new pay-in-full and installment amounts are the advertised cents", () => {
   assert.equal(GIFT_TIER_PRICING.builder.fullLabel, "$5,100");
 });
 
-test("Black Friday 15% off matches Stripe percent_off rounding and sale labels", () => {
+test("Black Friday page labels are the advertised whole dollars", () => {
+  assert.equal(GIFT_TIER_PRICING.starter.blackFridayLabel, "$422");
+  assert.equal(GIFT_TIER_PRICING.headstart.blackFridayLabel, "$2,549");
+  assert.equal(GIFT_TIER_PRICING.builder.blackFridayLabel, "$4,335");
+});
+
+test("a 15% Stripe coupon would charge cents that do not match Starter and Head Start labels", () => {
   const expected = [
-    { name: "Starter", regular: 49_700, sale: 42_245, label: "$422.45" },
-    { name: "Head Start", regular: 299_900, sale: 254_915, label: "$2,549.15" },
-    { name: "Builder", regular: 510_000, sale: 433_500, label: "$4,335.00" },
+    { name: "Starter", regular: 49_700, sale: 42_245, couponLabel: "$422.45", pageLabel: "$422" },
+    { name: "Head Start", regular: 299_900, sale: 254_915, couponLabel: "$2,549.15", pageLabel: "$2,549" },
+    { name: "Builder", regular: 510_000, sale: 433_500, couponLabel: "$4,335.00", pageLabel: "$4,335" },
   ] as const;
   for (const tier of expected) {
     assert.equal(blackFridaySaleCents(tier.regular, GIFT_BF_PERCENT_OFF), tier.sale, tier.name);
-    assert.equal(blackFridaySaleLabel(tier.regular), tier.label, tier.name);
-    assert.equal(formatUsd(tier.sale), tier.label, tier.name);
+    assert.equal(blackFridaySaleLabel(tier.regular), tier.couponLabel, tier.name);
+    assert.equal(formatUsd(tier.sale), tier.couponLabel, tier.name);
   }
+  assert.notEqual(GIFT_TIER_PRICING.starter.blackFridayLabel, "$422.45");
+  assert.notEqual(GIFT_TIER_PRICING.headstart.blackFridayLabel, "$2,549.15");
 });
 
 test("Black Friday flag defaults on and is off only for false", () => {
