@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { SITE } from "@/lib/site";
-import { isGiftCheckoutUiEnabled } from "@/lib/checkout/gift-public";
+import { isGiftBlackFridayUiEnabled, isGiftCheckoutUiEnabled, isGiftInstallmentUiEnabled } from "@/lib/checkout/gift-public";
 import GiftReserveControls from "@/components/gift/GiftReserveControls";
+import { blackFridaySaleLabel, GIFT_TIER_PRICING } from "@/lib/checkout/gift-pricing";
 
 type Path = "gift" | "enroll";
 
@@ -13,8 +14,8 @@ const TIERS = [
     id: "starter",
     kicker: "Tier one",
     name: "Starter",
-    sale: "$1,274.15",
-    regular: "$1,499",
+    sale: blackFridaySaleLabel(GIFT_TIER_PRICING.starter.fullCents),
+    regular: GIFT_TIER_PRICING.starter.fullLabel,
     plan: null as string | null,
     recommended: false,
     giftItems: [
@@ -34,9 +35,9 @@ const TIERS = [
     id: "head-start",
     kicker: "Tier two",
     name: "Head Start",
-    sale: "$2,549.15",
-    regular: "$2,999",
-    plan: "Or 3 payments of $1,000 at the regular price of $2,999",
+    sale: blackFridaySaleLabel(GIFT_TIER_PRICING.headstart.fullCents),
+    regular: GIFT_TIER_PRICING.headstart.fullLabel,
+    plan: `Or 3 payments of ${GIFT_TIER_PRICING.headstart.installmentLabel}`,
     recommended: true,
     giftItems: [
       "12 months of AI Workforce membership",
@@ -59,20 +60,20 @@ const TIERS = [
     id: "builder",
     kicker: "Tier three",
     name: "Builder",
-    sale: "$5,949.15",
-    regular: "$6,999",
-    plan: "Or 3 payments of $2,333 at the regular price of $6,999",
+    sale: blackFridaySaleLabel(GIFT_TIER_PRICING.builder.fullCents),
+    regular: GIFT_TIER_PRICING.builder.fullLabel,
+    plan: `Or 3 payments of ${GIFT_TIER_PRICING.builder.installmentLabel}`,
     recommended: false,
     giftItems: [
       "Everything in Head Start",
-      "5 hours of 1:1 marketing support",
+      "6 hrs of 1:1 marketing support",
       "Certificate with final review",
       "Monthly progress notes to the giver",
       "No free trial",
     ],
     enrollItems: [
       "Everything in Head Start",
-      "5 hours of 1:1 marketing support",
+      "6 hrs of 1:1 marketing support",
       "Certificate with final review",
       "Monthly progress notes to the student",
       "No free trial",
@@ -91,7 +92,7 @@ const FAQS = [
   },
   {
     q: "What is included in each tier?",
-    a: "Starter is 12 months of AI Workforce membership plus one portfolio project with a 1-hour written review, and no live 1:1. Head Start adds two more portfolio projects, a certificate with final review (coming soon), and monthly progress notes — to the giver on Gift It, or to the student on Enroll Direct. Builder includes everything in Head Start, plus 5 hours of 1:1 marketing support.",
+    a: "Starter is 12 months of AI Workforce membership plus one portfolio project with a 1-hour written review, and no live 1:1. Head Start adds two more portfolio projects, a certificate with final review (coming soon), and monthly progress notes — to the giver on Gift It, or to the student on Enroll Direct. Builder includes everything in Head Start, plus 6 hrs of 1:1 marketing support.",
   },
   {
     q: "What does “Certificate: coming soon” mean?",
@@ -103,7 +104,7 @@ const FAQS = [
   },
   {
     q: "Can I pay in three payments?",
-    a: "At regular price, Head Start can be 3 payments of $1,000, and Builder can be 3 payments of $2,333. Black Friday prices shown on this page are the 15% off pay-in-full amounts. Sale payment-plan amounts are not listed here.",
+    a: "Head Start can be paid in full or in 3 payments of $1,000. Builder can be paid in full or in 3 payments of $1,700. Starter is pay in full only. When Black Friday is on, the prices shown are the 15% off pay-in-full amounts. Sale payment-plan amounts are not listed here.",
   },
   {
     q: "Is there a free trial?",
@@ -129,6 +130,8 @@ export default function GiftEducationPage() {
   const [path, setPath] = useState<Path>("gift");
   const isGift = path === "gift";
   const checkoutOn = isGiftCheckoutUiEnabled();
+  const blackFridayOn = isGiftBlackFridayUiEnabled();
+  const installmentsOn = isGiftInstallmentUiEnabled();
   const [banner, setBanner] = useState<string | null>(null);
 
   useEffect(() => {
@@ -171,12 +174,16 @@ export default function GiftEducationPage() {
             How gifting works
           </a>
         </div>
-        <p className="mt-6 inline-flex rounded-full border border-[color:var(--line)] bg-[color:var(--bg-panel)] px-4 py-2 text-sm font-semibold text-[color:var(--gold-bright)]">
-          Black Friday: 15% off every tier
-        </p>
+        {blackFridayOn ? (
+          <p className="mt-6 inline-flex rounded-full border border-[color:var(--line)] bg-[color:var(--bg-panel)] px-4 py-2 text-sm font-semibold text-[color:var(--gold-bright)]">
+            Black Friday: 15% off every tier through Cyber Monday, November 30
+          </p>
+        ) : null}
         <p className="mt-4 max-w-xl text-sm text-[color:var(--text-muted)]">
           {checkoutOn
-            ? "Choose a tier and continue to checkout to pay in full at the Black Friday price. Payment is taken on Stripe Checkout, not on this page. There is no free trial on any tier."
+            ? blackFridayOn
+              ? "Choose a tier and continue to checkout to pay in full at the Black Friday price. Payment is taken on Stripe Checkout, not on this page. There is no free trial on any tier."
+              : "Choose a tier and continue to checkout to pay in full. Payment is taken on Stripe Checkout, not on this page. There is no free trial on any tier."
             : "Buttons on this page collect interest only. They do not take payment. There is no free trial on any tier."}
         </p>
       </section>
@@ -263,14 +270,18 @@ export default function GiftEducationPage() {
                   {tier.name}
                 </h3>
                 <p className="mt-4 flex flex-wrap items-baseline gap-x-2">
-                  <span className="text-4xl font-bold text-[#e8bd63]">{tier.sale}</span>
-                  <span className="text-lg text-[color:var(--text-muted)] line-through">
-                    {tier.regular}
-                  </span>
+                  <span className="text-4xl font-bold text-[#e8bd63]">{blackFridayOn ? tier.sale : tier.regular}</span>
+                  {blackFridayOn ? (
+                    <span className="text-lg text-[color:var(--text-muted)] line-through">
+                      {tier.regular}
+                    </span>
+                  ) : null}
                 </p>
-                <p className="mt-2 text-sm font-semibold text-[color:var(--gold-bright)]">
-                  Black Friday: 15% off
-                </p>
+                {blackFridayOn ? (
+                  <p className="mt-2 text-sm font-semibold text-[color:var(--gold-bright)]">
+                    Black Friday: 15% off
+                  </p>
+                ) : null}
                 {tier.plan ? (
                   <p className="mt-2 text-sm text-[color:var(--text-muted)]">{tier.plan}</p>
                 ) : null}
@@ -298,6 +309,7 @@ export default function GiftEducationPage() {
                   tierName={tier.name}
                   path={path}
                   buttonClass={`${btnGold} mt-auto w-full`}
+                  installmentsEnabled={installmentsOn}
                 />
               </article>
             );
@@ -568,8 +580,9 @@ export default function GiftEducationPage() {
           See the gift options
         </a>
         <p className="mx-auto mt-10 max-w-3xl text-left text-xs leading-relaxed text-[color:var(--text-muted)]">
-          Black Friday pricing is 15% off the regular tier prices: Starter $1,274.15 (was $1,499), Head
-          Start $2,549.15 (was $2,999), and Builder $5,949.15 (was $6,999). There is no free trial on any
+          {blackFridayOn
+            ? `Black Friday pricing is 15% off the pay-in-full prices through Cyber Monday, November 30: Starter ${blackFridaySaleLabel(GIFT_TIER_PRICING.starter.fullCents)} (was ${GIFT_TIER_PRICING.starter.fullLabel}), Head Start ${blackFridaySaleLabel(GIFT_TIER_PRICING.headstart.fullCents)} (was ${GIFT_TIER_PRICING.headstart.fullLabel}), and Builder ${blackFridaySaleLabel(GIFT_TIER_PRICING.builder.fullCents)} (was ${GIFT_TIER_PRICING.builder.fullLabel}).`
+            : `Pay-in-full prices: Starter ${GIFT_TIER_PRICING.starter.fullLabel}, Head Start ${GIFT_TIER_PRICING.headstart.fullLabel}, and Builder ${GIFT_TIER_PRICING.builder.fullLabel}. Head Start can be 3 payments of ${GIFT_TIER_PRICING.headstart.installmentLabel}, and Builder can be 3 payments of ${GIFT_TIER_PRICING.builder.installmentLabel}.`} There is no free trial on any
           tier. The certificate with final review is coming soon. Refund and transfer terms: details
           coming soon. 12 months of membership; six months of guided, text-based lessons live today.{" "}
           {checkoutOn
