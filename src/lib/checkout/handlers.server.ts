@@ -10,6 +10,9 @@ import {
   validateShadowLabSignup,
   type ShadowLabSignup,
 } from "./shadow-lab-signup";
+import { isGiftSessionMetadata } from "./gift.server";
+import { giftOrderFromSession, kvGiftOrderStore, type GiftOrder, type GiftOrderStore } from "./gift-orders.server";
+import { notifyGiftFulfillment, type GiftNotifyResult } from "./gift-notify.server";
 
 type Json = { status: number; body: Record<string, unknown> };
 
@@ -74,6 +77,9 @@ export async function handleCheckout(raw: unknown, deps: CheckoutDeps): Promise<
 export type WebhookDeps = {
   secret: string | undefined;
   constructEvent: (body: string, sig: string, secret: string) => Stripe.Event;
+  env?: NodeJS.ProcessEnv;
+  giftStore?: GiftOrderStore;
+  notifyGift?: (order: GiftOrder) => Promise<GiftNotifyResult>;
 };
 
 const USABLE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -89,8 +95,37 @@ export async function handleWebhook(rawBody: string, signature: string | null, d
   }
   try {
     const outcome = await oncePerEvent(event.id, async () => {
-      if (event.type !== "checkout.session.completed" && event.type !== "checkout.session.async_payment_succeeded") return;
+      if (
+        event.type !== "checkout.session.completed" &&
+        event.type !== "checkout.session.async_payment_succeeded" &&
+        event.type !== "checkout.session.async_payment_failed"
+      ) {
+        return;
+      }
       const s = event.data.object as Stripe.Checkout.Session;
+      if (isGiftSessionMetadata(s.metadata)) {
+        const failed = event.type === "checkout.session.async_payment_failed";
+        const paidOk = s.payment_status === "paid" || s.payment_status === "no_payment_required";
+        if (!failed && !paidOk) return;
+        const order = giftOrderFromSession({
+          sessionId: s.id,
+          metadata: s.metadata,
+          status: failed ? "failed" : "paid",
+          buyerEmail: s.customer_details?.email ?? s.customer_email ?? null,
+          amountTotal: typeof s.amount_total === "number" ? s.amount_total : null,
+          currency: s.currency ?? null,
+          eventId: event.id,
+        });
+        if (!order) return;
+        const store = deps.giftStore ?? kvGiftOrderStore;
+        await store.record(order);
+        if (order.status === "paid") {
+          const notify = deps.notifyGift ?? ((o: GiftOrder) => notifyGiftFulfillment(o, deps.env ?? process.env));
+          await notify(order);
+        }
+        return;
+      }
+      if (event.type === "checkout.session.async_payment_failed") return;
       const key = productKeyFromMetadata(s.metadata);
       if (!key) return;
       if (s.payment_status !== "paid" && s.payment_status !== "no_payment_required") return;

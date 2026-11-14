@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { handleCheckout } from "@/lib/checkout/handlers.server";
+import { handleGiftCheckout, isGiftCheckoutRequest } from "@/lib/checkout/gift.server";
 import { getSiteUrl, getStripe } from "@/lib/checkout/stripe.server";
 
 export const runtime = "nodejs";
@@ -12,6 +13,13 @@ export async function POST(req: Request) {
     body = null;
   }
   try {
+    if (isGiftCheckoutRequest(body)) {
+      const r = await handleGiftCheckout(body, {
+        siteUrl: getSiteUrl,
+        createSession: (params, options) => getStripe().checkout.sessions.create(params, options),
+      });
+      return NextResponse.json(r.body, { status: r.status });
+    }
     const r = await handleCheckout(body, {
       siteUrl: getSiteUrl,
       createSession: (p) => getStripe().checkout.sessions.create(p),

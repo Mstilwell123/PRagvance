@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { SITE } from "@/lib/site";
+import { isGiftCheckoutUiEnabled } from "@/lib/checkout/gift-public";
+import GiftReserveControls from "@/components/gift/GiftReserveControls";
 
 type Path = "gift" | "enroll";
 
@@ -117,13 +119,6 @@ const FAQS = [
   },
 ] as const;
 
-function reserveMailto(tier: string, path: Path) {
-  const pathLabel = path === "enroll" ? "Enroll Direct" : "Gift It";
-  const subject = `Interest: ${tier} — ${pathLabel}`;
-  const body = `I would like to reserve interest in the ${tier} tier on the ${pathLabel} path. This is an interest request, not a payment.`;
-  return `mailto:${SITE.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-}
-
 const btnGold =
   "inline-flex items-center justify-center rounded-full bg-[color:var(--gold)] px-6 py-3 text-sm font-semibold text-black transition hover:bg-[color:var(--gold-bright)]";
 const btnGhost =
@@ -133,10 +128,31 @@ const kicker = "text-xs font-medium uppercase tracking-[0.2em] text-[color:var(-
 export default function GiftEducationPage() {
   const [path, setPath] = useState<Path>("gift");
   const isGift = path === "gift";
-  const reserveLabel = isGift ? "Reserve your gift" : "Reserve your spot";
+  const checkoutOn = isGiftCheckoutUiEnabled();
+  const [banner, setBanner] = useState<string | null>(null);
+
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get("checkout");
+    if (q === "success") setBanner("Thanks. If your payment completed, we will follow up by email. This page does not confirm payment by itself.");
+    if (q === "canceled") setBanner("Checkout was canceled. You can try again, or email support@pragvance.ai.");
+  }, []);
+
+  const faqs = FAQS.map((item) => {
+    if (!checkoutOn) return item;
+    if (item.q === "Do these buttons charge my card?") {
+      return {
+        q: item.q,
+        a: "When checkout is enabled, Continue to checkout opens a Stripe Checkout page. Payment is not taken on this page. If checkout is unavailable, you can still email support@pragvance.ai.",
+      };
+    }
+    return item;
+  });
 
   return (
     <div>
+      {banner ? (
+        <p className="section-pad mx-auto max-w-6xl pt-6 text-sm text-[color:var(--gold-bright)]">{banner}</p>
+      ) : null}
       <section className="section-pad mx-auto max-w-6xl py-12 md:py-20">
         <p className={kicker}>Pragvance Education</p>
         <h1 className="mt-3 max-w-3xl text-3xl font-semibold leading-tight text-[color:var(--text)] md:text-5xl">
@@ -277,15 +293,11 @@ export default function GiftEducationPage() {
                     </li>
                   ))}
                 </ul>
-                <a
-                  className={`${btnGold} mt-auto w-full`}
-                  href={reserveMailto(tier.name, path)}
-                >
-                  {reserveLabel}
-                </a>
-                <p className="mt-3 text-center text-xs text-[color:var(--text-muted)]">
-                  Interest only — this is not a checkout.
-                </p>
+                <GiftReserveControls
+                  tierName={tier.name}
+                  path={path}
+                  buttonClass={`${btnGold} mt-auto w-full`}
+                />
               </article>
             );
           })}
@@ -319,8 +331,9 @@ export default function GiftEducationPage() {
                     Add the recipient
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-[color:var(--text-muted)]">
-                    Add the recipient, your message, and a delivery date. We will use these when
-                    gift checkout is live. Today, start by reserving your gift.
+                    {checkoutOn
+                      ? "Add the recipient, your message, and a delivery date, then continue to checkout."
+                      : "Add the recipient, your message, and a delivery date. We will use these when gift checkout is live. Today, start by reserving your gift."}
                   </p>
                 </article>
                 <article className="panel p-6">
@@ -485,7 +498,7 @@ export default function GiftEducationPage() {
         <p className={kicker}>Questions</p>
         <h2 className="mt-3 text-2xl font-semibold text-[color:var(--text)] md:text-4xl">FAQ</h2>
         <div className="mt-8 max-w-3xl space-y-3">
-          {FAQS.map((item, i) => (
+          {faqs.map((item, i) => (
             <details key={item.q} className="panel group px-5 py-2" open={i === 0}>
               <summary className="cursor-pointer list-none py-3 font-medium text-[color:var(--text)] marker:content-none [&::-webkit-details-marker]:hidden">
                 <span className="flex items-start justify-between gap-4">
