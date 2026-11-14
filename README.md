@@ -86,6 +86,63 @@ Off by default. Set `CHECKOUT_ENABLED=true` to enable; otherwise pricing/summary
 - Env vars: see `.env.example`. Keys only via env. Test keys only on previews. Do not change live Stripe prices, payment links, or Dashboard objects from this app.
 - Store: Upstash/Vercel KV if configured, else in-memory. Without a shared store, CRM dedupe is per instance, so production needs KV. Reference Postgres schema: `db/migrations/0001_checkout.{up,down}.sql` (not applied).
 
+
+## Education gift checkout
+
+Off by default. This is a **separate** kill switch from `CHECKOUT_ENABLED` (Shadow Lab, consultation, Done-for-You). Until both gift flags are on, `/gift` keeps the live Reserve mailto buttons and does not call Stripe.
+
+| Var | Default | Purpose |
+|---|---|---|
+| `STRIPE_CHECKOUT_ENABLED` | unset (off) | Must be exactly `true` for `POST /api/checkout` with `{ tier, path }` to create a session. Anything else, including `1` or `false`, stays off. |
+| `NEXT_PUBLIC_STRIPE_CHECKOUT_ENABLED` | unset (off) | Must be exactly `true` for the gift page to show checkout instead of Reserve mailto. Leave unset on production until Mark turns it on. Requires a new deploy after it is set. |
+| `STRIPE_PRICE_STARTER` | unset | Stripe Price id for Starter. Server-only. No default; missing → 503. |
+| `STRIPE_PRICE_HEADSTART` | unset | Stripe Price id for Head Start (one-time / pay-in-full). |
+| `STRIPE_PRICE_BUILDER` | unset | Stripe Price id for Builder (one-time / pay-in-full). |
+| `STRIPE_COUPON_BLACKFRIDAY` | unset | Optional coupon id applied server-side. If unset, no discount. The client cannot send a coupon or amount. |
+| `STRIPE_ALLOW_LIVE` | unset | Gift checkout refuses `sk_live_` / `rk_live_` keys unless this is exactly `1`. Existing Shadow Lab checkout does not use this guard. |
+| `NEXT_PUBLIC_SITE_URL` | required | Success URL `{SITE}/gift?checkout=success&session_id={CHECKOUT_SESSION_ID}` and cancel URL `{SITE}/gift?checkout=canceled`. |
+| `PRAGVANCE_STRIPE_SECRET_KEY` or `STRIPE_SECRET_KEY` | required when on | Server Stripe key. Prefer a restricted test key (`rk_test_…`) in development. Never put keys in `NEXT_PUBLIC_` vars or in git. |
+| `STRIPE_WEBHOOK_SECRET` | required for webhooks | Signing secret for the existing `POST /api/webhooks/stripe` handler. |
+| `RESEND_API_KEY` | optional | If set, a paid gift/enrollment sends a fulfillment notice to support@pragvance.ai. If unset, the webhook logs that the order was recorded and does not send mail. |
+| `GIFT_FROM_EMAIL` | optional | From: address for that notice. Falls back to `ASSESSMENT_FROM_EMAIL`, then the Resend onboarding default. |
+
+`POST /api/checkout` still accepts the existing `{ product }` body. If the body has both `tier` and `path`, it is treated as a gift/enrollment checkout:
+
+- `tier`: `starter` | `headstart` | `builder`
+- `path`: `gift` | `direct`
+- For `path=gift`, also `recipientName`, `recipientEmail`, `message` (optional, ≤500), `deliveryDate` (`YYYY-MM-DD`, today or later). Email and date are validated on the server.
+- Mode is always `payment`. The price id comes from `STRIPE_PRICE_*`. A client-sent `amount`, `price`, or `coupon` is ignored.
+- Each request sends Stripe an idempotency key.
+- Installment prices (Head Start 3 × $1,000, Builder 3 × $2,333) are not implemented in this route. Mark still needs to decide how those plans should work.
+
+### Webhooks and storage
+
+Fulfillment is driven by the webhook, not the success page.
+
+- `POST /api/webhooks/stripe` is the existing route. `POST /api/webhook/stripe` is an alias with the same handler.
+- The handler verifies `stripe-signature` against `STRIPE_WEBHOOK_SECRET` on the raw body (bad or missing → 400).
+- It handles `checkout.session.completed`, `checkout.session.async_payment_succeeded`, and `checkout.session.async_payment_failed`.
+- Each Stripe event id is processed once (`stripe:evt:{event_id}` in KV).
+- Gift sessions are recognized by `metadata.kind=education_gift`. A paid or failed gift order is stored at `gift-order:{session_id}` through a `GiftOrderStore` interface. The default store is the existing Upstash Redis / Vercel KV (or in-memory when those env vars are unset). This PR does not provision a new database.
+- The smallest durable option later is a `gift_orders` table. The reference SQL is `db/migrations/0002_gift_orders.{up,down}.sql`. It is **not applied** and nothing was provisioned (no Neon project, no new KV). Prefer reusing the KV already used for entitlements until a Postgres move is approved.
+- On a paid gift/enrollment, if `RESEND_API_KEY` is set, support@pragvance.ai gets one fulfillment email per session. If the mailer is unset, the handler logs a redacted line and returns 200. A mailer failure returns 500 so Stripe retries, without sending a second email after a successful send.
+- Gift orders do not write GoHighLevel entitlements or booking links.
+
+This app does not create Stripe products, prices, coupons, payment links, customers, or webhook endpoints. Those remain Dashboard (or Mark-approved) actions.
+
+### End-to-end test (Stripe test mode only)
+
+Do this locally. Do not use live keys. Do not set `STRIPE_ALLOW_LIVE`. Do not change Vercel env vars from this PR.
+
+1. In the Stripe Dashboard, use a [sandbox](https://docs.stripe.com/sandboxes) or test mode. Create three one-time Prices for the regular amounts (Starter $1,499, Head Start $2,999, Builder $6,999). Optionally create a 15% coupon and put its id in `STRIPE_COUPON_BLACKFRIDAY`. Do not create these from this repo.
+2. Copy `.env.example` to `.env.local`. Set `NEXT_PUBLIC_SITE_URL=http://localhost:3000`, test-mode `PRAGVANCE_STRIPE_SECRET_KEY` (prefer `rk_test_…`), `STRIPE_PRICE_STARTER` / `HEADSTART` / `BUILDER`, `STRIPE_CHECKOUT_ENABLED=true`, and `NEXT_PUBLIC_STRIPE_CHECKOUT_ENABLED=true`. Leave `STRIPE_ALLOW_LIVE` unset.
+3. Start the app: `npm run dev`.
+4. Forward webhooks: `stripe listen --forward-to localhost:3000/api/webhooks/stripe` (the alias `/api/webhook/stripe` also works). Put the printed `whsec_…` signing secret in `STRIPE_WEBHOOK_SECRET`. Never commit it.
+5. Open `/gift`, choose Gift It or Enroll Direct, and continue to checkout. Pay with test card `4242 4242 4242 4242`, any future expiry, any CVC.
+6. Confirm the success URL returns to `/gift?checkout=success…`, the webhook returns 200, a `gift-order:` record is stored, and (if `RESEND_API_KEY` is set) support@pragvance.ai received one email. Replay the event in the Stripe CLI and confirm it is reported as a duplicate with no second email.
+
+Automated coverage: `npm test` includes gift validation, the kill switch, ignored client amounts, the live-key guard, webhook signature pass/fail, duplicate events, and failed async payments. `npm run build` must pass.
+
 ## Consultation booking page
 
 `/access/book` is server-rendered and `noindex` (page metadata and `X-Robots-Tag`). It is not in the nav or the sitemap. `/access` is disallowed in `robots.txt`. No redirect in `next.config` points at Calendly.
