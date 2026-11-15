@@ -6,7 +6,7 @@ import HeroCarousel from "@/components/HeroCarousel";
 import StartHereLink from "@/components/StartHereLink";
 import { PRODUCT_PAGES } from "@/lib/pricing";
 import { ASSESSMENT_SCORE_MAX, QUESTIONS } from "@/lib/assessment-questions";
-import { DESKS, SITE } from "@/lib/site";
+import { AI_INTELLECTUAL_CAPITAL_URL, DESKS, SITE } from "@/lib/site";
 
 export default function HomePage() {
   return (
@@ -32,6 +32,17 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <div className="border-t border-[color:var(--line)] bg-[color:var(--bg-void)]">
+        <div className="section-pad mx-auto flex max-w-6xl py-2">
+          <a
+            href={AI_INTELLECTUAL_CAPITAL_URL}
+            className="inline-flex items-center rounded-full border border-[color:var(--gold)] px-3 py-1 text-xs font-semibold text-[color:var(--gold-bright)] transition hover:bg-[color:rgba(208,162,86,0.12)]"
+          >
+            AI Intellectual Capital
+          </a>
+        </div>
+      </div>
 
       {/* HOW A DEPARTMENT WORKS */}
       <section
