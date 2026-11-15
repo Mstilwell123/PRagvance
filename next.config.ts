@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
       { source: "/book", destination: "/contact?interest=consultation#contact", permanent: false },
       // One consultation page. /consulting was a 404; it opens that page.
       { source: "/consulting", destination: "/consultation", permanent: false },
+      // AI Spin Up: short ad route and keyword-true search route both 308 to the canonical /spin-up.
+      { source: "/hi", destination: "/spin-up", permanent: true },
+      { source: "/talk-to-an-ai-agent", destination: "/spin-up", permanent: true },
     ];
   },
   async headers() {

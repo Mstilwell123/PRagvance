@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { createElement } from "react";
 import type Stripe from "stripe";
 import BookingPanel from "../src/components/BookingPanel.tsx";
-import { metadata } from "../src/app/access/book/page.tsx";
+import { metadata } from "../src/app/(site)/access/book/page.tsx";
 import robots from "../src/app/robots.ts";
 import nextConfig from "../next.config.ts";
 import {

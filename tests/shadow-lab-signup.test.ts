@@ -15,7 +15,7 @@ import {
 } from "../src/lib/crm.server.ts";
 import ShadowLabOffers from "../src/components/ShadowLabOffers.tsx";
 import ShadowLabSignup from "../src/components/ShadowLabSignup.tsx";
-import ShadowLabPage from "../src/app/shadow-lab/page.tsx";
+import ShadowLabPage from "../src/app/(site)/shadow-lab/page.tsx";
 
 const on = { CHECKOUT_ENABLED: "true", STRIPE_PRICE_CONSULTING: "price_test_x" } as NodeJS.ProcessEnv;
 
