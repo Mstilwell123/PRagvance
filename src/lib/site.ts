@@ -1,5 +1,8 @@
 import { PRICING, SHADOW_LAB_SUMMARY } from "./pricing";
 
+/** Public AI Intellectual Capital landing page. Swap this when the final domain is ready. */
+export const AI_INTELLECTUAL_CAPITAL_URL = "https://app-eight-roan-p8x7wfm1tp.vercel.app";
+
 export const SITE = {
   name: "Pragvance",
   legal: "PRAGVANCE LLC",

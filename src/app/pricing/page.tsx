@@ -4,6 +4,7 @@ import GrokBotNote from "@/components/GrokBotNote";
 import BreadcrumbJsonLd from "@/components/BreadcrumbJsonLd";
 import ShadowLabSwitch from "@/components/pricing/ShadowLabSwitch";
 import { PRICING, PRODUCT_PAGES } from "@/lib/pricing";
+import { AI_INTELLECTUAL_CAPITAL_URL } from "@/lib/site";
 import StartHereLink from "@/components/StartHereLink";
 import CheckoutButton from "@/components/CheckoutButton";
 
@@ -163,6 +164,14 @@ export default function PricingPage() {
               Real portfolio projects and a year of membership — give it as a gift, or start yourself.
             </p>
             <Link href="/gift" className={secondaryBtn}>See the gift options</Link>
+          </article>
+          {/* 7. AI Intellectual Capital */}
+          <article className={card} aria-labelledby="p-aic">
+            <h3 id="p-aic" className="text-xl font-semibold text-[color:var(--text)]">AI Intellectual Capital</h3>
+            <p className="mb-6 mt-3 text-sm text-[color:var(--text-muted)]">
+              Train and test yourself on AI abilities.
+            </p>
+            <a href={AI_INTELLECTUAL_CAPITAL_URL} className={secondaryBtn}>Start free training</a>
           </article>
         </div>
 
