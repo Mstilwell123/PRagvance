@@ -1,6 +1,7 @@
 export type ShowcaseApp = {
   name: string;
-  url: string;
+  /** Public product URL. Null when this repo has no URL for the product. */
+  url: string | null;
   /** Path under /public, or null to show an initial tile. */
   logo: string | null;
   /** One line taken from the app's own site or README. */
@@ -20,12 +21,6 @@ export const APPS: ShowcaseApp[] = [
     url: "https://mybriefing.us/",
     logo: "/apps/mybriefing.png",
     description: "My Briefing turns one spoken thought into an organized day.",
-  },
-  {
-    name: "App N SaaS Builder",
-    url: "https://www.appnsaasbuilder.com/",
-    logo: "/apps/appnsaasbuilder.png",
-    description: "Know how close your app is to shipping.",
   },
   {
     name: "ShowPiece.Pro",
@@ -56,5 +51,22 @@ export const APPS: ShowcaseApp[] = [
     url: "https://id-clare.vercel.app/",
     logo: "/apps/id-clare.png",
     description: "Know who you are in Christ. Speak the Word. Live from truth.",
+  },
+];
+
+/** Products shown in the SaaS section. Order is the on-page order. */
+export const SAAS_APPS: ShowcaseApp[] = [
+  {
+    name: "App N SaaS Builder",
+    url: "https://www.appnsaasbuilder.com/",
+    logo: "/apps/appnsaasbuilder.png",
+    description: "Know how close your app is to shipping.",
+  },
+  {
+    name: "AI Spin Up",
+    // This repo has no URL and no existing one-line description for AI Spin Up.
+    url: null,
+    logo: null,
+    description: "",
   },
 ];
