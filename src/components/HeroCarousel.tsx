@@ -68,8 +68,7 @@ export default function HeroCarousel() {
           />
         </div>
         <p className="pwh-lede">
-          Build helpers that do real work. Find a problem worth solving. Learn to put your AI team
-          to work in your life and business.
+          Build AI helpers (AI agents) that solve real problems in your life and business.
         </p>
       </div>
       <section aria-label="Six months of AI Workforce learning">
