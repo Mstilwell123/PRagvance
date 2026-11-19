@@ -52,17 +52,23 @@ export default function HeroCarousel() {
   return (
     <div className="pragvance-workforce-hero">
       <div className="pwh-intro">
-        <div>
-          <p className="pwh-eyebrow">AI WORKFORCE · THE SIX-MONTH JOURNEY</p>
-          <h1 className="pwh-h">
-            Your first agent.
-            <br />
-            Your own AI workforce.
-          </h1>
+        <div className="pwh-brand">
+          <h1 className="pwh-sr">Your first agent. Your own AI workforce.</h1>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/brand/pragvance-banner-1916.webp"
+            srcSet="/brand/pragvance-banner-640.webp 640w, /brand/pragvance-banner-1280.webp 1280w, /brand/pragvance-banner-1916.webp 1916w"
+            sizes="(max-width: 760px) 92vw, (max-width: 1100px) 54vw, 880px"
+            alt="Pragvance.ai — Practical AI. Built to advance your business."
+            width={1916}
+            height={821}
+            decoding="async"
+            loading="eager"
+            fetchPriority="high"
+          />
         </div>
         <p className="pwh-lede">
-          Build helpers that do real work. Find a problem worth solving. Learn to put your AI team
-          to work in your life and business.
+          Build AI helpers (AI agents) that solve real problems in your life and business.
         </p>
       </div>
       <section aria-label="Six months of AI Workforce learning">
