@@ -1,7 +1,7 @@
 .pragvance-workforce-hero{--g:#e8bd63;max-width:1440px;margin:0 auto;padding:24px 4% 0;color:#f5f7fb;font-family:inherit;box-sizing:border-box}
 .pragvance-workforce-hero *{box-sizing:border-box}
 .pragvance-workforce-hero .pwh-intro{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:32px;width:100%;padding:12px 0 24px}
-.pragvance-workforce-hero .pwh-brand{flex:0 0 auto;width:460px;max-width:460px;min-width:0}
+.pragvance-workforce-hero .pwh-brand{flex:0 0 auto;width:340px;max-width:340px;min-width:0}
 .pragvance-workforce-hero .pwh-brand img{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:1916/821}
 .pragvance-workforce-hero .pwh-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .pragvance-workforce-hero .pwh-lede{flex:1 1 auto;min-width:0;font-size:45px;color:#d89c41;line-height:1.6;margin:0;text-align:left}
@@ -26,7 +26,7 @@
 .pragvance-workforce-hero button:focus-visible,.pragvance-workforce-hero a:focus-visible{outline:3px solid #38baff;outline-offset:4px}
 @media(max-width:1023px){
 .pragvance-workforce-hero .pwh-intro{flex-direction:column;align-items:center;text-align:center}
-.pragvance-workforce-hero .pwh-brand{width:100%;max-width:260px}
+.pragvance-workforce-hero .pwh-brand{width:100%;max-width:220px}
 .pragvance-workforce-hero .pwh-lede{max-width:100%;text-align:center}}
 @media(min-width:1024px){
 .pragvance-workforce-hero{min-height:calc(100dvh - 61px);display:flex;flex-direction:column;justify-content:flex-end}}
@@ -56,3 +56,12 @@
 .pragvance-workforce-hero .pwh-stat{margin:0;padding:9px 20px;font-size:13px;line-height:1.45;color:#dfe7f1;background:#06111d;border-top:1px solid #d6ac5533;min-height:38px}
 .pragvance-workforce-hero .pwh-src{color:#c9a75a;font-size:11px;letter-spacing:.3px;white-space:nowrap}
 @media(max-width:760px){.pragvance-workforce-hero .pwh-stat{padding:8px 10px;font-size:12px}.pragvance-workforce-hero .pwh-src{white-space:normal}}
+/* 800–900px-tall desktops: shrink the carousel so the full hero fits and sits at the bottom. */
+@media(min-width:1024px) and (max-height:900px){
+.pragvance-workforce-hero{padding-top:8px}
+.pragvance-workforce-hero .pwh-intro{padding:4px 0 8px}
+.pragvance-workforce-hero .pwh-carousel{width:min(80%,450px)}
+.pragvance-workforce-hero .pwh-controls{padding:8px 8px;gap:8px;flex-wrap:wrap}
+.pragvance-workforce-hero .pwh-months{width:100%;flex-basis:100%;display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.pragvance-workforce-hero .pwh-month{padding:8px 0;font-size:11px}
+.pragvance-workforce-hero .pwh-detail{padding:10px 0 8px}}
