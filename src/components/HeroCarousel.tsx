@@ -58,7 +58,7 @@ export default function HeroCarousel() {
           <img
             src="/brand/pragvance-banner-1916.webp"
             srcSet="/brand/pragvance-banner-640.webp 640w, /brand/pragvance-banner-1280.webp 1280w, /brand/pragvance-banner-1916.webp 1916w"
-            sizes="(max-width: 760px) 92vw, (max-width: 1100px) 54vw, 880px"
+            sizes="(max-width: 1023px) 260px, 460px"
             alt="Pragvance.ai — Practical AI. Built to advance your business."
             width={1916}
             height={821}
