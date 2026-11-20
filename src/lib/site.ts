@@ -20,7 +20,7 @@ export const NAV = [
   { href: "/aiworkforce", label: "AI Workforce" },
   { href: "/shadow-lab", label: "Shadow Lab" },
   { href: "/assessment", label: "AI Assessment" },
-  { href: "/apps", label: "Apps" },
+  { href: "/apps", label: "Apps/SaaS" },
   { href: "/pricing", label: "Pricing" },
   { href: "/summary", label: "Summary" },
   { href: "/contact", label: "Contact" },
