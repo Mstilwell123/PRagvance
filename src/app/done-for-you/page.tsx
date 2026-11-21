@@ -5,10 +5,13 @@ import CheckoutButton from "@/components/CheckoutButton";
 import { PRICING } from "@/lib/pricing";
 import { SITE } from "@/lib/site";
 
+const PAGE_TITLE = "Done-for-You";
+const PAGE_DESCRIPTION =
+  "We build your AI department. You run your business. In about 30 days, we set up a working team of Grok Bot agents on your real work: your inbox, your leads, your documents and your follow-ups. Then we hand it over trained, tested and written down, so you know exactly what each agent does.";
+
 export const metadata: Metadata = {
-  title: "Done-for-You (draft preview)",
-  description:
-    "Draft preview of the Pragvance Done-for-You setup. Pending approval. This page is not for indexing.",
+  title: PAGE_TITLE,
+  description: PAGE_DESCRIPTION,
   robots: {
     index: false,
     follow: false,
@@ -19,8 +22,8 @@ export const metadata: Metadata = {
   },
   alternates: { canonical: "/done-for-you" },
   openGraph: {
-    title: "Done-for-You (draft preview)",
-    description: "Draft preview, pending approval.",
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
     url: "/done-for-you",
     images: [{ url: "/logo-lockup.png", alt: "Pragvance" }],
   },
@@ -337,10 +340,6 @@ function DepositCheckout({
 export default function DoneForYouPage() {
   return (
     <>
-      <p className="bg-[color:var(--gold)] px-4 py-3 text-center text-sm font-semibold text-black">
-        DRAFT preview, pending Mark&apos;s approval
-      </p>
-
       <section aria-labelledby="hero-heading" className="bg-[color:var(--bg-space)]">
         <div className="section-pad mx-auto max-w-6xl py-16 md:py-24">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-[color:var(--gold-bright)]">
