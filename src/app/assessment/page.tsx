@@ -8,15 +8,19 @@ const questionCount = QUESTIONS.length;
 
 export const metadata: Metadata = {
   title: { absolute: "AI Assessment — How well does your company use AI? | Pragvance" },
-  description: `Free AI Assessment: a ${questionCount}-question diagnostic (score 0–${ASSESSMENT_SCORE_MAX}) that bands how your company uses AI — and where AI Workforce or Shadow Lab fits. Replaces the old Reality Check.`,
+  description: `Free AI Assessment: a ${questionCount}-question diagnostic (score 0–${ASSESSMENT_SCORE_MAX}) that bands how your company uses AI — and where AI Workforce, a consultation, or a custom build fits. Replaces the old Reality Check.`,
   alternates: { canonical: "/assessment" },
   openGraph: {
     title: "AI Assessment — How well does your company use AI?",
-    description: `${questionCount} questions. Honest bands (0–${ASSESSMENT_SCORE_MAX}). No fake percentages — AI Workforce, Lab, apps, or clarity.`,
+    description: `${questionCount} questions. Honest bands (0–${ASSESSMENT_SCORE_MAX}). No fake percentages — AI Workforce, consultation, apps, or clarity.`,
     url: "/assessment",
     images: [{ url: "/logo-lockup.png", alt: "Pragvance" }],
   },
 };
+
+const assessmentAbout =
+  FAQ.find((item) => item.q === "What is the AI Assessment?")?.a ??
+  "A free diagnostic that bands how your company uses AI.";
 
 export default function AssessmentPage() {
   const assessmentFaq = {
@@ -28,7 +32,7 @@ export default function AssessmentPage() {
         name: "What is the AI Assessment?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: FAQ[3].a,
+          text: assessmentAbout,
         },
       },
       {
@@ -36,7 +40,7 @@ export default function AssessmentPage() {
         name: "Is the assessment free?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: `Yes. The AI Assessment is free. It scores 0–${ASSESSMENT_SCORE_MAX} across ${questionCount} questions and recommends AI Workforce, Shadow Lab, a custom build conversation, or contact-only clarity — with band labels only, no fake percentages.`,
+          text: `Yes. The AI Assessment is free. It scores 0–${ASSESSMENT_SCORE_MAX} across ${questionCount} questions and recommends AI Workforce, a consultation, a custom build conversation, or contact-only clarity — with band labels only, no fake percentages.`,
         },
       },
     ],
@@ -73,12 +77,12 @@ export default function AssessmentPage() {
           <div className="mt-4 space-y-4">
             <div className="panel p-4">
               <h3 className="font-medium text-[color:var(--text)]">What is the AI Assessment?</h3>
-              <p className="mt-2 text-sm text-[color:var(--text-muted)]">{FAQ[3].a}</p>
+              <p className="mt-2 text-sm text-[color:var(--text-muted)]">{assessmentAbout}</p>
             </div>
             <div className="panel p-4">
               <h3 className="font-medium text-[color:var(--text)]">Is it free?</h3>
               <p className="mt-2 text-sm text-[color:var(--text-muted)]">
-                Yes. Free diagnostic — then join AI Workforce, explore Lab, talk apps, or just email us.
+                Yes. Free diagnostic — then join AI Workforce, book a consultation, talk apps, or just email us.
               </p>
             </div>
           </div>

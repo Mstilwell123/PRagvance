@@ -2,14 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import GrokBotNote from "@/components/GrokBotNote";
 import BreadcrumbJsonLd from "@/components/BreadcrumbJsonLd";
-import ShadowLabSwitch from "@/components/pricing/ShadowLabSwitch";
 import { PRICING, PRODUCT_PAGES } from "@/lib/pricing";
 import { AI_INTELLECTUAL_CAPITAL_URL } from "@/lib/site";
 import StartHereLink from "@/components/StartHereLink";
 import CheckoutButton from "@/components/CheckoutButton";
 
 const DESC =
-  "Compare AI Workforce training, Shadow Lab coaching, Done-for-You setup, and custom app development.";
+  "Compare AI Workforce training, one-on-one consultation, Done-for-You setup, and custom app development.";
 
 export const metadata: Metadata = {
   title: { absolute: "Pricing | Pragvance.ai" },
@@ -59,7 +58,7 @@ export default function PricingPage() {
           Choose how you want to build with AI
         </h1>
         <p className="mt-4 max-w-3xl text-[color:var(--text-muted)] md:text-lg">
-          Learn to build your AI workforce, get closer guidance, or discuss a complete setup for your
+          Learn to build your AI workforce, book a consultation, or discuss a complete setup for your
           business. Choose the level of help that fits your needs.
         </p>
 
@@ -86,19 +85,6 @@ export default function PricingPage() {
             </p>
             <Points items={["Weekly training", "Practical resources", "Skool community"]} />
             <StartHereLink href={PRODUCT_PAGES.aiWorkforce} label="AI Workforce" variant="button" className={primaryBtn} />
-          </article>
-
-          {/* 2. Shadow Lab */}
-          <article className={card} aria-labelledby="p-lab">
-            <p className={group}>Get closer guidance</p>
-            <h3 id="p-lab" className="mt-2 text-xl font-semibold text-[color:var(--text)]">Shadow Lab</h3>
-            <p className="mb-4 mt-2 text-sm text-[color:var(--text-muted)]">
-              Live coaching for founders who want closer guidance than the AI Workforce classroom.
-            </p>
-            <ShadowLabSwitch />
-            <div className="mt-6 flex flex-1 flex-col">
-              <StartHereLink href={PRODUCT_PAGES.shadowLab} label="Shadow Lab" variant="button" className={primaryBtn} />
-            </div>
           </article>
 
           {/* 3. Done-for-You */}

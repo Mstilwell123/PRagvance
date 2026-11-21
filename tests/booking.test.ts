@@ -78,40 +78,6 @@ test("paid consulting confirmation masks email and shows the single-use link", a
   assert.doesNotMatch(page, /business day|within \d+/i);
 });
 
-test("paid shadow lab sessions get a single-use link and unpaid sessions do not", async () => {
-  for (const productKey of ["shadow_lab_group", "shadow_lab_monthly"] as const) {
-    const calls = { n: 0 };
-    const view = await resolveBooking(SID, {
-      issueLink: issue({ delivery: "link", bookingUrl: LINK }, calls),
-      retrieve: async () => paid({ productKey, amount_total: productKey === "shadow_lab_group" ? 49700 : 99700 }),
-    });
-    assert.equal(calls.n, 1);
-    assert.equal(view.state, "confirmed");
-    if (view.state !== "confirmed") continue;
-    assert.equal(view.bookingUrl, LINK);
-    assert.equal(view.productName, productKey === "shadow_lab_group" ? "Shadow Lab Group" : "Shadow Lab Monthly");
-    const page = html(view);
-    assert.match(page, new RegExp(`href="${LINK}"`));
-    assert.match(page, /data-auto-redirect="true"/);
-    assert.match(page, /Payment confirmed/);
-    assert.equal(page.includes("buyer@example.com"), false);
-    assert.equal(page.includes(PUBLIC_EVENT), false);
-  }
-
-  const calls = { n: 0 };
-  const unpaid = await resolveBooking(SID, {
-    issueLink: issue({ delivery: "link", bookingUrl: LINK }, calls),
-    retrieve: async () => paid({ productKey: "shadow_lab_monthly", payment_status: "unpaid" }),
-  });
-  assert.equal(calls.n, 0);
-  assert.equal(unpaid.state, "unavailable");
-  const hidden = html(unpaid);
-  assert.equal(hidden.includes(LINK), false);
-  assert.equal(hidden.includes(PUBLIC_EVENT), false);
-  assert.equal(hidden.includes("data-auto-redirect"), false);
-  assert.equal(hidden.includes("Payment confirmed"), false);
-});
-
 test("missing calendly config or a reusable url says we'll email the booking link", async () => {
   const retrieve = async () => paid();
   const bad: IssuedLink[] = [

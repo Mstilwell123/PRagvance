@@ -136,8 +136,8 @@ test("band boundaries are 27/28, 44/45, 61/62, and 84", () => {
 
 test("FAQ copy matches the computed question count and max without importing the list into site", () => {
   assert.equal(
-    FAQ[3].a,
-    `A free ${QUESTIONS.length}-question diagnostic (0–${ASSESSMENT_SCORE_MAX}) that bands how your company uses AI — from chat toys to an operating layer — and points to AI Workforce or Shadow Lab. It replaces the old Reality Check.`,
+    FAQ.find((item) => item.q === "What is the AI Assessment?")?.a,
+    `A free ${QUESTIONS.length}-question diagnostic (0–${ASSESSMENT_SCORE_MAX}) that bands how your company uses AI — from chat toys to an operating layer — and points to AI Workforce, a consultation, or a custom build. It replaces the old Reality Check.`,
   );
   const site = readFileSync(new URL("../src/lib/site.ts", import.meta.url), "utf8");
   assert.equal(site.includes("assessment-questions"), false);

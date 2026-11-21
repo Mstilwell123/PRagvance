@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 import { offerFromSlug, validateLead, OFFERS } from "../src/lib/lead.ts";
 
 test("offer mapping", () => {
-  assert.equal(offerFromSlug("shadow-lab"), "Shadow Lab");
   assert.equal(offerFromSlug("done-for-you"), "Done-for-You Setup");
   assert.equal(offerFromSlug("consultation"), "One-on-One AI Consultation");
   assert.equal(offerFromSlug("aiworkforce"), "AI Workforce");
@@ -11,10 +10,10 @@ test("offer mapping", () => {
   assert.equal(offerFromSlug("custom"), "Custom app / SaaS");
   assert.equal(offerFromSlug(null), "General");
   assert.equal(offerFromSlug("bogus"), "General");
-  assert.equal(OFFERS.length, 6);
+  assert.equal(OFFERS.length, 5);
 });
 
-const good = { name: "A B", email: "a@b.co", offer: "Shadow Lab", building: "x", message: "hi" };
+const good = { name: "A B", email: "a@b.co", offer: "General", building: "x", message: "hi" };
 test("validation", () => {
   assert.equal(validateLead(good).ok, true);
   assert.equal(validateLead({ ...good, name: "" }).ok, false);

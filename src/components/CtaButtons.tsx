@@ -11,8 +11,8 @@ type Props = {
 
 export default function CtaButtons({
   primaryLabel = `Join AI Workforce — ${SITE.swarmPrice}`,
-  secondaryHref = "/contact#contact",
-  secondaryLabel = "Discuss Shadow Lab",
+  secondaryHref = "/pricing",
+  secondaryLabel = "See pricing",
   className = "",
   stack = false,
 }: Props) {

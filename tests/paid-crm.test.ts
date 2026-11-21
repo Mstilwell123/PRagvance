@@ -168,43 +168,6 @@ test("paid consulting session upserts once across both events and a retry", asyn
   assert.equal(ghl.hits.some((h) => h.url.includes("/opportunities")), false);
 });
 
-test("shadow lab products get their own paid tags and no lead tag", async () => {
-  resetKv();
-  const ghl = installGhl();
-  await withCrmEnv(true, async () => {
-    const group = sessionEvent({
-      eventId: "evt_group",
-      sessionId: "cs_test_shadowgroup1",
-      product_key: "shadow_lab_group",
-      amount_total: 49700,
-      name: null,
-    });
-    const monthly = sessionEvent({
-      eventId: "evt_month",
-      sessionId: "cs_test_shadowmonth1",
-      product_key: "shadow_lab_monthly",
-      amount_total: 99700,
-    });
-    assert.equal((await handleWebhook(group, sign(group), wh)).status, 200);
-    assert.equal((await handleWebhook(monthly, sign(monthly), wh)).status, 200);
-  });
-  ghl.restore();
-  const tags = ghl.hits.filter((h) => h.url.endsWith("/tags")).map((h) => h.body.tags);
-  assert.deepEqual(tags, [
-    ["paid", "paid - shadow lab (session)"],
-    ["paid", "paid - shadow lab (monthly)"],
-  ]);
-  const notes = ghl.hits.filter((h) => h.url.endsWith("/notes")).map((h) => h.body.body);
-  assert.deepEqual(notes, [
-    "Amount: 497.00 USD\nProduct: shadow_lab_group\nStripe session: cs_test_shadowgroup1",
-    "Amount: 997.00 USD\nProduct: shadow_lab_monthly\nStripe session: cs_test_shadowmonth1",
-  ]);
-  const groupUpsert = ghl.hits.find((h) => h.url.endsWith("/contacts/upsert"));
-  assert.equal(groupUpsert?.body.firstName, undefined);
-  assert.equal(JSON.stringify(tags).includes("New - Lead"), false);
-  assert.equal(ghl.hits.some((h) => h.url.includes("/opportunities")), false);
-});
-
 test("GHL failure keeps the entitlement, skips the marker, and a retry writes once", async () => {
   resetKv();
   const sessionId = "cs_test_retryconsult1";

@@ -109,7 +109,7 @@ export default function HomePage() {
           <div className="mt-6">
             <GrokBotNote boxClass="border border-[color:var(--line)] bg-[color:var(--bg-void)]" accent="text-[color:var(--gold-bright)]" />
           </div>
-          <div className="mt-10 grid gap-6 md:grid-cols-2">
+          <div className="mt-10 max-w-xl">
             <article className="panel gold-glow flex flex-col p-6 md:p-8">
               <p className="text-xs uppercase tracking-wider text-[color:var(--gold)]">Primary</p>
               <h3 className="mt-2 text-2xl font-semibold text-[color:var(--text)]">
@@ -132,28 +132,6 @@ export default function HomePage() {
                 Join AI Workforce — {SITE.swarmPrice}
               </a>
               <StartHereLink href={PRODUCT_PAGES.aiWorkforce} label="AI Workforce" />
-            </article>
-
-            <article className="panel flex flex-col p-6 md:p-8">
-              <p className="text-xs uppercase tracking-wider text-[color:var(--electric)]">
-                Upsell
-              </p>
-              <h3 className="mt-2 text-2xl font-semibold text-[color:var(--text)]">Shadow Lab</h3>
-              <p className="mt-1 text-lg font-semibold text-[color:var(--electric-bright)]">
-                {SITE.labPrices}
-              </p>
-              <ul className="mt-4 space-y-2 text-sm text-[color:var(--text-muted)]">
-                <li>Live coaching for founders who want closer guidance.</li>
-                <li>Separate from the AI Workforce classroom track on Skool.</li>
-                <li>Discuss via the contact page.</li>
-              </ul>
-              <Link
-                href="/contact?interest=shadow-lab#contact"
-                className="mt-8 inline-flex items-center justify-center rounded-full border border-[color:var(--electric)] px-6 py-3 text-sm font-semibold text-[color:var(--electric-bright)] transition hover:bg-[color:rgba(9,155,228,0.12)]"
-              >
-                Discuss Shadow Lab
-              </Link>
-              <StartHereLink href={PRODUCT_PAGES.shadowLab} label="Shadow Lab" />
             </article>
           </div>
           <p className="mt-6 text-center text-sm text-[color:var(--text-muted)]">
