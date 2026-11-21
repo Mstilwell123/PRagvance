@@ -1,6 +1,5 @@
 // Shared lead validation + offer mapping (safe for client and server; no vendor names).
 export const OFFERS = [
-  { slug: "shadow-lab", label: "Shadow Lab" },
   { slug: "done-for-you", label: "Done-for-You Setup" },
   { slug: "consultation", label: "One-on-One AI Consultation" },
   { slug: "aiworkforce", label: "AI Workforce" },

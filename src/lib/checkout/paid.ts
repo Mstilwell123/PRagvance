@@ -12,8 +12,6 @@ export const PAID_TAG = "paid";
 /** Exact GoHighLevel tag added alongside "paid". */
 export const PAID_PRODUCT_TAG: Record<ProductKey, string> = {
   consulting_1hr: "paid - consulting (60 min 1:1)",
-  shadow_lab_group: "paid - shadow lab (session)",
-  shadow_lab_monthly: "paid - shadow lab (monthly)",
   done_for_you_deposit: "paid - done-for-you deposit",
 };
 

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import BreadcrumbJsonLd from "@/components/BreadcrumbJsonLd";
 import { SITE } from "@/lib/site";
 
@@ -41,13 +40,6 @@ export default function SwarmPage() {
           </p>
           <p>
             Classroom + community on Skool. We teach; you build on your real work.
-          </p>
-          <p>
-            Want closer live coaching? That’s{" "}
-            <Link href="/shadow-lab" className="text-[color:var(--electric-bright)] hover:underline">
-              Shadow Lab
-            </Link>{" "}
-            (separate) — AI Workforce on Skool is the self-paced / weekly classroom track.
           </p>
         </div>
         <a

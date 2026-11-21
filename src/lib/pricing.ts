@@ -15,13 +15,9 @@ export const PRICING = {
   assessment: { label: "Free" },
 } as const;
 
-export const SHADOW_LAB_SUMMARY =
-  "$497 for one two-hour session, or $997/month for four two-hour sessions (eight hours total)";
-
 /** One page per priced product. Start Here links use these paths. */
 export const PRODUCT_PAGES = {
   aiWorkforce: "/aiworkforce",
-  shadowLab: "/shadow-lab",
   doneForYou: "/done-for-you",
   consultation: "/consultation",
   customApp: "/custom-app",

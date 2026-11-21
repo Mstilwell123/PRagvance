@@ -125,7 +125,7 @@ export default function ConsultationPage() {
             .
           </p>
           <p>
-            The terms say that for services other than Shadow Lab and the Done-for-You deposit, refund
+            The terms say that for services other than the Done-for-You deposit, refund
             requests are reviewed case by case unless a written agreement says otherwise. Email{" "}
             <a href={`mailto:${SITE.email}`} className={textLink}>
               {SITE.email}

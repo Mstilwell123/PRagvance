@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS processed_stripe_events (
 );
 CREATE TABLE IF NOT EXISTS entitlements (
   checkout_session_id TEXT PRIMARY KEY,
-  product_key TEXT NOT NULL CHECK (product_key IN ('shadow_lab_group','shadow_lab_monthly','consulting_1hr')),
+  product_key TEXT NOT NULL CHECK (product_key IN ('consulting_1hr')),
   customer_email TEXT,
   stripe_customer_id TEXT,
   stripe_subscription_id TEXT,
