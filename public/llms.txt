@@ -11,6 +11,7 @@ Pragvance helps you staff a Grok Bot department — roles, skills, tools, routin
 - AI Assessment: https://pragvance.ai/assessment
 - Apps & SaaS: https://pragvance.ai/apps
 - Contact: https://pragvance.ai/contact
+- AI Spin Up: https://pragvance.ai/ai-spin-up
 
 ## Offers
 - AI Workforce (primary): $99/mo on Skool — https://www.skool.com/aiworkforce
@@ -19,6 +20,17 @@ Pragvance helps you staff a Grok Bot department — roles, skills, tools, routin
   Live high-touch seats. Not a second school on this site.
 - AI Assessment: free readiness assessment at /assessment
 - Apps: portfolio including MinutesIntel.ai (https://minutesintel.ai); custom builds via contact
+
+## AI Spin Up
+- Page: https://pragvance.ai/ai-spin-up
+- Aliases that 308 to that page: /spin-up, /hi, /talk-to-an-ai-agent
+- What it is: an AI voice agent for small business from Pragvance. A business owner gets an AI agent speaking in their voice. The agent talks with prospects who reach out from an ad or a call and books a call with the owner.
+- Setup: a 5-10 minute interview. The agent stays inside the owner's service area.
+- Steps: They reach out. The agent trades information. They book a call with you. You get the summary.
+- Coming soon: the post-call summary email, the missed-call text back, and the weekly digest.
+- Talk to an AI Spin Up agent: https://connect-now-landing.vercel.app/
+- See plans: the same AI Spin Up site. This page does not list a price.
+- Tagline: Practical AI. Built to advance your business.
 
 ## Contact
 - Email: support@pragvance.ai

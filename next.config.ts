@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
       { source: "/book", destination: "/contact?interest=consultation#contact", permanent: false },
       // One consultation page. /consulting was a 404; it opens that page.
       { source: "/consulting", destination: "/consultation", permanent: false },
+      // AI Spin Up aliases. permanent: true is a 308. Canonical page is /ai-spin-up.
+      { source: "/spin-up", destination: "/ai-spin-up", permanent: true },
+      { source: "/hi", destination: "/ai-spin-up", permanent: true },
+      { source: "/talk-to-an-ai-agent", destination: "/ai-spin-up", permanent: true },
     ];
   },
   async headers() {
