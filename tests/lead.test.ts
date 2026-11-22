@@ -10,6 +10,9 @@ test("offer mapping", () => {
   assert.equal(offerFromSlug("custom"), "Custom app / SaaS");
   assert.equal(offerFromSlug(null), "General");
   assert.equal(offerFromSlug("bogus"), "General");
+  assert.equal(offerFromSlug("shadow-lab"), "General");
+  assert.equal(offerFromSlug("shadowlab"), "General");
+  assert.equal(offerFromSlug("shadow_lab"), "General");
   assert.equal(OFFERS.length, 5);
 });
 
