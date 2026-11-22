@@ -5,22 +5,25 @@ import { join } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import AppsPage, { metadata } from "../src/app/apps/page.tsx";
+import Header from "../src/components/Header.tsx";
+import Footer from "../src/components/Footer.tsx";
 import { APPS, B2B_APPS, B2C_APPS } from "../src/lib/apps.ts";
-import { NAV } from "../src/lib/site.ts";
+import { AI_INTELLECTUAL_CAPITAL_URL, NAV } from "../src/lib/site.ts";
 
 const B2B = [
   ["MinutesIntel.ai", "https://www.minutesintel.ai/"],
-  ["ShowPiece.Pro", "https://showpiece.pro/"],
   ["App N SaaS Builder", "https://www.appnsaasbuilder.com/"],
+  ["ShowPiece.Pro", "https://showpiece.pro/"],
+  ["AI Intellectual Capital", AI_INTELLECTUAL_CAPITAL_URL],
 ] as const;
 
 const B2C = [
+  ["My Briefing", "https://mybriefing.us/"],
   ["VoiceTalk.app", "https://voicetalk.app/"],
   ["ID-Clare", "https://id-clare.vercel.app/"],
-  ["My Briefing", "https://mybriefing.us/"],
 ] as const;
 
-test("/apps lists six cards in B2B then B2C order", () => {
+test("/apps lists B2B then B2C in Mark's order", () => {
   assert.deepEqual(
     B2B_APPS.map((app) => [app.name, app.url]),
     B2B.map((row) => [...row]),
@@ -29,7 +32,9 @@ test("/apps lists six cards in B2B then B2C order", () => {
     B2C_APPS.map((app) => [app.name, app.url]),
     B2C.map((row) => [...row]),
   );
-  assert.equal(APPS.length, 6);
+  assert.equal(APPS.length, 7);
+  assert.equal(B2B_APPS[3]?.tag, "SaaS");
+  assert.equal(B2B_APPS.filter((app) => app.tag).length, 1);
   assert.deepEqual(APPS.map((app) => app.name), [...B2B, ...B2C].map((row) => row[0]));
 });
 
@@ -37,7 +42,10 @@ test("each /apps card is one external link covering the whole card", () => {
   const html = renderToStaticMarkup(createElement(AppsPage));
   assert.equal((html.match(/<h1\b/g) || []).length, 1);
   assert.match(html, /<h1[^>]*>\s*Apps \/ SaaS\s*<\/h1>/);
+  assert.match(html, /grid-cols-1 items-center gap-3 md:grid-cols-2 lg:grid-cols-5/);
+  assert.match(html, /grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-5/);
   assert.match(html, /<h2[^>]*>\s*B2B\s*<\/h2>/);
+  assert.equal(html.includes("lg:col-start-2"), false);
   assert.match(html, /Business to business/);
   assert.match(html, /<hr\b/);
   assert.match(html, /<h2[^>]*>\s*B2C\s*<\/h2>/);
@@ -56,7 +64,10 @@ test("each /apps card is one external link covering the whole card", () => {
     assert.ok(at > cursor, name);
     cursor = at;
   }
-  assert.ok(html.indexOf(">MinutesIntel.ai<") < ruleAt);
+  const minutesAt = html.indexOf(">MinutesIntel.ai<");
+  const builderAt = html.indexOf(">App N SaaS Builder<");
+  assert.ok(minutesAt < b2bAt && b2bAt < builderAt);
+  assert.ok(minutesAt < ruleAt);
   assert.ok(html.indexOf(">VoiceTalk.app<") > ruleAt);
 
   for (const [name, url] of [...B2B, ...B2C]) {
@@ -77,21 +88,37 @@ test("each /apps card is one external link covering the whole card", () => {
     assert.match(card, />Start Here</);
     assert.equal(card.includes("<h2"), false);
     assert.match(card, /<h3/);
+    assert.match(card, /p-3/);
+    assert.match(card, /h-14 w-14/);
+    if (name === "AI Intellectual Capital") {
+      assert.match(card, />SaaS</);
+      assert.match(card, /SaaS training and certification for working with Grok Bot\./);
+    } else {
+      assert.equal(card.includes(">SaaS<"), false);
+    }
+    if (name === "VoiceTalk.app") assert.match(card, /lg:col-start-3/);
+    if (name === "ID-Clare") assert.match(card, /lg:col-start-5/);
+    if (name === "My Briefing") assert.equal(card.includes("lg:col-start-"), false);
   }
 
   assert.equal(html.includes("AppDemo"), false);
   assert.equal(html.includes("MinutePush"), false);
-  assert.equal(html.includes("AI Intellectual Capital"), false);
   assert.equal(html.includes('href="/apps"'), false);
 });
 
-test("the nav label is Apps / SAAS and page titles stay Apps / SaaS", () => {
+test("the nav label is App / SaaS and page titles stay Apps / SaaS", () => {
   const nav = NAV.find((item) => item.href === "/apps");
   assert.ok(nav);
-  assert.equal(nav.label, "Apps / SAAS");
+  assert.equal(nav.href, "/apps");
+  assert.equal(nav.label, "App / SaaS");
   assert.equal(metadata.title, "Apps / SaaS Portfolio");
   assert.equal(metadata.openGraph && "title" in metadata.openGraph ? metadata.openGraph.title : "", "Apps / SaaS | Pragvance");
   assert.equal(metadata.alternates && "canonical" in metadata.alternates ? metadata.alternates.canonical : "", "/apps");
+
+  const header = renderToStaticMarkup(createElement(Header));
+  const footer = renderToStaticMarkup(createElement(Footer));
+  assert.match(header, /href="\/apps"[^>]*>App \/ SaaS</);
+  assert.match(footer, /href="\/apps"[^>]*>App \/ SaaS</);
 });
 
 test("AppDemo.live and MinutePushPro are gone from this repo", () => {
