@@ -75,7 +75,7 @@ export default function AiSpinUpPage() {
             <nav aria-label="Breadcrumb" className="text-sm text-[color:var(--text-muted)]">
               <ol className="flex items-center gap-2">
                 <li>
-                  <Link href="/" className="hover:text-[color:var(--electric-bright)]">
+                  <Link href="/" className="hover:underline" style={{ color: "#c0c8d4" }}>
                     Home
                   </Link>
                 </li>
@@ -97,13 +97,15 @@ export default function AiSpinUpPage() {
             <div className="mt-7 flex flex-col items-stretch gap-3 sm:items-start">
               <a
                 href={AI_SPIN_UP_URL}
-                className="inline-flex min-h-14 w-full items-center justify-center rounded-full bg-[color:var(--gold)] px-8 text-center text-lg font-semibold text-black shadow-[0_12px_40px_rgba(208,162,86,0.28)] transition hover:bg-[color:var(--gold-bright)] sm:w-auto sm:min-w-[22rem]"
+                className="inline-flex min-h-14 w-full items-center justify-center rounded-full bg-[color:var(--gold)] px-8 text-center text-lg shadow-[0_12px_40px_rgba(208,162,86,0.28)] transition hover:bg-[color:var(--gold-bright)] sm:w-auto sm:min-w-[22rem]"
+                style={{ color: "#08111d", fontWeight: 650 }}
               >
                 Talk to an AI Spin Up agent
               </a>
               <a
                 href={AI_SPIN_UP_URL}
-                className="inline-flex min-h-11 items-center justify-center text-sm font-semibold text-[color:var(--electric-bright)] underline decoration-[color:var(--electric)] underline-offset-4 hover:text-[color:var(--gold-bright)] sm:justify-start"
+                className="inline-flex min-h-11 items-center justify-center text-sm font-semibold underline decoration-[#01affc] underline-offset-4 sm:justify-start"
+                style={{ color: "#01affc" }}
               >
                 See plans
               </a>
@@ -130,7 +132,7 @@ export default function AiSpinUpPage() {
                       : "mr-8 rounded-2xl rounded-bl-md border border-[color:var(--line)] bg-[color:var(--bg-panel)] px-4 py-3 text-sm leading-relaxed text-[color:var(--text)]"
                   }
                 >
-                  <span className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--gold-bright)]">
+                  <span className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.16em] text-[color:var(--text)]">
                     {line.from === "prospect" ? "Prospect" : "AI agent"}
                   </span>
                   {line.text}
@@ -261,13 +263,15 @@ export default function AiSpinUpPage() {
             <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
               <a
                 href={AI_SPIN_UP_URL}
-                className="inline-flex min-h-14 items-center justify-center rounded-full bg-[color:var(--gold)] px-8 text-center text-lg font-semibold text-black transition hover:bg-[color:var(--gold-bright)]"
+                className="inline-flex min-h-14 items-center justify-center rounded-full bg-[color:var(--gold)] px-8 text-center text-lg transition hover:bg-[color:var(--gold-bright)]"
+                style={{ color: "#08111d", fontWeight: 650 }}
               >
                 Talk to an AI Spin Up agent
               </a>
               <a
                 href={AI_SPIN_UP_URL}
-                className="inline-flex min-h-11 items-center justify-center text-sm font-semibold text-[color:var(--electric-bright)] underline decoration-[color:var(--electric)] underline-offset-4 sm:px-4"
+                className="inline-flex min-h-11 items-center justify-center text-sm font-semibold underline decoration-[#01affc] underline-offset-4 sm:px-4"
+                style={{ color: "#01affc" }}
               >
                 See plans
               </a>
