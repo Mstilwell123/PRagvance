@@ -417,7 +417,7 @@ export default function DoneForYouPage() {
               </Link>
               , {PRICING.aiWorkforce.short}) or need custom software (point to{" "}
               <Link href="/contact?interest=custom#contact" className={textLink}>
-                Custom App / SaaS
+                Custom App / Saas
               </Link>
               ).
             </p>
@@ -564,7 +564,7 @@ export default function DoneForYouPage() {
                     Offer
                   </span>
                   <Link href="/contact?interest=custom#contact" className={textLink}>
-                    Custom App / SaaS
+                    Custom App / Saas
                   </Link>
                 </td>
                 <td className="px-4 py-4 align-top text-sm text-[color:var(--text)] max-md:block">

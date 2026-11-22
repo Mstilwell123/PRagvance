@@ -3,7 +3,7 @@ export const OFFERS = [
   { slug: "done-for-you", label: "Done-for-You Setup" },
   { slug: "consultation", label: "One-on-One AI Consultation" },
   { slug: "aiworkforce", label: "AI Workforce" },
-  { slug: "custom", label: "Custom app / SaaS" },
+  { slug: "custom", label: "Custom app / Saas" },
   { slug: "general", label: "General" },
 ] as const;
 

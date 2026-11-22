@@ -176,7 +176,7 @@ export default function ContactPage() {
             required
             maxLength={2000}
             className="mt-1 w-full rounded-lg border border-[color:var(--line)] bg-[color:var(--bg-elevated)] px-3 py-2 text-[color:var(--text)]"
-            placeholder="An app, a SaaS, an AI agent team for your business..."
+            placeholder="An app, a Saas, an AI agent team for your business..."
           />
         </div>
         <div>

@@ -130,17 +130,17 @@ export default function PricingPage() {
             <p className="mb-3 mt-2 text-center text-xs text-[color:var(--text-muted)]">50% deposit. Remaining $2,500 billed on completion. The $2,500 deposit is non-refundable.</p>
             <StartHereLink href={PRODUCT_PAGES.doneForYou} label="Done-for-You Complete Setup" />
           </article>
-          {/* 5. Custom app / SaaS */}
+          {/* 5. Custom app / Saas */}
           <article className={card} aria-labelledby="p-custom">
-            <p className={group}>Need a company-specific app or SaaS?</p>
-            <h3 id="p-custom" className="mt-2 text-xl font-semibold text-[color:var(--text)]">Custom App / SaaS</h3>
+            <p className={group}>Need a company-specific app or Saas?</p>
+            <h3 id="p-custom" className="mt-2 text-xl font-semibold text-[color:var(--text)]">Custom App / Saas</h3>
             <p className="mt-4 text-4xl font-bold text-[#e8bd63]">{PRICING.custom.label}</p>
             <p className="mb-6 mt-3 text-sm text-[color:var(--text-muted)]">
               Software built around your company&apos;s requirements. Scope and pricing are agreed before
               development.
             </p>
             <Link href="/contact?interest=custom#contact" className={secondaryBtn}>Discuss a Custom Build</Link>
-            <StartHereLink href={PRODUCT_PAGES.customApp} label="Custom App / SaaS" />
+            <StartHereLink href={PRODUCT_PAGES.customApp} label="Custom App / Saas" />
           </article>
           {/* 6. Pragvance Education gift */}
           <article className={card} aria-labelledby="p-gift">

@@ -7,7 +7,7 @@ export type ShowcaseApp = {
   logo: string | null;
   /** One line taken from the app's own site or README. */
   description: string;
-  /** Small label drawn on the card, such as SaaS. */
+  /** Small label drawn on the card, such as Saas. */
   tag?: string;
 };
 
@@ -21,7 +21,7 @@ export const B2B_APPS: ShowcaseApp[] = [
       "Privacy-first, on-device meeting recording and AI-generated board-quality minutes for CEOs and business consultants.",
   },
   {
-    name: "App N SaaS Builder",
+    name: "App N Saas Builder",
     url: "https://www.appnsaasbuilder.com/",
     logo: "/apps/appnsaasbuilder.png",
     description: "Know how close your app is to shipping.",
@@ -36,8 +36,8 @@ export const B2B_APPS: ShowcaseApp[] = [
     name: "AI Intellectual Capital",
     url: AI_INTELLECTUAL_CAPITAL_URL,
     logo: "/apps/ai-intellectual-capital.png",
-    description: "SaaS training and certification for working with Grok Bot.",
-    tag: "SaaS",
+    description: "Saas training and certification for working with Grok Bot.",
+    tag: "Saas",
   },
 ];
 

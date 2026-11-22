@@ -191,7 +191,7 @@ export default function HomePage() {
             id="portfolio-heading"
             className="text-2xl font-semibold text-[color:var(--gold-bright)] md:text-3xl"
           >
-            Apps & SaaS
+            Apps & Saas
           </h2>
           <p className="mt-4 max-w-2xl text-[color:var(--text-muted)]">
             We turn a locked PRD into a shipped app — web or store — with an AI Guide in the loop
@@ -230,7 +230,7 @@ export default function HomePage() {
               >
                 Talk about your next app →
               </Link>
-              <StartHereLink href={PRODUCT_PAGES.customApp} label="Custom App / SaaS" className="mt-3 block text-left" />
+              <StartHereLink href={PRODUCT_PAGES.customApp} label="Custom App / Saas" className="mt-3 block text-left" />
             </article>
           </div>
           <Link
