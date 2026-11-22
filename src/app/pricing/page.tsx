@@ -87,6 +87,23 @@ export default function PricingPage() {
             <StartHereLink href={PRODUCT_PAGES.aiWorkforce} label="AI Workforce" variant="button" className={primaryBtn} />
           </article>
 
+          {/* 4. One-on-One AI Consultation */}
+          <article className={card} aria-labelledby="p-con">
+            <p className={group}>One-on-one guidance</p>
+            <h3 id="p-con" className="mt-2 text-xl font-semibold text-[color:var(--text)]">One-on-One AI Consultation</h3>
+            <p className="mt-4 flex items-baseline gap-2">
+              <span className="text-4xl font-bold text-[#e8bd63]">{PRICING.consultation.amount}</span>
+              <span className="text-sm text-[color:var(--text-muted)]">/ session</span>
+            </p>
+            <p className="mt-2 text-sm text-[color:var(--text-muted)]">60 minutes · one-on-one by video</p>
+            <p className="mb-6 mt-3 text-sm text-[color:var(--text-muted)]">
+              One-on-one guidance. Focused on your business priorities and questions.
+            </p>
+            <CheckoutButton product="consulting_1hr" className={primaryBtn} ariaLabel="Start Here: One-on-One AI Consultation">
+              Start Here
+            </CheckoutButton>
+          </article>
+
           {/* 3. Done-for-You */}
           <article className={card} aria-labelledby="p-dfy">
             <p className={group}>Have the setup implemented</p>
@@ -112,23 +129,6 @@ export default function PricingPage() {
             </CheckoutButton>
             <p className="mb-3 mt-2 text-center text-xs text-[color:var(--text-muted)]">50% deposit. Remaining $2,500 billed on completion. The $2,500 deposit is non-refundable.</p>
             <StartHereLink href={PRODUCT_PAGES.doneForYou} label="Done-for-You Complete Setup" />
-          </article>
-
-          {/* 4. One-on-One AI Consultation */}
-          <article className={card} aria-labelledby="p-con">
-            <p className={group}>One-on-one guidance</p>
-            <h3 id="p-con" className="mt-2 text-xl font-semibold text-[color:var(--text)]">One-on-One AI Consultation</h3>
-            <p className="mt-4 flex items-baseline gap-2">
-              <span className="text-4xl font-bold text-[#e8bd63]">{PRICING.consultation.amount}</span>
-              <span className="text-sm text-[color:var(--text-muted)]">/ session</span>
-            </p>
-            <p className="mt-2 text-sm text-[color:var(--text-muted)]">60 minutes · one-on-one by video</p>
-            <p className="mb-6 mt-3 text-sm text-[color:var(--text-muted)]">
-              One-on-one guidance. Focused on your business priorities and questions.
-            </p>
-            <CheckoutButton product="consulting_1hr" className={primaryBtn} ariaLabel="Start Here: One-on-One AI Consultation">
-              Start Here
-            </CheckoutButton>
           </article>
           {/* 5. Custom app / SaaS */}
           <article className={card} aria-labelledby="p-custom">

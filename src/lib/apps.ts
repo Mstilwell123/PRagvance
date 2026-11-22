@@ -1,3 +1,5 @@
+import { AI_INTELLECTUAL_CAPITAL_URL } from "./site";
+
 export type ShowcaseApp = {
   name: string;
   url: string;
@@ -5,21 +7,18 @@ export type ShowcaseApp = {
   logo: string | null;
   /** One line taken from the app's own site or README. */
   description: string;
+  /** Small label drawn on the card, such as SaaS. */
+  tag?: string;
 };
 
-export const APPS: ShowcaseApp[] = [
+/** Business-to-business cards, in display order. */
+export const B2B_APPS: ShowcaseApp[] = [
   {
     name: "MinutesIntel.ai",
     url: "https://www.minutesintel.ai/",
     logo: "/apps/minutesintel.png",
     description:
       "Privacy-first, on-device meeting recording and AI-generated board-quality minutes for CEOs and business consultants.",
-  },
-  {
-    name: "My Briefing",
-    url: "https://mybriefing.us/",
-    logo: "/apps/mybriefing.png",
-    description: "My Briefing turns one spoken thought into an organized day.",
   },
   {
     name: "App N SaaS Builder",
@@ -34,16 +33,21 @@ export const APPS: ShowcaseApp[] = [
     description: "Turn contractor project photos and clips into branded, narrated videos.",
   },
   {
-    name: "MinutePushPro",
-    url: "https://minute-push-pro.vercel.app/",
-    logo: "/apps/minutepushpro.png",
-    description: "90-second job proof that ranks locally.",
+    name: "AI Intellectual Capital",
+    url: AI_INTELLECTUAL_CAPITAL_URL,
+    logo: "/apps/ai-intellectual-capital.png",
+    description: "SaaS training and certification for working with Grok Bot.",
+    tag: "SaaS",
   },
+];
+
+/** Bottom-row order, left to right. Reorder this list to change the row. */
+export const B2C_APPS: ShowcaseApp[] = [
   {
-    name: "AppDemo.live",
-    url: "https://appdemo.live/",
-    logo: "/apps/appdemo-live.png",
-    description: "Launch your software live.",
+    name: "My Briefing",
+    url: "https://mybriefing.us/",
+    logo: "/apps/mybriefing.png",
+    description: "My Briefing turns one spoken thought into an organized day.",
   },
   {
     name: "VoiceTalk.app",
@@ -58,3 +62,6 @@ export const APPS: ShowcaseApp[] = [
     description: "Know who you are in Christ. Speak the Word. Live from truth.",
   },
 ];
+
+/** Public /apps cards: B2B, then B2C. */
+export const APPS: ShowcaseApp[] = [...B2B_APPS, ...B2C_APPS];

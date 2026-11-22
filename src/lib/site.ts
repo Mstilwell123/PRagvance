@@ -1,7 +1,7 @@
 import { PRICING } from "./pricing";
 
-/** Public AI Intellectual Capital landing page. Swap this when the final domain is ready. */
-export const AI_INTELLECTUAL_CAPITAL_URL = "https://app-eight-roan-p8x7wfm1tp.vercel.app";
+/** Public AI Intellectual Capital landing page. Final domain is set (Nov 22, 2026). */
+export const AI_INTELLECTUAL_CAPITAL_URL = "https://aiintellectualcapital.com";
 
 export const SITE = {
   name: "Pragvance",
@@ -18,7 +18,7 @@ export const NAV = [
   { href: "/", label: "Home" },
   { href: "/aiworkforce", label: "AI Workforce" },
   { href: "/assessment", label: "AI Assessment" },
-  { href: "/apps", label: "Apps" },
+  { href: "/apps", label: "App / SaaS" },
   { href: "/pricing", label: "Pricing" },
   { href: "/summary", label: "Summary" },
   { href: "/contact", label: "Contact" },
