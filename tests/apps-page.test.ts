@@ -97,7 +97,7 @@ test("each /apps card is one external link covering the whole card", () => {
     assert.match(card, /h-14 w-14/);
     if (name === "AI Intellectual Capital") {
       assert.equal(card.includes(">Saas<"), false);
-      assert.match(card, /Saas training and certification for working with Grok Bot\./);
+      assert.match(card, /Training and certification for working with Grok Bot\./);
     } else {
       assert.equal(card.includes(">Saas<"), false);
     }
