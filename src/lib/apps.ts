@@ -7,7 +7,8 @@ export type ShowcaseApp = {
   description: string;
 };
 
-export const APPS: ShowcaseApp[] = [
+/** Business-to-business cards, in display order. */
+export const B2B_APPS: ShowcaseApp[] = [
   {
     name: "MinutesIntel.ai",
     url: "https://www.minutesintel.ai/",
@@ -16,10 +17,10 @@ export const APPS: ShowcaseApp[] = [
       "Privacy-first, on-device meeting recording and AI-generated board-quality minutes for CEOs and business consultants.",
   },
   {
-    name: "My Briefing",
-    url: "https://mybriefing.us/",
-    logo: "/apps/mybriefing.png",
-    description: "My Briefing turns one spoken thought into an organized day.",
+    name: "ShowPiece.Pro",
+    url: "https://showpiece.pro/",
+    logo: "/apps/showpiece.png",
+    description: "Turn contractor project photos and clips into branded, narrated videos.",
   },
   {
     name: "App N SaaS Builder",
@@ -27,24 +28,10 @@ export const APPS: ShowcaseApp[] = [
     logo: "/apps/appnsaasbuilder.png",
     description: "Know how close your app is to shipping.",
   },
-  {
-    name: "ShowPiece.Pro",
-    url: "https://showpiece.pro/",
-    logo: "/apps/showpiece.png",
-    description: "Turn contractor project photos and clips into branded, narrated videos.",
-  },
-  {
-    name: "MinutePushPro",
-    url: "https://minute-push-pro.vercel.app/",
-    logo: "/apps/minutepushpro.png",
-    description: "90-second job proof that ranks locally.",
-  },
-  {
-    name: "AppDemo.live",
-    url: "https://appdemo.live/",
-    logo: "/apps/appdemo-live.png",
-    description: "Launch your software live.",
-  },
+];
+
+/** Business-to-consumer cards, in display order. */
+export const B2C_APPS: ShowcaseApp[] = [
   {
     name: "VoiceTalk.app",
     url: "https://voicetalk.app/",
@@ -57,4 +44,13 @@ export const APPS: ShowcaseApp[] = [
     logo: "/apps/id-clare.png",
     description: "Know who you are in Christ. Speak the Word. Live from truth.",
   },
+  {
+    name: "My Briefing",
+    url: "https://mybriefing.us/",
+    logo: "/apps/mybriefing.png",
+    description: "My Briefing turns one spoken thought into an organized day.",
+  },
 ];
+
+/** Public /apps cards: B2B, then B2C. */
+export const APPS: ShowcaseApp[] = [...B2B_APPS, ...B2C_APPS];
