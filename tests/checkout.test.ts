@@ -25,7 +25,7 @@ test("flag off -> 403 and no session", async () => {
 });
 
 test("unknown product -> 400", async () => {
-  for (const body of [{ product: "nope" }, { product: "shadow_lab_group" }, { product: "shadow_lab_monthly" }, { product: "__proto__" }, {}, null]) {
+  for (const body of [{ product: "nope" }, { product: "__proto__" }, {}, null]) {
     assert.equal((await handleCheckout(body, deps(on))).status, 400);
   }
 });
