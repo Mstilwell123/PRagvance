@@ -80,7 +80,7 @@ test("paid products land on the booking page", async () => {
   assert.equal((await handleCheckout({ product: "consulting_1hr" }, quiet)).status, 200);
   const book = "https://example.test/access/book?session_id={CHECKOUT_SESSION_ID}";
   assert.equal(created[0].success_url, book);
-  assert.equal(created[0].cancel_url, "https://example.test/summary?checkout=canceled");
+  assert.equal(created[0].cancel_url, "https://example.test/pricing?checkout=canceled");
   assert.equal(created[0].metadata?.product_key, "consulting_1hr");
 
   const deposit = await handleCheckout({ product: "done_for_you_deposit", price: "price_evil", amount: 1 }, quiet);
@@ -88,7 +88,7 @@ test("paid products land on the booking page", async () => {
   assert.deepEqual(created[1].line_items, [{ price: DONE_FOR_YOU_DEPOSIT_PRICE, quantity: 1 }]);
   assert.equal(created[1].mode, "payment");
   assert.equal(created[1].success_url, book);
-  assert.equal(created[1].cancel_url, "https://example.test/summary?checkout=canceled");
+  assert.equal(created[1].cancel_url, "https://example.test/pricing?checkout=canceled");
   assert.equal(created[1].metadata?.product_key, "done_for_you_deposit");
   assert.equal(created[1].customer_email, undefined);
 

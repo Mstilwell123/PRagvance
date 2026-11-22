@@ -53,10 +53,10 @@ Before going live, add both to the Production environment. Paid checkout uses th
 
 ## Gated Stripe checkout
 
-Off by default. Set `CHECKOUT_ENABLED=true` to enable; otherwise pricing/summary buttons go to `/contact` and `POST /api/checkout` returns 403.
+Off by default. Set `CHECKOUT_ENABLED=true` to enable; otherwise pricing buttons go to `/contact` and `POST /api/checkout` returns 403.
 
 - `POST /api/checkout` body `{ "product": "consulting_1hr" | "done_for_you_deposit" }` → `{ url }`. The price ID is looked up server-side from `STRIPE_PRICE_*`; the client never sends a price or amount. Unknown product → 400. The Done-for-You deposit falls back to the live $2,500 price `price_1UXv5983KSR7xg0b6Lpq66K8` on product `prod_VZ3By2B3NbN20I` when `STRIPE_PRICE_DONE_FOR_YOU` is unset. Env values starting with `price_1UXufc` or `price_1UXufe` ($1 test prices) are ignored for any product that has a live default. `consulting_1hr` and `done_for_you_deposit` are product-key checkouts with no signup form.
-- Success URL for `consulting_1hr` and `done_for_you_deposit`: `{SITE}/access/book?session_id={CHECKOUT_SESSION_ID}`. Cancel stays `/summary?checkout=canceled`.
+- Success URL for `consulting_1hr` and `done_for_you_deposit`: `{SITE}/access/book?session_id={CHECKOUT_SESSION_ID}`. Cancel stays `/pricing?checkout=canceled`.
 - `POST /api/webhooks/stripe` verifies `stripe-signature` with `STRIPE_WEBHOOK_SECRET` (bad or missing → 400). Each event id is processed once.
 - On `checkout.session.completed` or `checkout.session.async_payment_succeeded`, a known `metadata.product_key` with `payment_status` `paid` or `no_payment_required` writes an idempotent KV entitlement `entitlement:{session_id}`.
 - A **paid** known product also upserts the buyer in GoHighLevel through the same CRM client as the contact form. Email and name come from `customer_details`. Unknown products do not get an entitlement or a CRM write. A Checkout Session that never carried one of these product keys, including an old payment-link checkout, stays in that unknown group.
