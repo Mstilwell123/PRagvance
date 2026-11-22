@@ -85,10 +85,10 @@ test("each /apps card is one external link covering the whole card", () => {
   assert.equal(html.includes('href="/apps"'), false);
 });
 
-test("the section label is Apps / SaaS in nav and page titles", () => {
+test("the nav label is Apps / SAAS and page titles stay Apps / SaaS", () => {
   const nav = NAV.find((item) => item.href === "/apps");
   assert.ok(nav);
-  assert.equal(nav.label, "Apps / SaaS");
+  assert.equal(nav.label, "Apps / SAAS");
   assert.equal(metadata.title, "Apps / SaaS Portfolio");
   assert.equal(metadata.openGraph && "title" in metadata.openGraph ? metadata.openGraph.title : "", "Apps / SaaS | Pragvance");
   assert.equal(metadata.alternates && "canonical" in metadata.alternates ? metadata.alternates.canonical : "", "/apps");

@@ -18,7 +18,7 @@ export const NAV = [
   { href: "/", label: "Home" },
   { href: "/aiworkforce", label: "AI Workforce" },
   { href: "/assessment", label: "AI Assessment" },
-  { href: "/apps", label: "Apps / SaaS" },
+  { href: "/apps", label: "Apps / SAAS" },
   { href: "/pricing", label: "Pricing" },
   { href: "/summary", label: "Summary" },
   { href: "/contact", label: "Contact" },
