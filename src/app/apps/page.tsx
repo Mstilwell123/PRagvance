@@ -23,9 +23,9 @@ const appCard =
 const logoMotion =
   "motion-safe:transition-transform motion-safe:duration-200 motion-safe:group-hover:scale-105 motion-safe:group-focus-visible:scale-105";
 
-function AppCard({ app, className = "" }: { app: ShowcaseApp; className?: string }) {
+function AppCard({ app }: { app: ShowcaseApp }) {
   return (
-    <a href={app.url} target="_blank" rel="noopener noreferrer" className={`${appCard} ${className}`.trim()}>
+    <a href={app.url} target="_blank" rel="noopener noreferrer" className={appCard}>
       {app.logo ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -58,8 +58,30 @@ function AppCard({ app, className = "" }: { app: ShowcaseApp; className?: string
   );
 }
 
-/** Same five tracks as the B2B row, so these three cards stay the same size: left, middle, right. */
-const B2C_DESKTOP_COLUMN = ["", "lg:col-start-3", "lg:col-start-5"];
+const rowGrid = "grid grid-cols-1 items-center gap-3 md:grid-cols-2 lg:grid-cols-5";
+const rowTitle = "text-4xl font-bold tracking-tight md:text-5xl";
+const rowSubtitle = "mt-1 text-xs text-[color:var(--text-muted)]";
+
+function RowLabel({
+  id,
+  title,
+  subtitle,
+  titleColor,
+}: {
+  id: string;
+  title: string;
+  subtitle: string;
+  titleColor: string;
+}) {
+  return (
+    <div className="px-2 text-center">
+      <h2 id={id} className={`${rowTitle} ${titleColor}`}>
+        {title}
+      </h2>
+      <p className={rowSubtitle}>{subtitle}</p>
+    </div>
+  );
+}
 
 export default function AppsPage() {
   return (
@@ -81,13 +103,13 @@ export default function AppsPage() {
         </p>
 
         <section className="mt-10" aria-labelledby="b2b-heading">
-          <div className="grid grid-cols-1 items-center gap-3 md:grid-cols-2 lg:grid-cols-5">
-            <div className="px-2 text-center">
-              <h2 id="b2b-heading" className="text-4xl font-bold tracking-tight text-[color:var(--text)] md:text-5xl">
-                B2B
-              </h2>
-              <p className="mt-1 text-xs text-[color:var(--text-muted)]">Business to business</p>
-            </div>
+          <div className={rowGrid}>
+            <RowLabel
+              id="b2b-heading"
+              title="B2B"
+              subtitle="Business to business"
+              titleColor="text-[color:var(--text)]"
+            />
             {B2B_APPS.map((app) => (
               <AppCard key={app.name} app={app} />
             ))}
@@ -97,13 +119,15 @@ export default function AppsPage() {
         <hr className="my-12 h-[2px] w-full border-0 bg-[rgba(208,162,86,0.6)]" />
 
         <section aria-labelledby="b2c-heading">
-          <h2 id="b2c-heading" className="text-2xl font-semibold text-[color:var(--gold-bright)]">
-            B2C
-          </h2>
-          <p className="mt-1 text-sm text-[color:var(--text-muted)]">Business to consumer</p>
-          <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-5">
-            {B2C_APPS.map((app, index) => (
-              <AppCard key={app.name} app={app} className={B2C_DESKTOP_COLUMN[index] ?? ""} />
+          <div className={rowGrid}>
+            <RowLabel
+              id="b2c-heading"
+              title="B2C"
+              subtitle="Business to consumer"
+              titleColor="text-[color:var(--gold-bright)]"
+            />
+            {B2C_APPS.map((app) => (
+              <AppCard key={app.name} app={app} />
             ))}
           </div>
         </section>

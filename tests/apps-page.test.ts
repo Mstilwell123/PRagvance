@@ -42,10 +42,13 @@ test("each /apps card is one external link covering the whole card", () => {
   const html = renderToStaticMarkup(createElement(AppsPage));
   assert.equal((html.match(/<h1\b/g) || []).length, 1);
   assert.match(html, /<h1[^>]*>\s*Apps \/ Saas\s*<\/h1>/);
-  assert.match(html, /grid-cols-1 items-center gap-3 md:grid-cols-2 lg:grid-cols-5/);
-  assert.match(html, /grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-5/);
-  assert.match(html, /<h2[^>]*>\s*B2B\s*<\/h2>/);
-  assert.equal(html.includes("lg:col-start-2"), false);
+  assert.equal(
+    (html.match(/grid grid-cols-1 items-center gap-3 md:grid-cols-2 lg:grid-cols-5/g) || []).length,
+    2,
+  );
+  assert.match(html, /<h2 id="b2b-heading" class="text-4xl font-bold tracking-tight md:text-5xl text-\[color:var\(--text\)\]">\s*B2B\s*<\/h2>/);
+  assert.match(html, /<h2 id="b2c-heading" class="text-4xl font-bold tracking-tight md:text-5xl text-\[color:var\(--gold-bright\)\]">\s*B2C\s*<\/h2>/);
+  assert.equal(html.includes("lg:col-start-"), false);
   assert.match(html, /Business to business/);
   assert.match(html, /<hr class="my-12 h-\[2px\] w-full border-0 bg-\[rgba\(208,162,86,0\.6\)\]"/);
   assert.equal(html.includes("uppercase"), false);
@@ -69,7 +72,9 @@ test("each /apps card is one external link covering the whole card", () => {
   const builderAt = html.indexOf(">App N Saas Builder<");
   assert.ok(b2bAt < minutesAt && minutesAt < builderAt);
   assert.ok(minutesAt < ruleAt);
-  assert.ok(html.indexOf(">VoiceTalk.app<") > ruleAt);
+  const briefAt = html.indexOf(">My Briefing<");
+  assert.ok(ruleAt < b2cAt && b2cAt < briefAt);
+  assert.ok(html.indexOf(">VoiceTalk.app<") > briefAt);
 
   for (const [name, url] of [...B2B, ...B2C]) {
     const heading = html.indexOf(`>${name}<`);
@@ -97,9 +102,6 @@ test("each /apps card is one external link covering the whole card", () => {
     } else {
       assert.equal(card.includes(">Saas<"), false);
     }
-    if (name === "VoiceTalk.app") assert.match(card, /lg:col-start-3/);
-    if (name === "ID-Clare") assert.match(card, /lg:col-start-5/);
-    if (name === "My Briefing") assert.equal(card.includes("lg:col-start-"), false);
   }
 
   assert.equal(html.includes("AppDemo"), false);
