@@ -33,8 +33,7 @@ test("/apps lists B2B then B2C in Mark's order", () => {
     B2C.map((row) => [...row]),
   );
   assert.equal(APPS.length, 7);
-  assert.equal(B2B_APPS[3]?.tag, "Saas");
-  assert.equal(B2B_APPS.filter((app) => app.tag).length, 1);
+  assert.equal(APPS.filter((app) => app.tag).length, 0);
   assert.deepEqual(APPS.map((app) => app.name), [...B2B, ...B2C].map((row) => row[0]));
 });
 
@@ -97,7 +96,7 @@ test("each /apps card is one external link covering the whole card", () => {
     assert.match(card, /p-3/);
     assert.match(card, /h-14 w-14/);
     if (name === "AI Intellectual Capital") {
-      assert.match(card, />Saas</);
+      assert.equal(card.includes(">Saas<"), false);
       assert.match(card, /Saas training and certification for working with Grok Bot\./);
     } else {
       assert.equal(card.includes(">Saas<"), false);
