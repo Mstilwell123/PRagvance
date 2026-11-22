@@ -25,7 +25,7 @@ test("flag off -> 403 and no session", async () => {
 });
 
 test("unknown product -> 400", async () => {
-  for (const body of [{ product: "nope" }, { product: "__proto__" }, {}, null]) {
+  for (const body of [{ product: "nope" }, { product: "shadow_lab_group" }, { product: "shadow_lab_monthly" }, { product: "__proto__" }, {}, null]) {
     assert.equal((await handleCheckout(body, deps(on))).status, 400);
   }
 });
@@ -75,47 +75,36 @@ test("duplicate event -> processed once, entitlement recorded", async () => {
 
 test("paid products land on the booking page", async () => {
   created = [];
-  const env = {
-    ...on,
-    STRIPE_PRICE_SHADOW_LAB_GROUP: "price_group",
-    STRIPE_PRICE_SHADOW_LAB_MONTHLY: "price_month",
-  } as NodeJS.ProcessEnv;
-  const signup = { name: "Jane Doe", email: "buyer@example.com", interest: "Build an agent", message: "" };
-  const quiet = { ...deps(env), recordLead: async () => {} };
+  const env = { ...on } as NodeJS.ProcessEnv;
+  const quiet = deps(env);
   assert.equal((await handleCheckout({ product: "consulting_1hr" }, quiet)).status, 200);
-  assert.equal((await handleCheckout({ product: "shadow_lab_group", ...signup }, quiet)).status, 200);
-  assert.equal((await handleCheckout({ product: "shadow_lab_monthly", ...signup }, quiet)).status, 200);
   const book = "https://example.test/access/book?session_id={CHECKOUT_SESSION_ID}";
   assert.equal(created[0].success_url, book);
   assert.equal(created[0].cancel_url, "https://example.test/summary?checkout=canceled");
   assert.equal(created[0].metadata?.product_key, "consulting_1hr");
-  assert.equal(created[1].success_url, book);
-  assert.equal(created[1].customer_email, "buyer@example.com");
-  assert.equal(created[2].success_url, book);
-  assert.equal(created[2].mode, "subscription");
 
   const deposit = await handleCheckout({ product: "done_for_you_deposit", price: "price_evil", amount: 1 }, quiet);
   assert.equal(deposit.status, 200);
-  assert.deepEqual(created[3].line_items, [{ price: DONE_FOR_YOU_DEPOSIT_PRICE, quantity: 1 }]);
-  assert.equal(created[3].mode, "payment");
-  assert.equal(created[3].success_url, book);
-  assert.equal(created[3].cancel_url, "https://example.test/summary?checkout=canceled");
-  assert.equal(created[3].metadata?.product_key, "done_for_you_deposit");
-  assert.equal(created[3].customer_email, undefined);
+  assert.deepEqual(created[1].line_items, [{ price: DONE_FOR_YOU_DEPOSIT_PRICE, quantity: 1 }]);
+  assert.equal(created[1].mode, "payment");
+  assert.equal(created[1].success_url, book);
+  assert.equal(created[1].cancel_url, "https://example.test/summary?checkout=canceled");
+  assert.equal(created[1].metadata?.product_key, "done_for_you_deposit");
+  assert.equal(created[1].customer_email, undefined);
 
   const overridden = await handleCheckout(
     { product: "done_for_you_deposit" },
     { ...quiet, env: { ...env, STRIPE_PRICE_DONE_FOR_YOU: "price_dfy_override" } },
   );
   assert.equal(overridden.status, 200);
-  assert.equal(created[4].line_items?.[0]?.price, "price_dfy_override");
+  assert.equal(created[2].line_items?.[0]?.price, "price_dfy_override");
 
   const ignored = await handleCheckout(
     { product: "done_for_you_deposit" },
     { ...quiet, env: { ...env, STRIPE_PRICE_DONE_FOR_YOU: "price_1UXufcTEST" } },
   );
   assert.equal(ignored.status, 200);
-  assert.equal(created[5].line_items?.[0]?.price, DONE_FOR_YOU_DEPOSIT_PRICE);
+  assert.equal(created[3].line_items?.[0]?.price, DONE_FOR_YOU_DEPOSIT_PRICE);
 });
 
 test("deposit pages do not link to a Stripe payment link", () => {

@@ -4,11 +4,11 @@ import BreadcrumbJsonLd from "@/components/BreadcrumbJsonLd";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Contact Pragvance at support@pragvance.ai. Book Shadow Lab or talk about your next AI app. PRAGVANCE LLC — Oregon.",
+    "Contact Pragvance at support@pragvance.ai. Talk about AI Workforce, a consultation, or your next AI app. PRAGVANCE LLC — Oregon.",
   alternates: { canonical: "/contact" },
   openGraph: {
     title: "Contact Pragvance",
-    description: "support@pragvance.ai — Shadow Lab, AI Workforce, and custom builds.",
+    description: "support@pragvance.ai — AI Workforce, consultation, and custom builds.",
     url: "/contact",
     images: [{ url: "/logo-lockup.png", alt: "Pragvance" }],
   },

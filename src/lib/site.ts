@@ -1,4 +1,4 @@
-import { PRICING, SHADOW_LAB_SUMMARY } from "./pricing";
+import { PRICING } from "./pricing";
 
 /** Public AI Intellectual Capital landing page. Swap this when the final domain is ready. */
 export const AI_INTELLECTUAL_CAPITAL_URL = "https://app-eight-roan-p8x7wfm1tp.vercel.app";
@@ -12,13 +12,11 @@ export const SITE = {
   location: "Oregon, USA",
   skoolUrl: "https://www.skool.com/aiworkforce",
   swarmPrice: PRICING.aiWorkforce.short,
-  labPrices: SHADOW_LAB_SUMMARY,
 } as const;
 
 export const NAV = [
   { href: "/", label: "Home" },
   { href: "/aiworkforce", label: "AI Workforce" },
-  { href: "/shadow-lab", label: "Shadow Lab" },
   { href: "/assessment", label: "AI Assessment" },
   { href: "/apps", label: "Apps" },
   { href: "/pricing", label: "Pricing" },
@@ -36,12 +34,8 @@ export const FAQ = [
     a: "AI Workforce is weekly live training on Skool ($99/mo) to build a Grok Bot agent team for your business — from your first bot to roles and agents that work together. Classroom + community stay on Skool; we teach, you build on your real work.",
   },
   {
-    q: "How is Shadow Lab different from AI Workforce?",
-    a: "AI Workforce is the self-paced / weekly classroom track on Skool. Shadow Lab is live coaching for founders who want closer guidance — " + SHADOW_LAB_SUMMARY + ". It is separate from the AI Workforce classroom.",
-  },
-  {
     q: "What is the AI Assessment?",
-    a: "A free 28-question diagnostic (0–84) that bands how your company uses AI — from chat toys to an operating layer — and points to AI Workforce or Shadow Lab. It replaces the old Reality Check.",
+    a: "A free 28-question diagnostic (0–84) that bands how your company uses AI — from chat toys to an operating layer — and points to AI Workforce, a consultation, or a custom build. It replaces the old Reality Check.",
   },
   {
     q: "Do you build custom AI apps?",

@@ -14,7 +14,7 @@ export const ASSESSMENT_BANDS = [
 
 export type AssessmentBand = (typeof ASSESSMENT_BANDS)[number];
 
-export const ASSESSMENT_NEXT = ["swarm", "lab", "custom", "score"] as const;
+export const ASSESSMENT_NEXT = ["swarm", "consult", "custom", "score"] as const;
 export type AssessmentNextWant = (typeof ASSESSMENT_NEXT)[number] | null;
 
 export const ASSESSMENT_SOURCE = "pragvance.ai AI Assessment";
@@ -27,7 +27,7 @@ const COMPANY_MAX = 200;
 
 const NEXT_LABEL: Record<Exclude<AssessmentNextWant, null>, string> = {
   swarm: "Weekly classroom (AI Workforce)",
-  lab: "High-touch seats (Lab)",
+  consult: "One-on-one consultation",
   custom: "Custom app / product",
   score: "Just the score",
 };

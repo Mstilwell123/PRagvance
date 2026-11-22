@@ -1,6 +1,7 @@
 // Single source of truth for Pragvance prices (Pricing PRD v1.2, Oct 23 2026). USD.
 export const PRICING = {
   aiWorkforce: { amount: "$99", basis: "/month", short: "$99/mo" },
+  // Still read by the Done-for-You comparison table. That page is intentionally unchanged.
   shadowLabSingle: { amount: "$497", basis: "one two-hour session", hours: 2 },
   shadowLabMonthly: {
     amount: "$997",
@@ -15,13 +16,9 @@ export const PRICING = {
   assessment: { label: "Free" },
 } as const;
 
-export const SHADOW_LAB_SUMMARY =
-  "$497 for one two-hour session, or $997/month for four two-hour sessions (eight hours total)";
-
 /** One page per priced product. Start Here links use these paths. */
 export const PRODUCT_PAGES = {
   aiWorkforce: "/aiworkforce",
-  shadowLab: "/shadow-lab",
   doneForYou: "/done-for-you",
   consultation: "/consultation",
   customApp: "/custom-app",

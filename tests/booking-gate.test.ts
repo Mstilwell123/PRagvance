@@ -263,46 +263,6 @@ test("opening the confirmation page before the webhook still issues one link", a
   assert.equal(api.calls.filter((call) => call.url.endsWith("/contacts/upsert")).length, 1);
 });
 
-test("shadow lab payment gets one single-use link and the same location tags", async () => {
-  resetKv();
-  const api = installApis();
-  try {
-    await withEnv(readyEnv, async () => {
-      const body = sessionEvent({
-        eventId: "evt_gate_lab",
-        sessionId: "cs_test_gatelab00001",
-        product_key: "shadow_lab_group",
-        amount_total: 49700,
-        name: "TEST Lab",
-        email: "test.lab@example.com",
-      });
-      assert.equal((await handleWebhook(body, sign(body), wh)).status, 200);
-      const view = await loadBookingPage("cs_test_gatelab00001", {
-        retrieve: async () => paidSnapshot("cs_test_gatelab00001", {
-          productKey: "shadow_lab_group",
-          amount_total: 49700,
-          email: "test.lab@example.com",
-          name: "TEST Lab",
-        }),
-      });
-      assert.equal(view.state, "confirmed");
-      if (view.state === "confirmed") {
-        assert.equal(view.bookingUrl?.startsWith("https://calendly.com/d/"), true);
-        assert.equal(api.book(view.bookingUrl!), 201);
-        assert.equal(api.book(view.bookingUrl!), 403);
-      }
-    });
-  } finally {
-    api.restore();
-  }
-  assert.equal(api.calls.filter((call) => call.url.endsWith("/scheduling_links")).length, 1);
-  const tags = api.calls.find((call) => call.url.endsWith("/tags"));
-  assert.deepEqual(tags?.body.tags, ["paid", "paid - shadow lab (session)"]);
-  const upsert = api.calls.find((call) => call.url.endsWith("/contacts/upsert"));
-  assert.equal(upsert?.body.locationId, LOCATION);
-  assert.equal(upsert?.body.email, "test.lab@example.com");
-});
-
 test("unpaid, forged, and unsigned sessions get no link and no CRM write", async () => {
   resetKv();
   const api = installApis();

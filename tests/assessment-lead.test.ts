@@ -18,7 +18,7 @@ import {
   recordAssessmentLead,
   runAssessmentLead,
   upsertAssessmentLead,
-  type ShadowLabCrmResponse,
+  type CrmPostResponse,
 } from "../src/lib/crm.server.ts";
 import { handleAssessmentLead, POST, sendAssessmentEmail } from "../src/app/api/assessment-lead/route.ts";
 
@@ -113,7 +113,7 @@ test("assessment upsert payload, tags, band tag, and note", async () => {
     post: async (path, payload, timeoutMs) => {
       posts.push({ path, body: payload as Record<string, unknown>, timeoutMs });
       assert.ok(timeoutMs > 0 && timeoutMs <= ASSESSMENT_LEAD_TIMEOUT_MS);
-      const res: ShadowLabCrmResponse = {
+      const res: CrmPostResponse = {
         ok: true,
         status: 200,
         json: async () => (path === "/contacts/upsert" ? { contact: { id: "abc12345" } } : null),
