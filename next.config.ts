@@ -2,8 +2,16 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: { unoptimized: true },
+  // Own the trailing-slash redirect so /summary/ reaches /pricing in one
+  // hop. Other paths still drop a trailing slash.
+  skipTrailingSlashRedirect: true,
   async redirects() {
     return [
+      // Retired page. It duplicated /pricing. Trailing slash and any subpath included.
+      { source: "/summary", destination: "/pricing", statusCode: 308 },
+      { source: "/summary/", destination: "/pricing", statusCode: 308 },
+      { source: "/summary/:path*", destination: "/pricing", statusCode: 308 },
+      { source: "/:path+/", destination: "/:path+", statusCode: 308 },
       { source: "/swarm", destination: "/aiworkforce", permanent: true },
       { source: "/swarm/:path*", destination: "/aiworkforce", permanent: true },
       // Retired offer. Old links land on /pricing, the page that lists the

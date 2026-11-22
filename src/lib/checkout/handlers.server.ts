@@ -21,7 +21,7 @@ export type CheckoutDeps = {
 function successUrl(site: string, product: ProductKey): string {
   const path = isBookingProduct(product)
     ? "/access/book?session_id={CHECKOUT_SESSION_ID}"
-    : "/summary?checkout=success&session_id={CHECKOUT_SESSION_ID}";
+    : "/pricing?checkout=success&session_id={CHECKOUT_SESSION_ID}";
   return `${site}${path}`;
 }
 
@@ -48,7 +48,7 @@ export async function handleCheckout(raw: unknown, deps: CheckoutDeps): Promise<
     mode: p.mode,
     line_items: [{ price, quantity: 1 }],
     success_url: successUrl(site, product),
-    cancel_url: `${site}/summary?checkout=canceled`,
+    cancel_url: `${site}/pricing?checkout=canceled`,
     metadata,
   };
 
