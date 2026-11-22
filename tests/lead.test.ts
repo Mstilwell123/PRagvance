@@ -7,7 +7,7 @@ test("offer mapping", () => {
   assert.equal(offerFromSlug("consultation"), "One-on-One AI Consultation");
   assert.equal(offerFromSlug("aiworkforce"), "AI Workforce");
   assert.equal(offerFromSlug("ai-workforce"), "AI Workforce");
-  assert.equal(offerFromSlug("custom"), "Custom app / SaaS");
+  assert.equal(offerFromSlug("custom"), "Custom app / Saas");
   assert.equal(offerFromSlug(null), "General");
   assert.equal(offerFromSlug("bogus"), "General");
   assert.equal(OFFERS.length, 5);

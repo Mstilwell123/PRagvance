@@ -6,9 +6,9 @@ import { SITE } from "@/lib/site";
 const PATH = PRODUCT_PAGES.customApp;
 
 export const metadata: Metadata = {
-  title: "Custom App / SaaS (preview)",
+  title: "Custom App / Saas (preview)",
   description:
-    "Preview of Pragvance Custom App / SaaS: a custom quote for software built around your company's requirements. Pending approval. This page is not for indexing.",
+    "Preview of Pragvance Custom App / Saas: a custom quote for software built around your company's requirements. Pending approval. This page is not for indexing.",
   robots: {
     index: false,
     follow: false,
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   alternates: { canonical: PATH },
   openGraph: {
-    title: "Custom App / SaaS (preview)",
+    title: "Custom App / Saas (preview)",
     description: "Draft preview, pending approval.",
     url: PATH,
     images: [{ url: "/logo-lockup.png", alt: "Pragvance" }],
@@ -42,10 +42,10 @@ export default function CustomAppPage() {
       </p>
       <section className="section-pad mx-auto max-w-3xl py-16 md:py-24">
         <p className="text-sm uppercase tracking-wider text-[color:var(--gold)]">
-          Need a company-specific app or SaaS?
+          Need a company-specific app or Saas?
         </p>
         <h1 className="mt-3 text-4xl font-semibold text-[color:var(--text)] md:text-5xl">
-          Custom App / SaaS
+          Custom App / Saas
         </h1>
         <p className="mt-4 text-2xl font-semibold text-[color:var(--gold-bright)]">{PRICING.custom.label}</p>
 
@@ -98,7 +98,7 @@ export default function CustomAppPage() {
           <Link href="/contact?interest=custom#contact" className={textLink}>
             contact form
           </Link>{" "}
-          with Custom app / SaaS selected. The same conversation is labeled “Talk about your next
+          with Custom app / Saas selected. The same conversation is labeled “Talk about your next
           app” on the home page and the apps page.
         </p>
         <p className="mt-4 text-sm text-[color:var(--text-muted)]">

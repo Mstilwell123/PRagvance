@@ -18,7 +18,7 @@ export const NAV = [
   { href: "/", label: "Home" },
   { href: "/aiworkforce", label: "AI Workforce" },
   { href: "/assessment", label: "AI Assessment" },
-  { href: "/apps", label: "App / SaaS" },
+  { href: "/apps", label: "App / Saas" },
   { href: "/pricing", label: "Pricing" },
   { href: "/summary", label: "Summary" },
   { href: "/contact", label: "Contact" },
@@ -27,7 +27,7 @@ export const NAV = [
 export const FAQ = [
   {
     q: "What is Pragvance?",
-    a: "Pragvance helps you staff a Grok Bot department — roles, skills, tools, and routines — and ships apps & SaaS when the work needs a product. Practical AI built to advance your business.",
+    a: "Pragvance helps you staff a Grok Bot department — roles, skills, tools, and routines — and ships apps & Saas when the work needs a product. Practical AI built to advance your business.",
   },
   {
     q: "What is AI Workforce?",

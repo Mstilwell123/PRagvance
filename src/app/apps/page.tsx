@@ -6,12 +6,12 @@ import { PRODUCT_PAGES } from "@/lib/pricing";
 import StartHereLink from "@/components/StartHereLink";
 
 export const metadata: Metadata = {
-  title: "Apps / SaaS Portfolio",
+  title: "Apps / Saas Portfolio",
   description:
-    "Thin portfolio of AI apps & SaaS from Pragvance — including MinutesIntel.ai. We turn a locked PRD into a shipped product.",
+    "Thin portfolio of AI apps & Saas from Pragvance — including MinutesIntel.ai. We turn a locked PRD into a shipped product.",
   alternates: { canonical: "/apps" },
   openGraph: {
-    title: "Apps / SaaS | Pragvance",
+    title: "Apps / Saas | Pragvance",
     description: "MinutesIntel.ai and custom AI product builds.",
     url: "/apps",
     images: [{ url: "/logo-lockup.png", alt: "Pragvance" }],
@@ -45,7 +45,7 @@ function AppCard({ app, className = "" }: { app: ShowcaseApp; className?: string
         </span>
       )}
       {app.tag ? (
-        <span className="mt-2 rounded-full border border-[color:var(--line)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--gold-bright)]">
+        <span className="mt-2 rounded-full border border-[color:var(--line)] px-2 py-0.5 text-[10px] font-semibold tracking-[0.14em] text-[color:var(--gold-bright)]">
           {app.tag}
         </span>
       ) : null}
@@ -67,12 +67,12 @@ export default function AppsPage() {
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "/" },
-          { name: "Apps / SaaS", path: "/apps" },
+          { name: "Apps / Saas", path: "/apps" },
         ]}
       />
       <section className="section-pad mx-auto max-w-7xl py-16 md:py-24">
         <h1 className="text-4xl font-semibold text-[color:var(--text)] md:text-5xl">
-          Apps / SaaS
+          Apps / Saas
         </h1>
         <p className="mt-4 max-w-2xl text-[color:var(--text-muted)]">
           We design + ship AI products for founders, ops, and L&D. We turn a locked PRD into a
@@ -82,20 +82,19 @@ export default function AppsPage() {
 
         <section className="mt-10" aria-labelledby="b2b-heading">
           <div className="grid grid-cols-1 items-center gap-3 md:grid-cols-2 lg:grid-cols-5">
-            <AppCard app={B2B_APPS[0]} />
             <div className="px-2 text-center">
               <h2 id="b2b-heading" className="text-4xl font-bold tracking-tight text-[color:var(--text)] md:text-5xl">
                 B2B
               </h2>
               <p className="mt-1 text-xs text-[color:var(--text-muted)]">Business to business</p>
             </div>
-            {B2B_APPS.slice(1).map((app) => (
+            {B2B_APPS.map((app) => (
               <AppCard key={app.name} app={app} />
             ))}
           </div>
         </section>
 
-        <hr className="my-12 border-0 border-t border-[color:var(--line)]" />
+        <hr className="my-12 h-[2px] w-full border-0 bg-[rgba(208,162,86,0.6)]" />
 
         <section aria-labelledby="b2c-heading">
           <h2 id="b2c-heading" className="text-2xl font-semibold text-[color:var(--gold-bright)]">
@@ -121,7 +120,7 @@ export default function AppsPage() {
             >
               Talk about your next app →
             </Link>
-            <StartHereLink href={PRODUCT_PAGES.customApp} label="Custom App / SaaS" className="mt-3 block text-left" />
+            <StartHereLink href={PRODUCT_PAGES.customApp} label="Custom App / Saas" className="mt-3 block text-left" />
           </article>
         </div>
       </section>

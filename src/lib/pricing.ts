@@ -17,6 +17,6 @@ export const PRODUCT_PAGES = {
 
 export const PRODUCTS = [
   { name: "MinutesIntel.ai", href: "https://www.minutesintel.ai/" },
-  { name: "App N SaaS Builder", href: "https://www.appnsaasbuilder.com/" },
+  { name: "App N Saas Builder", href: "https://www.appnsaasbuilder.com/" },
   { name: "My Briefing", href: "https://mybriefing.us/" },
 ] as const;
