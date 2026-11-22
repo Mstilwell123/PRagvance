@@ -37,7 +37,6 @@ export const B2B_APPS: ShowcaseApp[] = [
     url: AI_INTELLECTUAL_CAPITAL_URL,
     logo: "/apps/ai-intellectual-capital.png",
     description: "Saas training and certification for working with Grok Bot.",
-    tag: "Saas",
   },
 ];
 
