@@ -539,30 +539,6 @@ export default function DoneForYouPage() {
                 </td>
               </tr>
               <tr className="max-md:block border-t border-[color:var(--line)]">
-                <td className="px-4 py-4 align-top text-sm max-md:block">
-                  <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[color:var(--gold)] md:hidden">
-                    Offer
-                  </span>
-                  <Link href="/shadow-lab" className={textLink}>
-                    Shadow Lab
-                  </Link>
-                </td>
-                <td className="px-4 py-4 align-top text-sm text-[color:var(--text)] max-md:block">
-                  <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[color:var(--gold)] md:hidden">
-                    Price
-                  </span>
-                  {PRICING.shadowLabSingle.amount} for one two-hour session, or{" "}
-                  {PRICING.shadowLabMonthly.amount}
-                  /month for four two-hour sessions (eight hours total)
-                </td>
-                <td className="px-4 py-4 align-top text-sm text-[color:var(--text-muted)] max-md:block">
-                  <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[color:var(--gold)] md:hidden">
-                    How you work with us
-                  </span>
-                  Coached
-                </td>
-              </tr>
-              <tr className="max-md:block border-t border-[color:var(--line)]">
                 <td className="px-4 py-4 align-top text-sm font-semibold text-[color:var(--text)] max-md:block">
                   <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[color:var(--gold)] md:hidden">
                     Offer
