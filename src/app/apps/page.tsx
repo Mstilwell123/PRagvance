@@ -97,9 +97,10 @@ export default function AppsPage() {
           Apps / Saas
         </h1>
         <p className="mt-4 max-w-2xl text-[color:var(--text-muted)]">
-          We design + ship AI products for founders, ops, and L&D. We turn a locked PRD into a
-          shipped app — web or store — with an AI Guide in the loop so founders aren’t blocked
-          waiting on a traditional PM.
+          We design and ship AI products for founders, operations teams, and learning and
+          development departments. We turn a locked product requirements document into a shipped
+          app — for the web or an app store — with an AI Guide in the loop, so founders are never
+          blocked waiting on a traditional project manager.
         </p>
 
         <section className="mt-10" aria-labelledby="b2b-heading">
