@@ -17,6 +17,7 @@ export const SITE = {
 export const NAV = [
   { href: "/", label: "Home" },
   { href: "/aiworkforce", label: "AI Workforce" },
+  { href: "/agents-a-la-carte", label: "Agents a la Carte" },
   { href: "/assessment", label: "AI Assessment" },
   { href: "/apps", label: "App / Saas" },
   { href: "/pricing", label: "Pricing" },

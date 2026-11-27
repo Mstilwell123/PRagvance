@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import "./HeroCarousel.css";
 
 const CLASSROOM = "https://www.skool.com/aiworkforce/classroom";
@@ -16,17 +16,34 @@ const COURSES = [
   { title: "Build Your AI Workforce", description: "Connect your separate helpers into one organized system and see what AI now handles for you.", src: "/hero-carousel/month-06.webp", stat: "78% of organizations used AI in 2024, up from 55% the year before.", source: "Stanford AI Index 2025" },
 ];
 const N = COURSES.length;
+
+function subscribeReducedMotion(onChange: () => void) {
+  const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+  media.addEventListener("change", onChange);
+  return () => media.removeEventListener("change", onChange);
+}
+
+function subscribeVisibility(onChange: () => void) {
+  document.addEventListener("visibilitychange", onChange);
+  return () => document.removeEventListener("visibilitychange", onChange);
+}
 type Course = { title: string; description: string; src: string; stat?: string; source?: string };
 
 export default function HeroCarousel() {
   const [current, setCurrent] = useState(0);
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState<boolean | null>(null);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
-  const [hidden, setHidden] = useState(false);
   const [tick, setTick] = useState(0); // restarts the timer after manual navigation
   const rootRef = useRef<HTMLDivElement>(null);
   const touchStart = useRef<number | null>(null);
+  const reduceMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    () => false,
+  );
+  const hidden = useSyncExternalStore(subscribeVisibility, () => document.hidden, () => false);
+  const autoplay = playing ?? !reduceMotion;
 
   const show = useCallback((i: number) => {
     setCurrent(((i % N) + N) % N);
@@ -34,18 +51,10 @@ export default function HeroCarousel() {
   }, []);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setPlaying(false);
-    const onVis = () => setHidden(document.hidden);
-    onVis();
-    document.addEventListener("visibilitychange", onVis);
-    return () => document.removeEventListener("visibilitychange", onVis);
-  }, []);
-
-  useEffect(() => {
-    if (!playing || hovered || focused || hidden) return;
+    if (!autoplay || hovered || focused || hidden) return;
     const id = window.setInterval(() => setCurrent((c) => (c + 1) % N), INTERVAL);
     return () => window.clearInterval(id);
-  }, [playing, hovered, focused, hidden, tick]);
+  }, [autoplay, hovered, focused, hidden, tick]);
 
   const course: Course = COURSES[current];
 
@@ -150,10 +159,10 @@ export default function HeroCarousel() {
             <button
               type="button"
               className="pwh-pause"
-              aria-label={playing ? "Pause automatic rotation" : "Start automatic rotation"}
-              onClick={() => setPlaying((p) => !p)}
+              aria-label={autoplay ? "Pause automatic rotation" : "Start automatic rotation"}
+              onClick={() => setPlaying(!autoplay)}
             >
-              {playing ? "❚❚ Pause" : "▶ Play"}
+              {autoplay ? "❚❚ Pause" : "▶ Play"}
             </button>
           </div>
         </div>
