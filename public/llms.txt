@@ -10,6 +10,7 @@ Pragvance helps you staff a Grok Bot department — roles, skills, tools, routin
 - Pricing: https://pragvance.ai/pricing
 - AI Assessment: https://pragvance.ai/assessment
 - Apps & Saas: https://pragvance.ai/apps
+- Agents a la Carte: https://pragvance.ai/agents-a-la-carte
 - Contact: https://pragvance.ai/contact
 
 ## Offers
@@ -17,6 +18,8 @@ Pragvance helps you staff a Grok Bot department — roles, skills, tools, routin
   Weekly live training to build a Grok Bot agent team. Classroom stays on Skool.
 - One-on-one consultation and Done-for-You setup: see https://pragvance.ai/pricing
 - AI Assessment: free readiness assessment at /assessment
+- Agents a la Carte: $99 one-time self-serve Grok Bot kit per agent — https://pragvance.ai/agents-a-la-carte
+  That $99 is a 30-day credit toward AI Workforce on Skool or Done-for-You. Optional 60-minute live setup call is $199–$249. A single agent is not a monthly hosted plan. Agents 16–20 are described on their own pages and marked Coming Soon.
 - Apps: portfolio including MinutesIntel.ai (https://minutesintel.ai); custom builds via contact
 
 ## Contact

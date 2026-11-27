@@ -1,30 +1,60 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import type { FormEvent } from "react";
 import { SITE } from "@/lib/site";
 import { PRODUCT_PAGES } from "@/lib/pricing";
 import StartHereLink from "@/components/StartHereLink";
 import CheckoutButton from "@/components/CheckoutButton";
 import { OFFERS, UTM_KEYS, offerFromSlug, validateLead } from "@/lib/lead";
+import { agentBySlug, agentInquiry } from "@/lib/agents-a-la-carte";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
+type ContactQuery = {
+  interest: string;
+  utm: Record<string, string>;
+  note: string;
+  message: string;
+};
+
+const EMPTY_CONTACT_QUERY: ContactQuery = { interest: "General", utm: {}, note: "", message: "" };
+let cachedContactSearch = "";
+let cachedContactQuery = EMPTY_CONTACT_QUERY;
+
+function readContactQuery(): ContactQuery {
+  const search = window.location.search;
+  if (search === cachedContactSearch) return cachedContactQuery;
+  const params = new URLSearchParams(search);
+  const utm: Record<string, string> = {};
+  for (const key of UTM_KEYS) {
+    const value = params.get(key);
+    if (value) utm[key] = value;
+  }
+  const agent = agentBySlug(params.get("agent"));
+  const inquiry = agent ? agentInquiry(agent) : null;
+  cachedContactSearch = search;
+  cachedContactQuery = {
+    interest: offerFromSlug(params.get("interest")),
+    utm,
+    note: inquiry?.note ?? "",
+    message: inquiry?.message ?? "",
+  };
+  return cachedContactQuery;
+}
+
+function subscribeContactQuery() {
+  return () => {};
+}
+
 export default function ContactPage() {
-  const [interest, setInterest] = useState<string>("General");
-  const [utm, setUtm] = useState<Record<string, string>>({});
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setInterest(offerFromSlug(params.get("interest")));
-    const found: Record<string, string> = {};
-    for (const k of UTM_KEYS) {
-      const v = params.get(k);
-      if (v) found[k] = v;
-    }
-    setUtm(found);
-  }, []);
+  const query = useSyncExternalStore(subscribeContactQuery, readContactQuery, () => EMPTY_CONTACT_QUERY);
+  const [interest, setInterest] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
+  const interestValue = interest ?? query.interest;
+  const messageValue = message ?? query.message;
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -37,7 +67,7 @@ export default function ContactPage() {
       building: String(data.get("building") || "").trim(),
       message: String(data.get("message") || ""),
       company_site: String(data.get("company_site") || ""),
-      utm,
+      utm: query.utm,
     };
     if (!payload.building) {
       setError("Please tell us what you’re building.");
@@ -79,7 +109,7 @@ export default function ContactPage() {
         . {SITE.legal} · {SITE.location}.
       </p>
 
-      {interest === "Done-for-You Setup" && (
+      {interestValue === "Done-for-You Setup" && (
         <div className="panel mt-8 space-y-3 p-6">
           <h2 className="text-xl font-semibold text-[color:var(--text)]">Ready to start Done-for-You Setup?</h2>
           <p className="text-sm text-[color:var(--text-muted)]">
@@ -109,11 +139,15 @@ export default function ContactPage() {
         </div>
       )}
 
+      {query.note ? (
+        <p className="panel mt-8 p-4 text-sm text-[color:var(--text-muted)]">{query.note}</p>
+      ) : null}
+
       {status === "sent" ? (
         <div className="panel mt-10 space-y-3 p-6" role="status">
           <h2 className="text-2xl font-semibold text-[color:var(--text)]">Thanks — we’ve got it.</h2>
           <p className="text-[color:var(--text-muted)]">
-            Your message about <span className="text-[color:var(--electric-bright)]">{interest}</span> reached the
+            Your message about <span className="text-[color:var(--electric-bright)]">{interestValue}</span> reached the
             Pragvance team. We’ll reply to you by email within one business day.
           </p>
         </div>
@@ -155,7 +189,7 @@ export default function ContactPage() {
             id="interest"
             name="interest"
             className="mt-1 w-full rounded-lg border border-[color:var(--line)] bg-[color:var(--bg-elevated)] px-3 py-2 text-[color:var(--text)]"
-            value={interest}
+            value={interestValue}
             onChange={(e) => setInterest(e.target.value)}
           >
             {OFFERS.map((i) => (
@@ -189,6 +223,8 @@ export default function ContactPage() {
             rows={5}
             required
             maxLength={5000}
+            value={messageValue}
+            onChange={(e) => setMessage(e.target.value)}
             className="mt-1 w-full rounded-lg border border-[color:var(--line)] bg-[color:var(--bg-elevated)] px-3 py-2 text-[color:var(--text)]"
             placeholder="Tell us what you’re building…"
           />

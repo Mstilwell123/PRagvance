@@ -10,13 +10,16 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-[color:var(--line)] bg-[color:rgba(0,0,0,0.82)] backdrop-blur-md">
       <div className="section-pad mx-auto flex max-w-6xl items-center justify-between gap-4 py-3">
-        <Link href="/" className="flex items-center gap-3" aria-label="Pragvance home">
+        <Link href="/" className="flex shrink-0 items-center gap-3" aria-label="Pragvance home">
           <span className="text-sm font-semibold tracking-[0.12em] text-[color:var(--text)] md:text-base">
             PRAGVANCE<span className="text-[color:var(--gold)]">.AI</span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
+        <nav
+          className="hidden min-w-0 flex-1 flex-wrap items-center justify-end gap-x-1 gap-y-2 lg:flex"
+          aria-label="Primary"
+        >
           {NAV.filter((n) => n.href !== "/").map((item) => (
             <Link
               key={item.href}

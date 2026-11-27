@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { SITE } from "@/lib/site";
 import { isGiftBlackFridayUiEnabled, isGiftCheckoutUiEnabled, isGiftInstallmentUiEnabled } from "@/lib/checkout/gift-public";
@@ -126,19 +126,28 @@ const btnGhost =
   "inline-flex items-center justify-center rounded-full border border-[color:var(--line)] px-6 py-3 text-sm font-semibold text-[color:var(--text)] transition hover:bg-[color:var(--bg-panel)]";
 const kicker = "text-xs font-medium uppercase tracking-[0.2em] text-[color:var(--gold-bright)]";
 
+function checkoutBanner() {
+  const checkout = new URLSearchParams(window.location.search).get("checkout");
+  if (checkout === "success") {
+    return "Thanks. If your payment completed, we will follow up by email. This page does not confirm payment by itself.";
+  }
+  if (checkout === "canceled") {
+    return "Checkout was canceled. You can try again, or email support@pragvance.ai.";
+  }
+  return null;
+}
+
+function subscribeCheckout() {
+  return () => {};
+}
+
 export default function GiftEducationPage() {
   const [path, setPath] = useState<Path>("gift");
   const isGift = path === "gift";
   const checkoutOn = isGiftCheckoutUiEnabled();
   const blackFridayOn = isGiftBlackFridayUiEnabled();
   const installmentsOn = isGiftInstallmentUiEnabled();
-  const [banner, setBanner] = useState<string | null>(null);
-
-  useEffect(() => {
-    const q = new URLSearchParams(window.location.search).get("checkout");
-    if (q === "success") setBanner("Thanks. If your payment completed, we will follow up by email. This page does not confirm payment by itself.");
-    if (q === "canceled") setBanner("Checkout was canceled. You can try again, or email support@pragvance.ai.");
-  }, []);
+  const banner = useSyncExternalStore(subscribeCheckout, checkoutBanner, () => null);
 
   const faqs = FAQS.map((item) => {
     if (!checkoutOn) return item;
